@@ -1,0 +1,202 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Ocean",
+  "scopeName": "source.ocean",
+  "fileTypes": ["ocean", "oc"],
+  "patterns": [
+    { "include": "#comments" },
+    { "include": "#strings" },
+    { "include": "#keywords" },
+    { "include": "#types" },
+    { "include": "#constants" },
+    { "include": "#numbers" },
+    { "include": "#functions" },
+    { "include": "#operators" },
+    { "include": "#punctuation" }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.double-slash.ocean",
+          "match": "//.*$"
+        },
+        {
+          "name": "comment.block.ocean",
+          "begin": "/\\*",
+          "end": "\\*/"
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.triple.interpolated.ocean",
+          "begin": "\\$\"\"\"",
+          "end": "\"\"\"",
+          "patterns": [
+            { "include": "#interpolations" },
+            { "name": "constant.character.escape.ocean", "match": "\\\\." }
+          ]
+        },
+        {
+          "name": "string.quoted.triple.ocean",
+          "begin": "\"\"\"",
+          "end": "\"\"\"",
+          "patterns": [
+            { "name": "constant.character.escape.ocean", "match": "\\\\." }
+          ]
+        },
+        {
+          "name": "string.quoted.double.interpolated.ocean",
+          "begin": "\\$\"",
+          "end": "\"",
+          "patterns": [
+            { "include": "#interpolations" },
+            { "name": "constant.character.escape.ocean", "match": "\\\\." }
+          ]
+        },
+        {
+          "name": "string.quoted.double.ocean",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            { "name": "constant.character.escape.ocean", "match": "\\\\." }
+          ]
+        },
+        {
+          "name": "string.quoted.single.ocean",
+          "begin": "'",
+          "end": "'",
+          "patterns": [
+            { "name": "constant.character.escape.ocean", "match": "\\\\." }
+          ]
+        }
+      ]
+    },
+    "interpolations": {
+      "patterns": [
+        {
+          "name": "meta.interpolation.ocean",
+          "begin": "\\{",
+          "end": "\\}",
+          "beginCaptures": { "0": { "name": "punctuation.section.interpolation.begin.ocean" } },
+          "endCaptures": { "0": { "name": "punctuation.section.interpolation.end.ocean" } },
+          "patterns": [
+            { "include": "$self" }
+          ]
+        }
+      ]
+    },
+    "keywords": {
+      "patterns": [
+        {
+          "name": "keyword.declaration.variable.ocean",
+          "match": "\\b(variable|value)\\b"
+        },
+        {
+          "name": "keyword.declaration.function.ocean",
+          "match": "\\b(function|main)\\b"
+        },
+        {
+          "name": "keyword.declaration.class.ocean",
+          "match": "\\b(class|data|interface|enum|annotation)\\b"
+        },
+        {
+          "name": "keyword.control.ocean",
+          "match": "\\b(if|else|for|while|do|trying|catch|finally|switch|case|default|return|skip|stop|throw|throws|when|verify)\\b"
+        },
+        {
+          "name": "keyword.control.concurrency.ocean",
+          "match": "\\b(async|await|sync|lock|Task|ScopedValue)\\b"
+        },
+        {
+          "name": "keyword.other.range.ocean",
+          "match": "\\b(from|to|with|decreasing|increasing|in)\\b"
+        },
+        {
+          "name": "storage.modifier.ocean",
+          "match": "\\b(public|private|protected|static|final|abstract|sealed|non-sealed|restricts|native)\\b"
+        },
+        {
+          "name": "keyword.other.ocean",
+          "match": "\\b(import|package|extends|implements|new|super|this|instanceof|result|OceanInput|OceanOutput)\\b"
+        }
+      ]
+    },
+    "types": {
+      "patterns": [
+        {
+          "name": "storage.type.primitive.ocean",
+          "match": "\\b(bool|int|long|short|byte|float|double|char|void)\\b"
+        },
+        {
+          "name": "storage.type.standard.ocean",
+          "match": "\\b(String|OceanString|OceanList|OceanIntList|OceanMap|OceanSet|OceanFile|OceanDate|OceanTime|OceanHttp|OceanJson|OceanRegex|StrBuilder)\\b"
+        },
+        {
+          "name": "storage.type.class.ocean",
+          "match": "\\b[A-Z][a-zA-Z0-9_]*\\b"
+        }
+      ]
+    },
+    "constants": {
+      "patterns": [
+        {
+          "name": "constant.language.ocean",
+          "match": "\\b(true|false|null)\\b"
+        }
+      ]
+    },
+    "numbers": {
+      "patterns": [
+        {
+          "name": "constant.numeric.hex.ocean",
+          "match": "\\b0[xX][0-9a-fA-F_]+[lL]?\\b"
+        },
+        {
+          "name": "constant.numeric.bin.ocean",
+          "match": "\\b0[bB][01_]+[lL]?\\b"
+        },
+        {
+          "name": "constant.numeric.float.ocean",
+          "match": "\\b[0-9][0-9_]*\\.[0-9][0-9_]*([eE][+-]?[0-9]+)?[fFdD]?\\b"
+        },
+        {
+          "name": "constant.numeric.integer.ocean",
+          "match": "\\b[0-9][0-9_]*[lL]?\\b"
+        }
+      ]
+    },
+    "functions": {
+      "patterns": [
+        {
+          "match": "\\b([a-zA-Z_][a-zA-Z0-9_]*)\\s*(?=\\()",
+          "captures": {
+            "1": { "name": "entity.name.function.ocean" }
+          }
+        }
+      ]
+    },
+    "operators": {
+      "patterns": [
+        {
+          "name": "keyword.operator.ocean",
+          "match": "(\\?\\?|\\?\\.|\\->|\\.\\.|\\+\\+|\\-\\-|\\+=|\\-=|\\*=|/=|%=|&=|\\|=|\\^=|>>>=|>>=|<<=|==|!=|<=|>=|&&|\\|\\||!|<|>|\\+|-|\\*|/|%|=|&|\\||\\^|~)"
+        }
+      ]
+    },
+    "punctuation": {
+      "patterns": [
+        {
+          "name": "punctuation.separator.ocean",
+          "match": "[,;:]"
+        },
+        {
+          "name": "punctuation.bracket.ocean",
+          "match": "[\\(\\)\\{\\}\\[\\]]"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,25 @@
+import com.resources.denemeClass;
+
+class MapElementControlTest {
+
+    class DenemeMap<U , T <: Number> {
+        U key;
+        T val;
+        void function setKey(U u){
+            key = u;
+        }
+        void function setVal(T t) {
+            val = t;
+        }
+        public String function get() {
+            return key.toString()+" : "+val.toString();
+        }
+
+    }
+
+    main(){
+        // T <: Number olduğu için T = String geçersiz → DERLEME HATASI bekleniyor
+        DenemeMap<Integer,String> denemeMap = new DenemeMap<>();
+        denemeMap.setKey(70);
+    }
+}

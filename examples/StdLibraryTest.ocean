@@ -1,0 +1,94 @@
+package com.resources;
+
+class StdLibraryTest {
+    static int function testList() {
+        OceanList list = new OceanList();
+        list.add(10);
+        list.add(20);
+        list.add(30);
+        
+        int sum = 0;
+        for (int x in list) {
+            sum = sum + x;
+        }
+        return sum;
+    }
+
+    static int function testArrayFor() {
+        int[] arr = new int[3];
+        arr[0] = 5;
+        arr[1] = 10;
+        arr[2] = 15;
+        
+        int sum = 0;
+        for (int i in arr) {
+            sum = sum + i;
+        }
+        return sum;
+    }
+
+    static int function testMap() {
+        OceanMap map = new OceanMap();
+        map.put("score", 95);
+        map.put("level", 5);
+        
+        int score = map.get("score");
+        int level = map.get("level");
+        
+        return score + level;
+    }
+
+    static int function testString() {
+        String msg = "Ocean Compiler";
+        OceanList<String> parts = OceanString.split(msg, " ");
+        String w1 = parts.get(0);
+        String w2 = parts.get(1);
+        
+        int len1 = OceanString.length(w1);
+        int len2 = OceanString.length(w2);
+        
+        return len1 + len2; // Ocean (5) + Compiler (8) = 13
+    }
+    
+    static int function testFileIO() {
+        String testPath = "test_ocean_io.txt";
+        OceanFile.write(testPath, "100");
+        String content = OceanFile.read(testPath);
+        OceanFile.delete(testPath);
+        
+        if (content == "100") {
+            return 1;
+        }
+        return 0; // Return 0 if string comparison fails or IO failed
+    }
+
+    main() {
+        OceanOutput("--- STD Library Test ---");
+        
+        int listResult = testList();
+        OceanOutput("List Sum: ");
+        OceanOutput(listResult); // Expected 60
+        
+        int arrResult = testArrayFor();
+        OceanOutput("Array Sum: ");
+        OceanOutput(arrResult); // Expected 30
+        
+        int mapResult = testMap();
+        OceanOutput("Map Score+Level: ");
+        OceanOutput(mapResult); // Expected 100
+        
+        int strResult = testString();
+        OceanOutput("String Lengths: ");
+        OceanOutput(strResult); // Expected 13
+        
+        int ioResult = testFileIO();
+        OceanOutput("File IO Success: ");
+        OceanOutput(ioResult); // Expected 1
+        
+        if (listResult == 60 && arrResult == 30 && mapResult == 100 && strResult == 13 && ioResult == 1) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

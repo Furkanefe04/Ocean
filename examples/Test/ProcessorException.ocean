@@ -1,0 +1,16 @@
+package Test;
+
+class ProcessorException extends Exception {
+    Processor processor;
+
+    function ProcessorException(String message,Processor processor){
+        super(message);
+        this.processor = processor;
+    }
+
+    @Override
+    public String function getMessage(){
+        if(processor == null) return super.getMessage();
+        return super.getMessage() +". Processor name that caused error is "+ processor.name;
+    }
+}

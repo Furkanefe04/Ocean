@@ -1,0 +1,54 @@
+class HeavyCompilerTest2 {
+    main(){
+        T t = new T();
+
+        byte b = 5;
+        short s = 5;
+        int i = 5;
+        long l = 5L;
+        float f = 5.0f;
+        double d = 5.0d;
+        t.foo(b);
+        t.foo(s);
+        t.foo(i);
+        t.foo(l);
+        t.foo(f);
+        t.foo(d);
+
+        if (t.out == "byte;short;int;long;float;double;") {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}
+class T {
+    String out;
+    function T() {
+        out = "";
+    }
+    void function foo(byte x){
+        OceanOutput("byte");
+        out = out + "byte;";
+    }
+    void function foo(short x){
+        OceanOutput("short");
+        out = out + "short;";
+    }
+    void function foo(int x){
+        OceanOutput("int");
+        out = out + "int;";
+    }
+    void function foo(long x){
+        OceanOutput("long");
+        out = out + "long;";
+    }
+    void function foo(double x){
+        OceanOutput("double");
+        out = out + "double;";
+    }
+    void function foo(float x){
+        OceanOutput("float");
+        out = out + "float;";
+    }
+}

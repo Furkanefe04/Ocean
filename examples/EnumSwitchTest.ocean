@@ -1,0 +1,45 @@
+package com.resources;
+enum Colors {
+    RED,
+    GREEN,
+    BLUE
+}
+
+class EnumSwitchTest {
+    main() {
+        variable c = Colors.GREEN;
+        bool greenMatched = false;
+        bool blueMatched = false;
+        bool defaultMatched = false;
+        bool dBlueMatched = false;
+
+        switch (c) {
+            case Colors.RED:
+                OceanOutput("Red color matched!");
+            case Colors.GREEN:
+                greenMatched = true;
+                OceanOutput("Green color matched!");
+            case Colors.BLUE:
+                blueMatched = true;
+                OceanOutput("Blue color matched!");
+            default:
+                defaultMatched = true;
+                OceanOutput("Unknown color!");
+        }
+
+        variable d = Colors.BLUE;
+        switch (d) {
+            case Colors.RED:
+                OceanOutput("Red color matched!");
+            case Colors.BLUE:
+                dBlueMatched = true;
+                OceanOutput("Blue color matched!");
+        }
+
+        if (greenMatched && blueMatched && defaultMatched && dBlueMatched) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

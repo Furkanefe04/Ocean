@@ -1,0 +1,5 @@
+package com.resources;
+
+interface FuncInterface {
+    int function apply(Object x,Object y);
+}

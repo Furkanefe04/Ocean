@@ -1,0 +1,22 @@
+package com.resources;
+
+import java.util.Scanner;
+
+class InputOutputStressTest {
+    main() {
+        OceanOutput("=== INPUT OUTPUT STRESS TEST START ===");
+
+        OceanOutput(); // Test zero-argument empty line print
+        OceanOutput("Single argument print test");
+        OceanOutput("Multiple arguments test:", "Arg1", "Arg2", 123, true);
+
+        Scanner sc = OceanInput;
+        OceanOutput("Scanner object acquired successfully: " + sc.getClass().getName());
+
+        if (sc != null && sc.getClass().getName() == "java.util.Scanner") {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

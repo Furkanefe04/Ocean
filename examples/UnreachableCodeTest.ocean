@@ -1,0 +1,43 @@
+package tests;
+
+import java.lang.RuntimeException;
+import java.lang.Exception;
+
+class UnreachableCodeTest {
+
+    static int function testAfterReturn() {
+        return 1;
+        OceanOutput("This is unreachable"); // Warning here
+    }
+
+    static int function testAfterIfElse(bool cond) {
+        if (cond) {
+            return 1;
+        } else {
+            return 1;
+        }
+        OceanOutput("This is also unreachable"); // Warning here
+    }
+
+    static int function testAfterTryCatch() {
+        trying {
+            throw new RuntimeException("error");
+        } catch (Exception e) {
+            return 1;
+        }
+        OceanOutput("This is also unreachable"); // Warning here
+    }
+
+    static main() {
+        OceanOutput("=== UnreachableCodeTest START ===");
+        int r1 = testAfterReturn();
+        int r2 = testAfterIfElse(true);
+        int r3 = testAfterTryCatch();
+        OceanOutput("[+] DONE");
+        if (r1 == 1 && r2 == 1 && r3 == 1) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

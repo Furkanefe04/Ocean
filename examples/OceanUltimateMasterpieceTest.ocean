@@ -1,0 +1,465 @@
+package com.ultimate;
+
+import java.util.concurrent.CompletableFuture;
+
+public annotation DatabaseEntity {
+    String tableName();
+    int cacheSize();
+}
+
+
+public annotation SecuredAction {
+    String requiredRole();
+    bool auditRequired();
+}
+
+
+public annotation Auditable {
+    String category();
+}
+
+
+public sealed interface TransactionEvent restricts
+    TxStartedEvent,
+    TxValidatedEvent,
+    TxCalculatedEvent,
+    TxSavedEvent,
+    TxCompletedEvent,
+    TxFailedEvent {}
+
+public final class TxStartedEvent implements TransactionEvent {
+    public int txId;
+    public long timestamp;
+
+    public function TxStartedEvent(int txId, long timestamp) {
+        this.txId = txId;
+        this.timestamp = timestamp;
+    }
+
+    public int function getTxId() {
+        return txId;
+    }
+
+    public long function getTimestamp() {
+        return timestamp;
+    }
+}
+
+public final class TxValidatedEvent implements TransactionEvent {
+    public int txId;
+    public bool isValid;
+    public String valMsg;
+
+    public function TxValidatedEvent(int txId, bool isValid, String valMsg) {
+        this.txId = txId;
+        this.isValid = isValid;
+        this.valMsg = valMsg;
+    }
+
+    public int function getTxId() {
+        return txId;
+    }
+
+    public bool function getIsValid() {
+        return isValid;
+    }
+
+    public String function getValMsg() {
+        return valMsg;
+    }
+}
+
+public final class TxCalculatedEvent implements TransactionEvent {
+    public int txId;
+    public double totalValue;
+
+    public function TxCalculatedEvent(int txId, double totalValue) {
+        this.txId = txId;
+        this.totalValue = totalValue;
+    }
+
+    public int function getTxId() {
+        return txId;
+    }
+
+    public double function getTotalValue() {
+        return totalValue;
+    }
+}
+
+public final class TxSavedEvent implements TransactionEvent {
+    public int txId;
+    public String dbTable;
+
+    public function TxSavedEvent(int txId, String dbTable) {
+        this.txId = txId;
+        this.dbTable = dbTable;
+    }
+
+    public int function getTxId() {
+        return txId;
+    }
+
+    public String function getDbTable() {
+        return dbTable;
+    }
+}
+
+public final class TxCompletedEvent implements TransactionEvent {
+    public int txId;
+    public long duration;
+
+    public function TxCompletedEvent(int txId, long duration) {
+        this.txId = txId;
+        this.duration = duration;
+    }
+
+    public int function getTxId() {
+        return txId;
+    }
+
+    public long function getDuration() {
+        return duration;
+    }
+}
+
+public final class TxFailedEvent implements TransactionEvent {
+    public int txId;
+    public String errorMsg;
+
+    public function TxFailedEvent(int txId, String errorMsg) {
+        this.txId = txId;
+        this.errorMsg = errorMsg;
+    }
+
+    public int function getTxId() {
+        return txId;
+    }
+
+    public String function getErrorMsg() {
+        return errorMsg;
+    }
+}
+
+
+public data class Product(int id, String name, double price, int stock);
+
+public data class Order(int orderId, int customerId, int productId, int quantity, String? promoCode);
+
+public data class AuditRecord(int txId, String user, String operation, String status, long timestamp);
+
+// Generic repository implementation
+public class GenericRepository<T> {
+    public OceanList<T> items;
+    public int count;
+
+    public function GenericRepository() {
+        // Initialize with default size
+        items = new OceanList(count);
+        count = 0;
+    }
+
+    public void function add(T item) {
+        items.add(item);
+        count = count + 1;
+    }
+
+    public T? function get(int index) {
+        if (index >= 0 && index < count) {
+            return items.get(index);
+        }
+        return null;
+    }
+
+    public int function size() {
+        return count;
+    }
+
+    public void function clear() {
+        count = 0;
+    }
+}
+
+
+
+// Static extension methods class
+public class SystemExtensions {
+    // String extension method
+    public static String String.function wrapInStars() {
+        return "*** " + this + " ***";
+    }
+
+    // CompletableFuture extension method
+    public static async String CompletableFuture<String>.function awaitWithSuffix(String suffix) {
+        String val = await this;
+        return val + suffix;
+    }
+
+    // CompletableFuture extension method for doubles
+    public static async double CompletableFuture<Double>.function awaitAndScale(double factor) {
+        double val = await this;
+        return val * factor;
+    }
+}
+
+// Base class for transaction processing engine
+public class BaseEngine {
+    public String engineName;
+    public int processedCount;
+
+    public function BaseEngine(String name) {
+        engineName = name;
+        processedCount = 0;
+    }
+
+    public async String function getEngineNameAsync() {
+        return "Engine: " + engineName;
+    }
+
+    public async bool function checkBaseValidation(int id) {
+        if (id <= 0) {
+            return false;
+        }
+        return true;
+    }
+}
+
+@DatabaseEntity(tableName = "ultimate_tx_logs", cacheSize = 1024)
+public class AdvancedEngine extends BaseEngine {
+    public GenericRepository<AuditRecord> auditRepo;
+    public GenericRepository<TransactionEvent> eventLog;
+    public String currentRole;
+
+    public function AdvancedEngine(String name) {
+        super(name);
+        auditRepo = new GenericRepository<AuditRecord>();
+        eventLog = new GenericRepository<TransactionEvent>();
+        currentRole = "USER";
+    }
+
+    public void function setRole(String role) {
+        currentRole = role;
+    }
+
+    @SecuredAction(requiredRole = "ADMIN", auditRequired = true)
+    public async bool function validateSecurity() {
+        String role = currentRole;
+        if (role.equals("ADMIN")) {
+            return true;
+        }
+        return false;
+    }
+
+    // Async method utilizing super calls and recursive generic lookups
+    public async bool function processTransactionPipeline(Order order) {
+        int txId = order.getOrderId();
+        
+        // Use super call inside async method
+        bool baseValid = await super.checkBaseValidation(txId);
+        if (!baseValid) {
+            eventLog.add(new TxFailedEvent(txId, "Invalid transaction ID (failed base check)"));
+            return false;
+        }
+
+        // Log start event
+        eventLog.add(new TxStartedEvent(txId, System.currentTimeMillis()));
+
+        // Validate promo code via null-coalescing
+        String promo = order.getPromoCode() ?? "NONE";
+        bool isPromoValid = true;
+        if (promo.equals("FAIL_PROMO")) {
+            isPromoValid = false;
+        }
+
+        eventLog.add(new TxValidatedEvent(txId, isPromoValid, "Promo validation: " + promo));
+        if (!isPromoValid) {
+            eventLog.add(new TxFailedEvent(txId, "Promotion code validation failed"));
+            return false;
+        }
+
+        return true;
+    }
+
+    public async double function calculateOrderValue(Product p, Order o) {
+        double baseVal = p.getPrice() * (double) o.getQuantity();
+        String promo = o.getPromoCode() ?? "NONE";
+
+        // Switch expression for discount
+        double discount = switch(promo) {
+            case "SAVE10" -> 0.10
+            case "SAVE20" -> 0.20
+            case "VIP50"  -> 0.50
+            default      -> 0.00
+        };
+
+        double finalVal = baseVal * (1.00 - discount);
+        eventLog.add(new TxCalculatedEvent(o.getOrderId(), finalVal));
+        return finalVal;
+    }
+
+    public async void function saveToDatabase(int txId) {
+        // Simulate database save
+        eventLog.add(new TxSavedEvent(txId, "ultimate_tx_logs"));
+        auditRepo.add(new AuditRecord(txId, currentRole, "TX_SAVE", "SUCCESS", System.currentTimeMillis()));
+    }
+}
+
+public class OceanUltimateMasterpieceTest {
+
+    public static async void function runStressTest() {
+        OceanOutput("[SYSTEM] Initializing Advanced Engine...");
+        AdvancedEngine engine = new AdvancedEngine("UltimateEngine-V4");
+
+        // Set products
+        Product p1 = new Product(101, "Elite Laptop", 1500.0, 10);
+        Product p2 = new Product(102, "Super Smartphone", 800.0, 25);
+        Product p3 = new Product(103, "Mechanical Keyboard", 150.0, 50);
+
+        // Set orders
+        Order o1 = new Order(1, 1001, 101, 2, "SAVE10");   // Valid (discount 10%)
+        Order o2 = new Order(2, 1002, 102, 1, "FAIL_PROMO");// Fails validation
+        Order o3 = new Order(3, 1003, 103, 5, null);       // Valid (no discount, null promo)
+        Order o4 = new Order(4, 1004, 101, 1, "VIP50");     // Valid (discount 50%)
+        Order o5 = new Order(-5, 1005, 102, 3, "SAVE20");   // Fails base validation (negative ID)
+
+        Order[] orders = new Order[5];
+        orders[0] = o1;
+        orders[1] = o2;
+        orders[2] = o3;
+        orders[3] = o4;
+        orders[4] = o5;
+
+        // Perform processing with sync/lock simulator block
+        for (int i from 0 to 5 with increasing 1) {
+            Order o = orders[i];
+            int orderId = o.getOrderId();
+            OceanOutput("[PROCESS] Executing pipeline for Order ID: " + orderId);
+
+            trying {
+                variable successFut = engine.processTransactionPipeline(o);
+                bool success = await successFut;
+
+                if (success) {
+                    Product? currentProd = switch(o.getProductId()) {
+                        case 101 -> p1
+                        case 102 -> p2
+                        case 103 -> p3
+                        default  -> null
+                    };
+
+                    if (currentProd != null) {
+                        variable valFut = engine.calculateOrderValue(currentProd, o);
+                        double finalVal = await valFut;
+                        OceanOutput("[CALC] Calculated value: $" + finalVal);
+
+                        // Save to database
+                        variable saveFut = engine.saveToDatabase(orderId);
+                        await saveFut;
+
+                        engine.eventLog.add(new TxCompletedEvent(orderId, 120L));
+                        OceanOutput("[COMPLETE] Completed Order ID: " + orderId);
+                    } else {
+                        engine.eventLog.add(new TxFailedEvent(orderId, "Product not found"));
+                    }
+                } else {
+                    OceanOutput("[FAILED] Pipeline aborted for Order ID: " + orderId);
+                }
+            } catch (Exception e) {
+                engine.eventLog.add(new TxFailedEvent(orderId, "Pipeline execution error: " + e.getMessage()));
+                OceanOutput("[ERROR] Caught exception for Order ID: " + orderId + " - " + e.getMessage());
+            }
+        }
+
+        // Verification phase
+        OceanOutput("[VERIFY] Commencing Reflection & Metadata checks...");
+
+        bool hasEntity = false;
+        bool isSealed = false;
+
+        trying {
+            // 1. Verify custom annotations on AdvancedEngine
+            java.lang.Class cClazz = engine.getClass();
+            java.lang.ClassLoader loader = cClazz.getClassLoader();
+            
+            variable dbEntityAnnoClass = loader.loadClass("com.ultimate.DatabaseEntity");
+            hasEntity = cClazz.isAnnotationPresent(dbEntityAnnoClass);
+            OceanOutput("AdvancedEngine has DatabaseEntity: " + hasEntity);
+
+            if (hasEntity) {
+                DatabaseEntity dbAnn = (DatabaseEntity) cClazz.getAnnotation(dbEntityAnnoClass);
+                OceanOutput("Database Table: " + dbAnn.tableName());
+                OceanOutput("Cache Size: " + dbAnn.cacheSize());
+            }
+
+            // 2. Verify sealed interfaces
+            java.lang.Class eventClazz = loader.loadClass("com.ultimate.TransactionEvent");
+            isSealed = eventClazz.isSealed();
+            OceanOutput("TransactionEvent isSealed: " + isSealed);
+
+            if (isSealed) {
+                java.lang.Class[] permitted = eventClazz.getPermittedSubclasses();
+                OceanOutput("Permitted subclasses count: " + permitted.length);
+                for (int i from 0 to permitted.length with increasing 1) {
+                    OceanOutput("  - Permitted subclass: " + permitted[i].getName());
+                }
+            }
+        } catch (Exception e) {
+            OceanOutput("Reflection error: " + e.getMessage());
+        }
+
+        // 3. Verify extension methods usage
+        String engineTitle = "Ocean Engine";
+        String starredTitle = engineTitle.wrapInStars();
+        OceanOutput("Extension String Result: " + starredTitle);
+
+        CompletableFuture<String> stringFuture = CompletableFuture.completedFuture("FutureValue");
+        variable extStrFut = stringFuture.awaitWithSuffix(" [SUFFIXED]");
+        String extStrVal = await extStrFut;
+        OceanOutput("Extension Future String: " + extStrVal);
+
+        CompletableFuture<Double> doubleFuture = CompletableFuture.completedFuture(100.0);
+        variable extDblFut = doubleFuture.awaitAndScale(2.5);
+        double extDblVal = await extDblFut;
+        OceanOutput("Extension Future Double: " + extDblVal);
+
+        // 4. Summarize logs
+        int totalEvents = engine.eventLog.size();
+        OceanOutput("Total logged transaction events: " + totalEvents);
+
+        int completedCount = 0;
+        int failedCount = 0;
+        double sumValues = 0.0;
+
+        for (int i from 0 to totalEvents with increasing 1) {
+            TransactionEvent? ev = engine.eventLog.get(i);
+            if (ev instanceof TxCompletedEvent) {
+                completedCount = completedCount + 1;
+            } else if (ev instanceof TxFailedEvent) {
+                failedCount = failedCount + 1;
+            } else if (ev instanceof TxCalculatedEvent) {
+                TxCalculatedEvent cev = (TxCalculatedEvent) ev;
+                sumValues = sumValues + cev.getTotalValue();
+            }
+        }
+
+        OceanOutput("Completed transactions: " + completedCount);
+        OceanOutput("Failed transactions: " + failedCount);
+        OceanOutput("Sum of order values: $" + sumValues);
+
+        // Ultimate validation assertions
+        if (hasEntity && isSealed && completedCount == 3 && failedCount == 2 && sumValues == 4200.0) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+
+    main() {
+        OceanOutput("=========================================================");
+        OceanOutput("===          OCEAN ULTIMATE MASTERPIECE STRESS TEST   ===");
+        OceanOutput("=========================================================");
+        variable f = runStressTest();
+        f.join();
+        OceanOutput("=========================================================");
+    }
+}

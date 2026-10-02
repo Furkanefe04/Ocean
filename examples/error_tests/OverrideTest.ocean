@@ -1,0 +1,21 @@
+package pkg_test;
+
+class Base {
+    public void function show() {
+        Output("Base show");
+    }
+}
+
+class Derived extends Base {
+    @Override
+    public void function show(String msg) {
+        Output("Derived show: " + msg);
+    }
+}
+
+class OverrideTest {
+    main() {
+        Base b = new Derived();
+        b.show();
+    }
+}

@@ -1,0 +1,81 @@
+package com.resources;
+
+
+import java.util.concurrent.CompletableFuture;
+import java.util.NoSuchElementException;
+
+public class ScopedValueComprehensiveTest {
+
+    public static ScopedValue USER_ID = ScopedValue.newInstance();
+    public static ScopedValue TENANT_ID = ScopedValue.newInstance();
+    public static ScopedValue REQUEST_ID = ScopedValue.newInstance();
+
+    public static String function getContextSummary() {
+        String u = (String) USER_ID.orElse("Anonymous");
+        String t = (String) TENANT_ID.orElse("DefaultTenant");
+        String r = (String) REQUEST_ID.orElse("None");
+        return "Tenant:" + t + ", User:" + u + ", Req:" + r;
+    }
+
+    public static async String function asyncTask(String taskName) {
+        String summary = getContextSummary();
+        bool isVirt = Task.isVirtual();
+        return taskName + " [" + summary + "] (Virtual=" + isVirt + ")";
+    }
+
+    public static async void function runComprehensiveSuite() {
+        OceanOutput("=== SCOPED VALUES COMPREHENSIVE TEST ===");
+
+        // 1. Unbound state
+        OceanOutput("Initial: " + getContextSummary());
+
+        // 2. Multi-carrier binding
+        ScopedValue.where(TENANT_ID, "ACME_CORP")
+                   .where(USER_ID, "john_doe")
+                   .where(REQUEST_ID, "req-1001")
+                   .run(() -> {
+                       OceanOutput("Bound level 1: " + getContextSummary());
+
+                       // 3. Re-binding in nested scope
+                       ScopedValue.where(USER_ID, "admin_override")
+                                  .where(REQUEST_ID, "req-nested-2002")
+                                  .run(() -> {
+                                      OceanOutput("Nested override: " + getContextSummary());
+                                  });
+
+                       OceanOutput("Restored level 1: " + getContextSummary());
+
+                       // 4. Virtual Thread propagation
+                       CompletableFuture f1 = asyncTask("TaskA");
+                       CompletableFuture f2 = asyncTask("TaskB");
+
+                       String r1 = (String) await f1;
+                       String r2 = (String) await f2;
+
+                       OceanOutput(r1);
+                       OceanOutput(r2);
+                   });
+
+        // 5. Post-scope verification
+        OceanOutput("After scope: " + getContextSummary());
+
+        // 6. Safety exception test
+        bool caught = false;
+        trying {
+            ScopedValue isolated = ScopedValue.newInstance();
+            isolated.get();
+        } catch (Exception e) {
+            caught = true;
+        }
+
+        if (caught) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+
+    static main() {
+        runComprehensiveSuite().join();
+    }
+}

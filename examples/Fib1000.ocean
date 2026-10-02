@@ -1,0 +1,34 @@
+package com.resources;
+import java.math.BigInteger;
+
+class Fib1000 {
+     main() {
+        BigInteger a = BigInteger.ZERO;
+        BigInteger b = BigInteger.ONE;
+        
+        OceanOutput("Fibonacci serisi 1000. elemana kadar hesaplaniyor...");
+
+        for (int i from 2 to 1000 with increasing 1) {
+            BigInteger temp = a.add(b);
+            a = b;
+            b = temp;
+            
+            if (i % 200 == 0) {
+                String str = b.toString();
+                OceanOutput("Fib(" + i + ") yaklasik: " + str.substring(0, 15) + "... (" + str.length() + " basamak)");
+            }
+        }
+        
+        OceanOutput("--------------------------------------------------");
+        OceanOutput("1000. Fibonacci Sayisi Hesaplanti:");
+        OceanOutput(b.toString());
+        OceanOutput("--------------------------------------------------");
+        OceanOutput("Toplam Basamak Sayisi: " + b.toString().length());
+
+        if (b.toString() == "26863810024485359386146727202142923967616609318986952340123175997617981700247881689338369654483356564191827856161443356312976673642210350324634850410377680367334151172899169723197082763985615764450078474174626") {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

@@ -1,0 +1,21 @@
+public class StaticInitializationOrder {
+    static int trace = 1;
+    static {
+        trace = trace * 10 + 2;
+    }
+
+    static int third = trace = trace * 10 +3;
+
+    public static int function val() {
+        return trace;
+    }
+
+    main(){
+        if (third == 123){
+            OceanOutput("STATUS: PASSED");
+        }
+        else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

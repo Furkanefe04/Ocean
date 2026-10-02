@@ -1,0 +1,12 @@
+package com.resources;
+
+class AsyncReturnTypeErrorTest {
+    public static async String function fetchString() {
+        return "hello";
+    }
+
+    public static async void function main() {
+        // Assigning await String to int variable MUST trigger compile-time semantic error!
+        int x = await fetchString();
+    }
+}

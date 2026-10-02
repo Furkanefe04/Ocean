@@ -1,0 +1,121 @@
+package duplicate;
+
+public class DuplicateClassTest {
+
+    // ROOT
+    class NodeA {
+
+        // NodeA.NodeB
+        class NodeB {
+
+            // Duplicate #1
+            class DuplicateClassTest {
+            }
+
+            class NodeC {
+
+                // Duplicate #2
+                class DuplicateClassTest {
+                }
+
+                class NodeD {
+
+                    // Duplicate #3
+                    class DuplicateClassTest {
+                    }
+                }
+            }
+        }
+    }
+
+
+    // İkinci bağımsız dal
+    class NodeE {
+
+        class NodeF {
+
+            // Duplicate #4
+            class DuplicateClassTest {
+            }
+
+            class NodeG {
+
+                class NodeH {
+
+                    // Duplicate #5
+                    class DuplicateClassTest {
+                    }
+                }
+            }
+        }
+    }
+
+
+    // Daha geniş dallanma
+    class NodeI {
+
+        class NodeJ {
+
+            class NodeK {
+
+                // Duplicate #6
+                class DuplicateClassTest {
+                }
+
+                class NodeL {
+
+                    // Duplicate #7
+                    class DuplicateClassTest {
+                    }
+                }
+            }
+        }
+
+        class NodeM {
+
+            // Duplicate #8
+            class DuplicateClassTest {
+            }
+        }
+    }
+
+
+    // Aynı isimli inner class'ların farklı parent zincirlerinde olması
+    class NodeN {
+
+        class DuplicateClassTest1 {
+
+            // Duplicate #9
+            class DuplicateClassTest {
+            }
+
+            class Deep {
+
+                class DuplicateClassTest2 {
+
+                    // Duplicate #10
+                    class DuplicateClassTest {
+                    }
+                }
+            }
+        }
+    }
+
+
+    // Bir dalda DuplicateClassTest1 de duplicate olsun
+    class NodeO {
+
+        class DuplicateClassTest1 {
+
+            class DuplicateClassTest {
+            }
+        }
+
+        class NodeP {
+
+            // DuplicateClassTest1 açısından da duplicate
+            class DuplicateClassTest1 {
+            }
+        }
+    }
+}

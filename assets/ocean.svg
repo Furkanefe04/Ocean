@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 16 16">
+  <defs>
+    <linearGradient id="oceanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00C6FF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0072FF;stop-opacity:1" />
+    </linearGradient>
+    <clipPath id="circleClip">
+      <circle cx="8" cy="8" r="8" />
+    </clipPath>
+  </defs>
+  
+  <!-- Outer High-Premium Ring -->
+  <circle cx="8" cy="8" r="8" fill="#FFFFFF" />
+  
+  <!-- Base depth -->
+  <circle cx="8" cy="8" r="7.2" fill="#003D5B" />
+  
+  <!-- Main Gradient Surface -->
+  <circle cx="8" cy="8" r="6.5" fill="url(#oceanGrad)" />
+  
+  <!-- Wave Graphics -->
+  <g clip-path="url(#circleClip)">
+    <path fill="#FFFFFF" opacity="0.4" d="M-2,10 C1,8 4,8 7,10 C10,12 13,12 16,10 L16,16 L-2,16 Z"/>
+    <path fill="#FFFFFF" opacity="0.2" d="M0,7 C3,5 6,5 9,7 C12,9 15,9 18,7 L18,12 L0,12 Z"/>
+  </g>
+  
+  <!-- Glass effect ring -->
+  <circle cx="8" cy="8" r="5" fill="none" stroke="#FFFFFF" stroke-width="0.2" opacity="0.4" />
+</svg>

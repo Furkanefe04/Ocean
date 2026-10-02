@@ -1,0 +1,167 @@
+package com.resources;
+
+import java.lang.Object;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.math.BigDecimal;
+import java.io.File;
+import java.lang.Thread;
+import java.lang.Runnable;
+import java.lang.Exception;
+import java.io.IOException;
+
+// --- 1. Inheritance & Interfaces ---
+abstract class Device {
+    variable id = 0;
+    variable status = "OFF";
+
+    function Device(int id) {
+        this.id = id;
+    }
+
+    abstract void function powerOn();
+}
+
+class SmartPhone extends Device implements Runnable {
+    variable model = "";
+    variable battery = 100;
+
+    function SmartPhone(int id, String model) {
+        super(id);
+        this.model = model;
+    }
+
+    void function powerOn() {
+        status = "ON";
+        Output("SmartPhone " + model + " is powering up...");
+    }
+
+    void function run() {
+        Output("Task running on SmartPhone " + model);
+    }
+}
+
+// --- 2. Logic & Math Wizard ---
+class MegaMath {
+    static int function factorial(int n) {
+        if (n <= 1) { return 1; }
+        return n * factorial(n - 1);
+    }
+
+    static int function bitTest(int a, int b) {
+        variable x = a << 2;
+        variable y = b >> 1;
+        return (x | y) ^ (a & b);
+    }
+}
+
+// --- 3. Main Stress Test ---
+class OceanMegaStressTest {
+    static main() {
+        Output("=============================================");
+        Output("   OCEAN MEGA COMPREHENSIVE STRESS TEST      ");
+        Output("=============================================");
+
+        // --- TEST 1: Collections & Interop ---
+        Output("\n[TEST 1] Collections & BigDecimal");
+        variable list = new ArrayList();
+        list.add("Ocean");
+        list.add("Derleyici");
+        list.add("Test");
+        Output("List size: " + list.size());
+
+        variable map = new HashMap();
+        map.put("ver", "1.0-MEGA");
+        map.put("status", "STABLE");
+        Output("Version: " + map.get("ver"));
+
+        variable bd1 =(Object) new BigDecimal("100.50");
+        variable bd2 = new BigDecimal("50.25");
+        variable res = ((BigDecimal)bd1).add(bd2);
+        Output("BigDecimal Sum: " + res.toString());
+
+        // --- TEST 2: Exception Handling ---
+        Output("\n[TEST 2] Try-Catch-Finally");
+        trying {
+            Output("Starting try block...");
+            /*if (1 > 0) {
+                Output("Condition true, block flow OK.");
+            }*/
+        } catch (IOException e) {
+            Output("Caught: " + e.getMessage());
+        } finally {
+            Output("Finally block executed.");
+        }
+
+        // --- TEST 3: Switch & Loops ---
+        Output("\n[TEST 3] Switch & Control Flow");
+        int mode = 2;
+        switch (mode) {
+            case 1: Output("Mode 1 selected");
+            case 2: Output("Mode 2 selected");
+            default: Output("Default mode selected");
+        }
+
+        int sum = 0;
+        for (int i from 1 to 10 with increasing 1) {
+            sum = sum + i;
+        }
+        Output("Sum 1-10: " + sum);
+
+        // --- TEST 4: Concurrency ---
+        Output("\n[TEST 4] Threads & Lock");
+        variable phone = new SmartPhone(101, "OceanPhone-X");
+        phone.powerOn();
+        
+        variable t = new Thread(phone);
+        t.start();
+        trying {
+            t.join();
+        } catch (Exception e) {
+            Output("Thread join interrupted: " + e.getMessage());
+        }
+
+        phone.battery = 95;
+        Output("Battery level updated: " + phone.battery);
+
+        // --- TEST 5: Advanced Ops ---
+        Output("\n[TEST 5] Safe Dot & Null Coalesce");
+        variable nullableStr = (Object) null;
+        variable finalVal = nullableStr?.toString() ?? "Fallback Value";
+        Output("Null Coalesce Result: " + finalVal);
+
+        variable bits = MegaMath.bitTest(10, 5);
+        Output("Bitwise Test Result (10, 5): " + bits);
+
+        // --- TEST 6: File System ---
+        Output("\n[TEST 6] File System Interop");
+        variable f = new File("mega_test.tmp");
+        Output("Temp File Object Created: " + f.getName());
+
+        // --- TEST 7: Recursion ---
+        Output("\n[TEST 7] Deep Recursion (Factorial)");
+        int fact5 = MegaMath.factorial(5);
+        Output("Factorial(5) = " + fact5);
+        if (fact5 == 120) { Output("Factorial Verification: SUCCESS"); }
+        Output("\n=============================================");
+        Output("   MEGA STRESS TEST COMPLETED SUCCESSFULLY!  ");
+        Output("=============================================");
+
+        bool success = (list.size() == 3) &&
+                       "1.0-MEGA".equals(map.get("ver")) &&
+                       "150.75".equals(res.toString()) &&
+                       (sum == 45) &&
+                       "ON".equals(phone.status) &&
+                       (phone.battery == 95) &&
+                       "Fallback Value".equals(finalVal) &&
+                       (bits == 42) &&
+                       "mega_test.tmp".equals(f.getName()) &&
+                       (fact5 == 120);
+
+        if (success) {
+            Output("STATUS: PASSED");
+        } else {
+            Output("STATUS: FAILED");
+        }
+    }
+}

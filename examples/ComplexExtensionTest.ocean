@@ -1,0 +1,49 @@
+package com.resources;
+
+class NumberExtensions {
+    public int int.function multiplyBy(int factor) {
+        return this * factor;
+    }
+    
+    public String int.function repeatString(String s) {
+        String resultx = "";
+        for (int i from 0 to this with increasing 1) {
+            resultx = resultx + s;
+        }
+        return resultx;
+    }
+}
+
+class StringUtils {
+    public String String.function surround(String prefix, String suffix) {
+        return prefix + this + suffix;
+    }
+}
+
+class ComplexExtensionTest {
+    static main() {
+        OceanOutput("--- Complex Extension Test ---");
+        
+        int x = 10;
+        int y = x.multiplyBy(3);
+        OceanOutput("10 multiplied by 3 is: " + y);
+        
+        int count = 3;
+        String repeated = count.repeatString("Abc");
+        OceanOutput("3 repeated 'Abc' is: " + repeated);
+        
+        String name = "Ocean";
+        String surrounded = name.surround("[", "]");
+        OceanOutput("Ocean surrounded: " + surrounded);
+        
+        OceanOutput("Chaining tests:");
+        String chained = 2.repeatString("X").surround("(", ")");
+        OceanOutput("2.repeatString('X').surround('(', ')') results in: " + chained);
+        
+        if (y == 30 && repeated.equals("AbcAbcAbc") && surrounded.equals("[Ocean]") && chained.equals("(XX)")) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

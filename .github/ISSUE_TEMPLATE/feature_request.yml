@@ -1,0 +1,31 @@
+name: Feature Proposal / RFC
+description: Suggest an idea or language proposal for Ocean
+title: "[RFC]: "
+labels: ["enhancement", "rfc"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        We welcome new language proposals, compiler optimizations, and stdlib enhancements!
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or Motivation
+      description: Is your feature request related to a problem or a missing language feature?
+    validations:
+      required: true
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: Proposed Syntax or API Design
+      description: Describe the proposed syntax, semantics, or API with Ocean code examples.
+      render: ocean
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Describe any alternative solutions or workarounds you considered.
+    validations:
+      required: false

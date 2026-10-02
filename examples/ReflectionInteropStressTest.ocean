@@ -1,0 +1,28 @@
+package com.resources;
+
+import java.util.*;
+
+class ReflectionInteropStressTest {
+    main() {
+        OceanOutput("=== REFLECTION INTEROP STRESS TEST START ===");
+
+        ArrayList<String> list = new ArrayList<String>();
+        list.add("Ocean");
+        list.add("Compiler");
+        OceanOutput("ArrayList size: " + list.size());
+        OceanOutput("ArrayList item 0: " + list.get(0));
+
+        HashMap<String, Integer> map = new HashMap<String, Integer>();
+        map.put("Key1", 100);
+        OceanOutput("Map get Key1: " + map.get("Key1"));
+
+        OceanOutput("=== REFLECTION INTEROP STRESS TEST COMPLETED ===");
+        bool checkList = (list.size() == 2) && (list.get(0) == "Ocean");
+        bool checkMap = (map.get("Key1").toString() == "100");
+        if (checkList && checkMap) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

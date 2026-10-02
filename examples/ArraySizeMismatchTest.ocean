@@ -1,0 +1,8 @@
+package com.resources;
+
+class ArraySizeMismatchTest {
+    main() {
+        variable arr = new int["hello"]; // Invalid: String size for array
+        OceanOutput("Array created successfully?");
+    }
+}

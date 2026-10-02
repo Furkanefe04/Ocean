@@ -1,0 +1,12 @@
+package com.pkg5;
+
+public class FinalizerClass {
+    main(String[] args) {
+        OceanOutput("--- FINALIZER CLASS ---");
+        String? val = args[0]; // sıkıntı çıkarabiliyor
+        String? origin = args[1];
+        OceanOutput("FinalizerClass finalizing: " + val + " finalized by: " + origin);
+        
+        OceanOutput("★ PIPELINE SUCCESS: " + val + " ★");
+    }
+}

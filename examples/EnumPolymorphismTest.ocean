@@ -1,0 +1,26 @@
+interface Printable {
+    String function printValue();
+}
+enum OpCode implements Printable {
+    ADD, SUB, MUL, DIV;
+
+    String function printValue() {
+        return "OP:" + this.name();
+    }
+}
+class EnumPolymorphismTest {
+    static void function printInfo(Printable p) {
+        OceanOutput(p.printValue());
+    }
+
+    static void function main() {
+        printInfo(OpCode.ADD);
+        printInfo(OpCode.MUL);
+        if (OpCode.ADD.printValue().equals("OP:ADD")){
+            OceanOutput("STATUS: PASSED");
+        }
+        else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

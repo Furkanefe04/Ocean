@@ -1,0 +1,37 @@
+package com.resources;
+    class MethodGenericTest {
+    
+    static <T <: Number > T function identity(T val) {
+        OceanOutput("Identity cagirildi.");
+
+        return val*val;
+    }
+
+    <T1, T2> void function printPair(T1 a, T2 b) {
+        OceanOutput("Pair: " + a.toString() + " , " + b.toString());
+    }
+
+    main() {
+        OceanOutput("=== METHOD GENERIC TEST START ===");
+
+        // Static jenerik cagrisi - String
+        /*variable s = identity("Merhaba Jenerik!");
+        OceanOutput("Result: " + s);*/
+
+        // Static jenerik cagrisi - Double
+        variable i = identity(12.5);
+        OceanOutput("Result: " + i);
+
+        // Instance jenerik cagrisi - coklu tip parametresi
+        variable tester = new MethodGenericTest();
+        tester.printPair("Yas", 25);
+        tester.printPair(true, 3.14);
+        tester.printPair("Ocean", "Compiler");
+
+        if (i == 156.25) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

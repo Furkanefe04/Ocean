@@ -1,0 +1,15 @@
+package com.resources;
+
+class ShadowingMethodScopeErrorTest {
+    static void function testMethodScopeShadow() {
+        int x = 10;
+        if (true) {
+            int x = 20; // MUST FAIL: Değişken 'x' bu metot kapsamında zaten tanımlı.
+            OceanOutput(x);
+        }
+    }
+
+    main() {
+        testMethodScopeShadow();
+    }
+}

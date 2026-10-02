@@ -1,0 +1,70 @@
+package com.resources;
+import java.io.IOException;
+import java.util.ArrayList;
+
+class MultiCatchTest {
+    static String? function getNull() {
+        return null;
+    }
+
+    static main() {
+        OceanOutput("=== MULTI-CATCH TEST ===");
+
+        bool t1 = false;
+        bool t2 = false;
+        bool t3 = false;
+        bool t3_finally = false;
+        bool t4 = false;
+        bool t4_finally = false;
+
+        // Test 1: Multi-catch - IOException yakalama
+        trying {
+            ArrayList list = new ArrayList();
+            list.get(99); // IndexOutOfBoundsException firlatiyor
+        } catch (IndexOutOfBoundsException | NullPointerException e) {
+            OceanOutput("Multi-catch yakaladi: " + e.getMessage());
+            t1 = true;
+        }
+
+        // Test 2: Coklu catch bloklari - farkli hata tipleri
+        trying {
+            String s = (String) getNull();
+            int len = s.length(); // NullPointerException
+        } catch (NullPointerException e) {
+            OceanOutput("NullPointerException yakaladi: null degere erisim!");
+            t2 = true;
+        } catch (Exception e) {
+            OceanOutput("Genel hata: " + e.getMessage());
+        }
+
+        // Test 3: finally ile multi-catch
+        trying {
+            int[] arr = new int[2];
+            int x = arr[5]; // ArrayIndexOutOfBoundsException
+        } catch (ArrayIndexOutOfBoundsException | NullPointerException e) {
+            OceanOutput("Hata yakalandi: " + e.getClass().getSimpleName());
+            t3 = true;
+        } finally {
+            OceanOutput("Finally her zaman calisir!");
+            t3_finally = true;
+        }
+
+        // Test 4: Hata olmadan try-catch (hata yok, normal akis)
+        trying {
+            OceanOutput("Normal akis - hata yok");
+            t4 = true;
+        } catch (Exception e) {
+            OceanOutput("Bu satir gozukmemeli");
+        } finally {
+            OceanOutput("Finally: islem tamamlandi");
+            t4_finally = true;
+        }
+
+        OceanOutput("=== TAMAMLANDI ===");
+        if (t1 && t2 && t3 && t3_finally && t4 && t4_finally) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

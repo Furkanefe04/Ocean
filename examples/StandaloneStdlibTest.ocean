@@ -1,0 +1,40 @@
+package com.test.standalone;
+
+public class StandaloneStdlibTest {
+    main() {
+        OceanOutput("=== TESTING STANDALONE STDLIB EXECUTION ===");
+
+        // 1. OceanList
+        OceanList list = ["Item 1","Item 2"];
+        OceanOutput("List size: " + list.size() + ", element 0: " + list.get(0));
+
+        // 2. OceanMap
+        OceanMap map ={"key1":100,"key2":200};
+        OceanOutput("Map size: " + map.size() + ", key1: " + map.get("key1"));
+
+        // 3. OceanSet
+        OceanSet set = #{("apple"),("banana"),("apple")};
+        OceanOutput("Set size: " + set.size());
+
+        // 4. OceanMath
+        int maxVal = OceanMath.max(42, 99);
+        OceanOutput("OceanMath.max(42, 99) = " + maxVal);
+
+        // 5. Dynamic Math with RuntimeUtils
+        Number n1 = 15;
+        Number n2 = 25;
+        Number sum = RuntimeUtils.add(n1, n2);
+        OceanOutput("RuntimeUtils.add(15, 25) = " + sum);
+
+        OceanOutput("=== STANDALONE TEST COMPLETE ===");
+        if (list.size() == 2 &&
+            map.size() == 2 &&
+            set.size() == 2 &&
+            maxVal == 99 &&
+            sum.equals(40)) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

@@ -1,0 +1,14 @@
+package com.resources;
+
+class OceanBench1RecFib {
+    static int function fib(int n) {
+        if (n <= 1) return n;
+        return fib(n - 1) + fib(n - 2);
+    }
+    static main() {
+        long start = System.nanoTime();
+        int resultx = fib(42);
+        long end = System.nanoTime();
+        OceanOutput("fib(42) = " + resultx + " | time_ms=" + ((end - start) / 1000000));
+    }
+}

@@ -1,0 +1,12 @@
+package com.resources;
+import java.lang.Runnable;
+
+class LambdaCaptureFailureTest {
+    main() {
+        variable x = 0;
+        variable r = (Runnable) () -> {
+            x++; // Error: x is captured and mutated!
+        };
+        r();
+    }
+}

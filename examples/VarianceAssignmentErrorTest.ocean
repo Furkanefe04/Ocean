@@ -1,0 +1,33 @@
+package com.resources;
+
+class Animal { }
+class Dog extends Animal { }
+class Cat extends Animal { }
+
+class Producer<+T> {
+    T? function get() { return null; }
+}
+
+class Consumer<-T> {
+    void function consume(T item) { }
+}
+
+class InvariantBox<T> {
+    T item;
+}
+
+class VarianceAssignmentErrorTest {
+    static main() {
+        // 1. Invalid Covariant Assignment: Producer<Animal> cannot be assigned to Producer<Dog>
+        Producer<Animal> animalProd = new Producer<Animal>();
+        Producer<Dog> dogProd = animalProd; // ERROR
+
+        // 2. Invalid Contravariant Assignment: Consumer<Dog> cannot be assigned to Consumer<Animal>
+        Consumer<Dog> dogCons = new Consumer<Dog>();
+        Consumer<Animal> animalCons = dogCons; // ERROR
+
+        // 3. Invalid Invariant Assignment: InvariantBox<Dog> cannot be assigned to InvariantBox<Animal>
+        InvariantBox<Dog> dogBox = new InvariantBox<Dog>();
+        InvariantBox<Animal> animalBox = dogBox; // ERROR
+    }
+}

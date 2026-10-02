@@ -1,0 +1,34 @@
+package tests;
+
+import java.lang.Exception;
+import java.lang.RuntimeException;
+
+class FinallyCatchThrowTest {
+    static int finallyCount = 0;
+
+    static void function test() {
+        trying {
+            throw new Exception("Try error");
+        } catch (Exception e) {
+            OceanOutput("Catch: throwing new RuntimeException");
+            throw new RuntimeException("Catch error");
+        } finally {
+            finallyCount = finallyCount + 1;
+            OceanOutput("Finally executed!");
+        }
+    }
+
+    static main() {
+        OceanOutput("=== FinallyCatchThrowTest START ===");
+        trying {
+            test();
+        } catch (RuntimeException e) {
+            OceanOutput("Main caught: " + e.getMessage());
+        }
+        if (finallyCount == 1) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

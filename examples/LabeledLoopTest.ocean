@@ -1,0 +1,39 @@
+package com.resources;
+class LabeledLoopTest {
+    static main() {
+        OceanOutput("--- Labeled Loop Test ---");
+        
+        String verify = "";
+        for (int i from 1 to 3 with increasing 1) {
+            for (int j from 1 to 3 with increasing 1) {
+                if (i == 2 && j == 2) {
+                    OceanOutput("Stop outer at i=2, j=2");
+                    verify = verify + "stop;";
+                    stop;
+                }
+                OceanOutput("i=" + i + ", j=" + j);
+                verify = verify + i + "," + j + ";";
+            }
+        }
+        
+        OceanOutput("After outer stop");
+        
+        int k = 0;
+        while (k < 5) {
+            k = k + 1;
+            if (k == 3) {
+                OceanOutput("Skip loopK at k=3");
+                verify = verify + "skip;";
+                skip;
+            }
+            OceanOutput("k=" + k);
+            verify = verify + "k" + k + ";";
+        }
+        
+        if (verify == "1,1;1,2;2,1;stop;k1;k2;skip;k4;k5;") {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

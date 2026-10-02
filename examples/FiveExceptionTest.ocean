@@ -1,0 +1,56 @@
+package com.resources;
+    class FiveExceptionTest {
+    static String? function getNull() {
+        return null;
+    }
+
+    main() {
+        OceanOutput("=== 5 EXCEPTION TEST START ===");
+        variable npCaught = false;
+        variable aioobCaught = false;
+        variable nfCaught = false;
+        variable arithCaught = false;
+    
+        // Test Case: Triggering and catching 5 different exceptions in one multi-catch
+        for (int i from 0 to 5 with increasing 1) {
+            trying {
+                OceanOutput("Test Adimi: " + i);
+                if (i == 1) {
+                    // 1. NullPointerException
+                    String s = (String) getNull();
+                    s.length();
+                } else if (i == 2) {
+                    // 2. ArrayIndexOutOfBoundsException
+                    int[] arr = new int[0];
+                    int x = arr[5];
+                } else if (i == 3) {
+                    // 3. NumberFormatException
+                    String s = "abc";
+                    int x = Integer.parseInt(s);
+                } else if (i == 4) {
+                    // 4. ArithmeticException
+                    int x = 10 / 0;
+                } else if (i == 5) {
+                    // 5. ClassCastException
+                    Object o = "string";
+                    Integer x = (Integer) o;
+                }
+            } catch (NullPointerException | ArrayIndexOutOfBoundsException | NumberFormatException | ArithmeticException | ClassCastException e) {
+                OceanOutput("YAKALANDI: " + e.getClass().getSimpleName() + " -> " + e.getMessage());
+                variable name = e.getClass().getSimpleName();
+                if (name == "NullPointerException") { npCaught = true; }
+                else if (name == "ArrayIndexOutOfBoundsException") { aioobCaught = true; }
+                else if (name == "NumberFormatException") { nfCaught = true; }
+                else if (name == "ArithmeticException") { arithCaught = true; }
+            } finally {
+                OceanOutput("Adim " + i + " tamamlandi (finally).");
+            }
+        }
+    
+        if (npCaught && aioobCaught && nfCaught && arithCaught) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

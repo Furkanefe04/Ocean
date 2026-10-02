@@ -1,0 +1,91 @@
+class MapElementControlAdvancedTest {
+    main() {
+        DenemeMap<Animal,Cat> denemeMap = new DenemeMap<>();
+        denemeMap.setKey(new Dog("köpke",10,true));
+        denemeMap.setVal(new Cat("car",12,5));
+        OceanOutput(denemeMap.get());
+        if (denemeMap.get().equals("köpke : 10 : true : car : 12 : 5")){
+            OceanOutput("STATUS: PASSED");
+        }
+        else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}
+
+class DenemeMap<U <: Animal, T <: U> {
+    U key;
+    T val;
+    void function setKey(U u){
+        key = u;
+    }
+    void function setVal(T t) {
+        val = t;
+    }
+    public String function get() {
+        return key.toString()+" : "+val.toString();
+    }
+
+}
+
+sealed class Animal restricts Dog,Cat,Bird {
+    variable name;
+    variable age;
+    function Animal(String name,int age){
+        this.name = name;
+        this.age = age;
+    }
+
+    @Override
+    public String function toString(){
+        return name+" : "+age;
+    }
+}
+
+non-sealed class Dog extends Animal {
+    variable hasCollar;
+
+    function Dog(String name,int age,bool hasCollar){
+        super(name,age);
+        this.hasCollar = hasCollar;
+    }
+
+    @Override
+    public String function toString(){
+        return super.name+" : "+super.age+" : "+this.hasCollar;
+    }
+}
+
+non-sealed class Cat extends Animal {
+    variable moustacheCm;
+
+    function Cat(String name,int age,int moustacheCm){
+        if(moustacheCm<0) {
+            throw new RuntimeException("bıyık uzunluğu 0'dan yüksek olmalı");
+        }
+        super(name,age);
+        this.moustacheCm = moustacheCm;
+    }
+
+    @Override
+    public String function toString(){
+        return super.name+" : "+super.age+" : "+this.moustacheCm;
+    }
+}
+
+non-sealed class Bird extends Animal {
+    variable flightLevel;
+
+    function Bird(String name,int age,int flightLevel){
+        if(flightLevel<0||flightLevel>100) {
+            throw new RuntimeException("Uçma seviyesi 0-100 arası olmalı");
+        }
+        super(name,age);
+        this.flightLevel = flightLevel;
+    }
+    @Override
+    public String function toString(){
+        return super.name+" : "+super.age+" : "+this.flightLevel;
+    }
+}
+

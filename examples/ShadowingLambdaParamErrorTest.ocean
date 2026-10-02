@@ -1,0 +1,13 @@
+package com.resources;
+
+import java.util.function.Consumer;
+
+class ShadowingLambdaParamErrorTest {
+    static void function doWork(int outerVal) {
+        Consumer c = (Consumer) (int outerVal) -> { // MUST FAIL: Lambda parametresi 'outerVal' metot kapsamındaki değişkeni gölgeleyemez.
+            OceanOutput(outerVal);
+        };
+    }
+
+    main() {}
+}

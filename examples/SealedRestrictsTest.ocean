@@ -1,0 +1,22 @@
+package com.resources;
+
+sealed class Shape restricts Circle, Square {
+}
+
+final class Circle extends Shape {
+}
+
+final class Square extends Shape {
+}
+
+class SealedRestrictsTest {
+    main() {
+        variable c = new Circle();
+        variable s = new Square();
+        if (c != null && s != null) {
+            Output("STATUS: PASSED - Sealed Restricts Validated");
+        } else {
+            Output("STATUS: FAILED");
+        }
+    }
+}

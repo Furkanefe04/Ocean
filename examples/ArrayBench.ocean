@@ -1,0 +1,23 @@
+package com.resources;
+    class ArrayBench {
+    static main() {
+        int size = 100000000;
+        int[] arr = new int[size];
+        
+        long start = System.currentTimeMillis();
+        long sum = 0;
+        for (int i from 0 to size with increasing 1) {
+            int val = i * 3 + 1;
+            arr[i] = val;
+            sum = sum + val;
+        }
+        long end = System.currentTimeMillis();
+        
+        OceanOutput("OCEAN Sum: " + sum + ", Time: " + (end - start) + " ms");
+        if (sum == 14999999950000000) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

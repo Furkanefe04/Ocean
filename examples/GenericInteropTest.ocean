@@ -1,0 +1,74 @@
+package com.resources;
+import java.util.ArrayList;
+import java.util.List;
+
+class GAnimal {
+    void function speak() {
+        OceanOutput("Animal");
+    }
+}
+
+class GDog extends GAnimal {
+    void function speak() {
+        OceanOutput("Dog");
+    }
+}
+
+class GCat extends GAnimal {
+    void function speak() {
+        OceanOutput("Cat");
+    }
+}
+
+class GenericInteropTest {
+    <T> T function printAndReturn(T item) {
+        OceanOutput("Item: " + item.toString());
+        return item;
+    }
+
+    <A, B> void function combine(A first, B second) {
+        OceanOutput("Combined: " + first.toString() + " + " + second.toString());
+    }
+
+    main() {
+        OceanOutput("=== GENERIC INTEROP TEST START ===");
+
+        GDog dog = new GDog();
+        GCat cat = new GCat();
+
+        variable tester = new GenericInteropTest();
+
+        // 1. Internal generic calls
+        OceanOutput("Testing internal generic calls:");
+        GDog dogResult = tester.printAndReturn(dog);
+        dogResult.speak();
+
+        GCat catResult = tester.printAndReturn(cat);
+        catResult.speak();
+
+        // 2. Testing external Java generic types (ArrayList)
+        OceanOutput("\nTesting external Java generic types:");
+        ArrayList<GAnimal> list = new ArrayList<GAnimal>();
+        list.add(dog);
+        list.add(cat);
+
+        OceanOutput("List size: " + list.size());
+        
+        // Reflection based call to get(int)
+        GAnimal item0 = (GAnimal) list.get(0);
+        item0.speak();
+
+        // 3. Testing multiple type parameters
+        OceanOutput("\nTesting multiple type parameters:");
+        tester.combine("Java String", 100);
+        tester.combine(dog, "Java String");
+        tester.combine(42, cat);
+        tester.combine("Ocean", "Java");
+
+        if (dogResult != null && catResult != null && list.size() == 2 && item0 != null) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

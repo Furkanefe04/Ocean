@@ -1,0 +1,215 @@
+package com.resources;
+    class HeavyBenchmark {
+
+    // ========== TEST 1: Matrix Multiplication (CPU-bound arithmetic) ==========
+    static int function matrixMultiply(int[] a, int[] b, int[] resultx, int size) {
+        for (int i from 0 to size with increasing 1) {
+            for (int j from 0 to size with increasing 1) {
+                variable sum = 0;
+                for (int k from 0 to size with increasing 1) {
+                    sum = sum + a[i * size + k] * b[k * size + j];
+                }
+                resultx[i * size + j] = sum;
+            }
+        }
+        return 1;
+    }
+
+    // ========== TEST 2: Fibonacci (Recursive depth stress) ==========
+    static int function fibonacci(int n) {
+        if (n <= 1) { return n; }
+        return fibonacci(n - 1) + fibonacci(n - 2);
+    }
+
+    // ========== TEST 3: Sieve of Eratosthenes (Array + branch-heavy) ==========
+    static int function sieveOfEratosthenes(int limit) {
+        variable flags = new int[limit + 1];
+        for (int i from 0 to limit with increasing 1) {
+            flags[i] = 1;
+        }
+        flags[0] = 0;
+        flags[1] = 0;
+
+        variable p = 2;
+        while (p * p <= limit) {
+            if (flags[p] == 1) {
+                variable multiple = p * p;
+                while (multiple <= limit) {
+                    flags[multiple] = 0;
+                    multiple = multiple + p;
+                }
+            }
+            p = p + 1;
+        }
+
+        variable count = 0;
+        for (int i from 0 to limit with increasing 1) {
+            if (flags[i] == 1) { count = count + 1; }
+        }
+        return count;
+    }
+
+    // ========== TEST 4: Selection Sort (Comparison-heavy in-place sort) ==========
+    static int function selectionSort(int[] arr, int n) {
+        for (int i from 0 to n with increasing 1) {
+            variable minIdx = i;
+            for (int j from i + 1 to n with increasing 1) {
+                if (arr[j] < arr[minIdx]) {
+                    minIdx = j;
+                }
+            }
+            variable temp = arr[minIdx];
+            arr[minIdx] = arr[i];
+            arr[i] = temp;
+        }
+        return 1;
+    }
+
+    // ========== TEST 5: Collatz Conjecture (Branch prediction stress) ==========
+    static int function collatzLength(int n) {
+        variable length = 0;
+        long val = n; 
+        while (val != 1) {
+            if (val % 2 == 0) {
+                val = val / 2;
+            } else {
+                val = 3 * val + 1;
+            }
+            length = length + 1;
+        }
+        return length;
+    }
+
+    static int function collatzStress(int limit) {
+        variable maxLen = 0;
+        for (int i from 1 to limit with increasing 1) {
+            variable len = collatzLength(i);
+            if (len > maxLen) {
+                maxLen = len;
+            }
+        }
+        return maxLen;
+    }
+
+    // ========== TEST 6: Array Reversal + Checksum (Memory bandwidth) ==========
+    static int function arrayChecksum(int[] arr, int n) {
+        variable left = 0;
+        variable right = n - 1;
+        while (left < right) {
+            variable temp = arr[left];
+            arr[left] = arr[right];
+            arr[right] = temp;
+            left = left + 1;
+            right = right - 1;
+        }
+
+        variable checksum = 0;
+        for (int i from 0 to n with increasing 1) {
+            checksum = checksum ^ arr[i];
+        }
+        return checksum;
+    }
+
+    // ========== TEST 7: GCD Stress (Tight arithmetic loop) ==========
+    static int function gcd(int a, int b) {
+        while (b != 0) {
+            variable temp = b;
+            b = a % b;
+            a = temp;
+        }
+        return a;
+    }
+
+    static int function gcdStress(int limit) {
+        variable total = 0;
+        for (int i from 1 to limit with increasing 1) {
+            for (int j from 1 to 100 with increasing 1) {
+                total = total + gcd(i, j);
+            }
+        }
+        return total;
+    }
+
+    static bool function runFullSuite() {
+        variable matSize = 150;
+        variable matN = matSize * matSize;
+        variable a = new int[matN];
+        variable b = new int[matN];
+        variable resultx = new int[matN];
+        for (int i from 0 to matN with increasing 1) {
+            a[i] = (i % 17) + 1;
+            b[i] = (i % 13) + 1;
+        }
+        matrixMultiply(a, b, resultx, matSize);
+        OceanOutput("Result[0][0] = " + resultx[0]);
+        OceanOutput("Result[74][74] = " + resultx[74 * matSize + 74]);
+
+        variable fib35 = fibonacci(35);
+        OceanOutput("Fib(35) = " + fib35);
+
+        variable primeCount = sieveOfEratosthenes(1000000);
+        OceanOutput("Asal Sayisi = " + primeCount);
+
+        variable sortN = 15000;
+        variable sortArr = new int[sortN];
+        for (int i from 0 to sortN with increasing 1) {
+            sortArr[i] = sortN - i;
+        }
+        selectionSort(sortArr, sortN);
+
+        variable collatzValue = collatzStress(100000);
+        OceanOutput("Collatz Zinciri = " + collatzValue);
+
+        variable arrN = 500000;
+        variable bigArr = new int[arrN];
+        for (int i from 0 to arrN with increasing 1) {
+            bigArr[i] = i * 3 + 7;
+        }
+        variable checksum = arrayChecksum(bigArr, arrN);
+        OceanOutput("XOR Checksum = " + checksum);
+
+        variable gcdTotal = gcdStress(50000);
+        OceanOutput("GCD Toplam = " + gcdTotal);
+
+        bool passed = true;
+        if (resultx[0] != 9200) { passed = false; }
+        if (resultx[74 * matSize + 74] != 9593) { passed = false; }
+        if (fib35 != 9227465) { passed = false; }
+        if (primeCount != 78498) { passed = false; }
+        if (collatzValue != 350) { passed = false; }
+        if (checksum != 1131072) { passed = false; }
+        if (gcdTotal != 16109374) { passed = false; }
+        return passed;
+    }
+
+    // ========== MAIN ==========
+    main() {
+        int trials = 3;
+        int warmUp = 1;
+
+        OceanOutput("--- Ocean Heavy Benchmark Suite ---");
+
+        bool verified = true;
+        // Warm-up phase
+        for (int i from 1 to warmUp with increasing 1) {
+            if (!runFullSuite()) { verified = false; }
+        }
+
+        long totalTimeNs = 0;
+        for (int i from 1 to trials with increasing 1) {
+            long start = System.nanoTime();
+            if (!runFullSuite()) { verified = false; }
+            long end = System.nanoTime();
+            long durationNs = end - start;
+            totalTimeNs = totalTimeNs + durationNs;
+            OceanOutput("Trial " + i + ": " + (durationNs / 1000000) + " ms");
+        }
+
+        OceanOutput("Average Time: " + (totalTimeNs / trials / 1000000) + " ms");
+        if (verified) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

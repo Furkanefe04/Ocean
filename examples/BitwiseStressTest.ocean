@@ -1,0 +1,356 @@
+class BitwiseStressTest {
+    main(){
+
+        variable allPassed = true;
+
+        // ============================================================
+        // 1. Deep arithmetic + shift + xor
+        // ============================================================
+
+        variable arithmetic =
+        (((15 + 5) * 4) << 2) ^ ((255 & 127) | 31);
+
+        if (arithmetic != 319) {
+            allPassed = false;
+            OceanOutput("FAIL 01:", arithmetic);
+        }
+
+
+        // ============================================================
+        // 2. Arithmetic result -> multiplication
+        // ============================================================
+
+        variable v2 = (arithmetic + 81) * 3;
+
+        if (v2 != 1200) {
+            allPassed = false;
+            OceanOutput("FAIL 02:", v2);
+        }
+
+
+        // ============================================================
+        // 3. Division + remainder using previous result
+        // ============================================================
+
+        variable v3 = (v2 / 7) + (v2 % 7);
+
+        if (v3 != 174) {
+            allPassed = false;
+            OceanOutput("FAIL 03:", v3);
+        }
+
+
+        // ============================================================
+        // 4. Nested subtraction
+        // ============================================================
+
+        variable v4 = ((v3 * 5) - (arithmetic + 100));
+
+        if (v4 != 451) {
+            allPassed = false;
+            OceanOutput("FAIL 04:", v4);
+        }
+
+
+        // ============================================================
+        // 5. Multiple shifts
+        // ============================================================
+
+        variable v5 = ((v4 << 2) >> 1);
+
+        if (v5 != 902) {
+            allPassed = false;
+            OceanOutput("FAIL 05:", v5);
+        }
+
+
+        // ============================================================
+        // 6. AND with previous calculated value
+        // ============================================================
+
+        variable v6 = v5 & 1023;
+
+        if (v6 != 902) {
+            allPassed = false;
+            OceanOutput("FAIL 06:", v6);
+        }
+
+
+        // ============================================================
+        // 7. OR + XOR interaction
+        // ============================================================
+
+        variable v7 = (v6 | 288) ^ 85;
+
+        if (v7 != 1011) {
+            allPassed = false;
+            OceanOutput("FAIL 07:", v7);
+        }
+
+
+        // ============================================================
+        // 8. NOT-like XOR mask
+        // ============================================================
+
+        variable v8 = v7 ^ 255;
+
+        if (v8 != 780) {
+            allPassed = false;
+            OceanOutput("FAIL 08:", v8);
+        }
+
+
+        // ============================================================
+        // 9. Combination of multiplication + shift
+        // ============================================================
+
+        variable v9 = ((v8 * 7) + arithmetic) << 1;
+
+        if (v9 != 11558) {
+            allPassed = false;
+            OceanOutput("FAIL 09:", v9);
+        }
+
+
+        // ============================================================
+        // 10. Division followed by bitwise
+        // ============================================================
+
+        variable v10 = (v9 / 5) ^ (v6 | 7);
+
+        if (v10 != 2688) {
+            allPassed = false;
+            OceanOutput("FAIL 10:", v10);
+        }
+
+
+        // ============================================================
+        // 11. Long promotion
+        // ============================================================
+
+        variable v11 = ((long)v10 << 20) + arithmetic;
+
+        if (v11 != 2818572607) {
+            allPassed = false;
+            OceanOutput("FAIL 11:", v11);
+        }
+
+
+        // ============================================================
+        // 12. Long arithmetic + modulo
+        // ============================================================
+
+        variable v12 = (v11 / 12345) * 17 + (v11 % 12345);
+
+        if (v12 != 3892959) {
+            allPassed = false;
+            OceanOutput("FAIL 12:", v12);
+        }
+
+
+        // ============================================================
+        // 13. Long bitwise AND
+        // ============================================================
+
+        variable v13 = v12 & 65535;
+
+        if (v13 != 26335) {
+            allPassed = false;
+            OceanOutput("FAIL 13:", v13);
+        }
+
+
+        // ============================================================
+        // 14. Long shift + OR
+        // ============================================================
+
+        variable v14 = (v13 << 4) | 15;
+
+        if (v14 != 421375) {
+            allPassed = false;
+            OceanOutput("FAIL 14:", v14);
+        }
+
+
+        // ============================================================
+        // 15. Explicit narrowing
+        // ============================================================
+
+            variable v15 = (short)(v14 & 32767);
+
+        if (v15 != 28159) {
+            allPassed = false;
+            OceanOutput("FAIL 15:", v15);
+        }
+
+
+        // ============================================================
+        // 16. Byte cast + arithmetic
+        // ============================================================
+
+        variable v16 = (byte)(v15 + 97);
+
+        if (v16 != 96) {
+            allPassed = false;
+            OceanOutput("FAIL 16:", v16);
+        }
+
+
+        // ============================================================
+        // 17. Short -> int -> shift
+        // ============================================================
+
+        variable v17 = ((int)v16 << 5) + v6;
+
+        if (v17 != 3974) {
+            allPassed = false;
+            OceanOutput("FAIL 17:", v17);
+        }
+
+
+        // ============================================================
+        // 18. Floating-point interaction
+        // ============================================================
+
+        variable v18 = ((double)v17 / 3.0) + ((float)v8 * 1.5f);
+
+        if (v18 != 2494.666666666667) {
+            allPassed = false;
+            OceanOutput("FAIL 18:", v18);
+        }
+
+
+        // ============================================================
+        // 19. Floating -> integer conversion
+        // ============================================================
+
+        variable v19 = (long)v18;
+
+        if (v19 != 2494) {
+            allPassed = false;
+            OceanOutput("FAIL 19:", v19);
+        }
+
+
+        // ============================================================
+        // 20. Long -> int + multiple arithmetic layers
+        // ============================================================
+
+        variable v20 = (((int)v19 * 13) - (v10 * 3)) / 7;
+
+        if (v20 != 3479) {
+            allPassed = false;
+            OceanOutput("FAIL 20:", v20);
+        }
+
+
+        // ============================================================
+        // 21. Mixed bitwise + arithmetic
+        // ============================================================
+
+        variable v21 =
+        ((v20 ^ v17) & 4095) | (v6 << 2);
+
+        if (v21 != 3609) {
+            allPassed = false;
+            OceanOutput("FAIL 21:", v21);
+        }
+
+
+        // ============================================================
+        // 22. Multiple nested binary operators
+        // ============================================================
+
+        variable v22 =
+        (((v21 + v13) * 3) >> 2)
+        ^ ((v17 | v6) & 1023);
+
+        if (v22 != 21564) {
+            allPassed = false;
+            OceanOutput("FAIL 22:", v22);
+        }
+
+
+        // ============================================================
+        // 23. Reuse almost everything
+        // ============================================================
+
+        variable v23 =
+        ((v22 * 5)
+        + (v21 / 3)
+        - (v20 % 17)
+        + (v19 & 255));
+
+        if (v23 != 109202) {
+            allPassed = false;
+            OceanOutput("FAIL 23:", v23);
+        }
+
+
+        // ============================================================
+        // 24. Final bitwise chaos
+        // ============================================================
+
+        variable v24 =
+        (((v23 << 3) ^ v22)
+        | (v17 & 511))
+        ^ ((v13 >> 2) & 255);
+        if (v24 != 852249) {
+            allPassed = false;
+            OceanOutput("FAIL 24:", v24);
+        }
+
+
+        // ============================================================
+        // 25. Final dependent expression
+        // ============================================================
+        // v24 = 852249 v23 = 109202 v21 = 3609 v20 = 3479 v17 = 3974 v16 = 96
+        variable finalValue =
+        (((v24 + v23) ^ (v21 << 2))
+        - ((v20 * 3) & 4095))
+        | (v17 ^ v16);
+
+        if (finalValue != 954350) {
+            allPassed = false;
+            OceanOutput("FAIL 25:", finalValue);
+        }
+
+
+        // ============================================================
+        // FINAL
+        // ============================================================
+
+        OceanOutput("arithmetic =", arithmetic);
+        OceanOutput("v2 =", v2);
+        OceanOutput("v3 =", v3);
+        OceanOutput("v4 =", v4);
+        OceanOutput("v5 =", v5);
+        OceanOutput("v6 =", v6);
+        OceanOutput("v7 =", v7);
+        OceanOutput("v8 =", v8);
+        OceanOutput("v9 =", v9);
+        OceanOutput("v10 =", v10);
+        OceanOutput("v11 =", v11);
+        OceanOutput("v12 =", v12);
+        OceanOutput("v13 =", v13);
+        OceanOutput("v14 =", v14);
+        OceanOutput("v15 =", v15);
+        OceanOutput("v16 =", v16);
+        OceanOutput("v17 =", v17);
+        OceanOutput("v18 =", v18);
+        OceanOutput("v19 =", v19);
+        OceanOutput("v20 =", v20);
+        OceanOutput("v21 =", v21);
+        OceanOutput("v22 =", v22);
+        OceanOutput("v23 =", v23);
+        OceanOutput("v24 =", v24);
+        OceanOutput("finalValue =", finalValue);
+
+        if (allPassed) {
+            OceanOutput("STATUS: PASSED");
+        }
+        else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

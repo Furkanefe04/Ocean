@@ -1,0 +1,65 @@
+package tests;
+
+class PrimitiveStorageTest {
+    static byte staticByte = (byte) 10;
+    static short staticShort = (short) 20;
+    static char staticChar = 'A';
+
+    byte instanceByte = (byte) 30;
+    short instanceShort = (short) 40;
+    char instanceChar = 'B';
+
+    static byte function getByte(byte b) {
+        variable localB = b;
+        localB = (byte) (localB + 1);
+        return localB;
+    }
+
+    static short function getShort(short s) {
+        variable localS = s;
+        localS = (short) (localS + 2);
+        return localS;
+    }
+
+    static char function getChar(char c) {
+        variable localC = c;
+        localC = 'Z';
+        return localC;
+    }
+
+    static main() {
+        OceanOutput("=== PrimitiveStorageTest START ===");
+
+        // Test Local Variables & Return Types
+        variable bRes = getByte((byte) 5);
+        variable sRes = getShort((short) 10);
+        variable cRes = getChar('C');
+
+        OceanOutput("Byte result: " + bRes);
+        OceanOutput("Short result: " + sRes);
+        OceanOutput("Char result: " + cRes);
+
+        // Test Static Fields
+        staticByte = (byte) 50;
+        staticShort = (short) 100;
+        staticChar = 'X';
+        OceanOutput("Static byte: " + staticByte);
+        OceanOutput("Static short: " + staticShort);
+        OceanOutput("Static char: " + staticChar);
+
+        // Test Instance Fields
+        variable obj = new PrimitiveStorageTest();
+        obj.instanceByte = (byte) 60;
+        obj.instanceShort = (short) 120;
+        obj.instanceChar = 'Y';
+        OceanOutput("Instance byte: " + obj.instanceByte);
+        OceanOutput("Instance short: " + obj.instanceShort);
+        OceanOutput("Instance char: " + obj.instanceChar);
+
+        if (bRes == 6 && sRes == 12 && cRes == 'Z' && staticByte == 50 && obj.instanceByte == 60) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

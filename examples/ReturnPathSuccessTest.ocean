@@ -1,0 +1,48 @@
+package tests;
+
+class ReturnPathSuccessTest {
+    static main() {
+        int r = checkSwitch(1);
+        OceanOutput("checkSwitch: " + r);
+        
+        bool ok = false;
+        trying {
+            int val = checkThrow(false);
+            if (val == 42) {
+                ok = true;
+            }
+            OceanOutput("checkThrow OK");
+        } catch (Exception e) {
+            OceanOutput("Caught exception");
+        }
+
+        if (r == 10 && ok) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+
+    static int function checkSwitch(int val) {
+        switch (val) {
+            case 1 -> {
+                return 10;
+            }
+            case 2 -> {
+                return 20;
+            }
+            default -> {
+                return 30;
+            }
+        }
+        return 0; // dummy return so control flow analyzer is satisfied
+    }
+
+    static int function checkThrow(bool shouldThrow) throws Exception {
+        if (shouldThrow) {
+            throw new Exception("Error occurred");
+        } else {
+            return 42;
+        }
+    }
+}

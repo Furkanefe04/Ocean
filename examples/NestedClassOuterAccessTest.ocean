@@ -1,0 +1,12 @@
+public class NestedClassOuterAccessTest {
+    int instanceField = 42;
+    public static class Nested {
+        public int function getVal() {
+            return 1;
+        }
+    }
+    main(){
+        int i = new NestedClassOuterAccessTest.Nested().getVal();
+        OceanOutput("STATUS: PASSED");
+    }
+}

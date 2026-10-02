@@ -1,0 +1,55 @@
+class MediumFourIssuesLogicalTest {
+
+    private static class SecretHolder {
+        public static int function getSecret() {
+            return 777;
+        }
+    }
+
+    public static class PublicInner {
+        public int function multiply(int a, int b) {
+            return a * b;
+        }
+    }
+
+    public sync int volatileCounter = 42;
+
+    public static void function main(String[] args) {
+        // OC-26: Test private static nested class
+        int s = SecretHolder.getSecret();
+        if (s != 777) {
+            OceanOutput("SecretHolder failed: " + s);
+            return;
+        }
+
+        // OC-25 & OC-26: Test public inner class
+        PublicInner pi = new PublicInner();
+        int prod = pi.multiply(6, 7);
+        if (prod != 42) {
+            OceanOutput("PublicInner failed: " + prod);
+            return;
+        }
+
+        // OC-25: Test local class
+        class LocalAdder {
+            public int function add(int x, int y) {
+                return x + y;
+            }
+        }
+        LocalAdder adder = new LocalAdder();
+        int sum = adder.add(15, 27);
+        if (sum != 42) {
+            OceanOutput("LocalAdder failed: " + sum);
+            return;
+        }
+
+        // OC-26: Test sync field
+        MediumFourIssuesLogicalTest instance = new MediumFourIssuesLogicalTest();
+        if (instance.volatileCounter != 42) {
+            OceanOutput("Volatile field failed: " + instance.volatileCounter);
+            return;
+        }
+
+        OceanOutput("STATUS: PASSED");
+    }
+}

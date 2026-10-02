@@ -1,0 +1,49 @@
+package barcodetest;
+
+
+data class Product(String name,double buyPrice,double sellPrice,double stock);
+
+class BarcodeTest {
+    main() {
+        OceanMap<String, Product> db = {
+        "8691234": new Product("Ekmek (Taze)", 8, 10, 100),
+        "8695678": new Product("Tam Yağlı Süt", 25, 35, 50),
+        "8690000": new Product("Bitter Çikolata", 15, 22, 200)
+        };
+
+        variable scanner = OceanInput();
+        
+        OceanOutput("=== Ocean Barkod Sistemi ===");
+        OceanOutput("Çıkış için 'exit' yazın.");
+        
+        variable running = true;
+        while (running) {
+            OceanOutput("");
+            OceanOutput("Barkodu Okutun: ");
+            variable code = scanner.nextLine().toString();
+            if (code.equals("exit")) {
+                running = false;
+            }
+            else {
+                if (db.containsKey(code)) {
+                    Product p = db.get(code);
+                    // Derleyicideki yeni 'unboxing' ve 'member access' düzelmeleri sayesinde
+                    // artık 'variable' alanlarla doğrudan çıkarma yapabiliyoruz.
+                    variable profit = p.sellPrice - p.buyPrice;
+                    
+                    OceanOutput("--- Ürün Bilgisi ---");
+                    OceanOutput("Adı:          " + p.name);
+                    OceanOutput("Alış Fiyatı:  " + p.buyPrice + " TL");
+                    OceanOutput("Satış Fiyatı: " + p.sellPrice + " TL");
+                    OceanOutput("Stok Adedi:   " + p.stock);
+                    OceanOutput("Kâr Payı:     " + profit + " TL");
+                    OceanOutput("--------------------");
+                } else {
+                    OceanOutput("Hata: [" + code + "] barkodlu ürün bulunamadı!");
+                }
+            }
+        }
+        
+        OceanOutput("Sistem kapatılıyor...");
+    }
+}

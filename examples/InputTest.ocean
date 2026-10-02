@@ -1,0 +1,23 @@
+package com.resources;
+
+class InputTest {
+    static main() {
+        OceanOutput("Lutfen isminizi girin: ");
+        OceanOutput("Türkçe karakter desteği testi: ğ ü ş ı ö ç");
+        
+        variable scanner = OceanInput();
+        
+        variable name = scanner.nextLine();
+        
+        OceanOutput("Merhaba, " + name + "!");
+        OceanOutput("Lutfen yasiniz girin: ");
+        
+        variable age = scanner.nextInt();
+        
+        scanner.nextLine();
+        
+        OceanOutput("Lutfen dogum gununuzu girin: ");
+        variable dogumGunu = scanner.nextLine();
+        OceanOutput("Gelecek yil " + dogumGunu + " zamanında " + (age+1) + " yasında olacaksınız.");
+    }
+}

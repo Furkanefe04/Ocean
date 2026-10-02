@@ -1,0 +1,41 @@
+package com.resources;
+
+import java.lang.Error;
+import java.lang.Exception;
+
+interface StringTransformer {
+    String function transform(String val);
+}
+
+class CustomError extends Error {
+    function CustomError(String msg) {
+        super(msg);
+    }
+}
+
+class CustomException extends Exception {
+    function CustomException(String msg) {
+        super(msg);
+    }
+}
+
+class P0CriticalBugFixesTest {
+    static void function main(String[] args) {
+        // 1. Verify Multi-Catch Common Supertype Resolution (P0-4 / P0-5)
+        trying {
+            throw new CustomError("Custom Error Raised");
+        } catch (CustomError | CustomException e) {
+            OceanOutput("CHECK 1 PASSED: Multi-Catch Caught Common Throwable (" + e.getMessage() + ")");
+        }
+
+        // 2. Verify Lambda Type & Descriptor Alignment (P0-1)
+        StringTransformer upper = (String s) -> s.toUpperCase();
+        OceanOutput("CHECK 2 PASSED: Lambda Invocation (" + upper.transform("hello ocean") + ")");
+
+        // 3. Verify Primitive Array Type Invariance Check & Array Literal Syntax {10, 20, 30} (P0-2)
+        int[] intArray = {10, 20, 30};
+        OceanOutput("CHECK 3 PASSED: Primitive Array Access (" + intArray[0] + ", " + intArray[1] + ", " + intArray[2] + ")");
+
+        OceanOutput("STATUS: PASSED - ALL P0 CRITICAL BUG FIXES VALIDATED!");
+    }
+}

@@ -1,0 +1,27 @@
+package com.resources;
+    class SwitchTest {
+    main() {
+        int x = 2;
+        int executed1 = 0;
+        int executed2 = 0;
+        int executed0 = 0;
+        switch (x) {
+            case 1:
+                       Output("1");
+                       executed1 = 1;
+                       stop;
+            case 2:
+                       Output("2");
+                       executed2 = 1;
+            case 0:
+                       Output("0");
+                       executed0 = 1;
+                       stop;
+        }
+        if (executed1 == 0 && executed2 == 1 && executed0 == 1) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

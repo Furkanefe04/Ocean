@@ -1,0 +1,55 @@
+public enum MathOperation {
+    ADD("+") {
+        public double function apply(double a, double b) {
+            return a + b;
+        }
+    },
+    SUB("-") {
+        public double function apply(double a, double b) {
+            return a - b;
+        }
+    },
+    MUL("*") {
+        public double function apply(double a, double b) {
+            return a * b;
+        }
+    },
+    DIV("/") {
+        public double function apply(double a, double b) {
+            if (b == 0.0) return 0.0;
+            return a / b;
+        }
+    };
+
+    private final String symbol;
+
+    function MathOperation(String symbol) {
+        this.symbol = symbol;
+    }
+
+    public String function getSymbol() {
+        return this.symbol;
+    }
+
+    public abstract double function apply(double a, double b);
+}
+
+public class EnumConstantBodiesStressTest {
+    public static void function main(String[] args) {
+        MathOperation add = MathOperation.ADD;
+        MathOperation sub = MathOperation.SUB;
+        MathOperation mul = MathOperation.MUL;
+        MathOperation div = MathOperation.DIV;
+
+        double r1 = add.apply(12.0, 4.0);
+        double r2 = sub.apply(12.0, 4.0);
+        double r3 = mul.apply(12.0, 4.0);
+        double r4 = div.apply(12.0, 4.0);
+
+        if (r1 == 16.0 && r2 == 8.0 && r3 == 48.0 && r4 == 3.0) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

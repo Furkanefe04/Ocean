@@ -1,0 +1,75 @@
+package com.asynctest;
+
+// Bu test async ve await özelliklerinin doğru çalıştığını test eder.
+
+public class AsyncBasicTest {
+
+    public static async String function fetchString(String prefix) {
+        return prefix + "-asenkron";
+    }
+
+    public static async int function fetchInt(int x) {
+        return x * 2;
+    }
+
+    public static async void function fireAndForget() {
+        OceanOutput("Fire and forget calisti");
+    }
+
+    public static async void function runTests() {
+        bool test1 = false;
+        bool test2 = false;
+        bool test3 = false;
+
+        // Test 1: async/await with String
+        trying {
+            variable future = fetchString("Ocean");
+            String resultx = await future;
+            OceanOutput("[1] String result: " + resultx);
+            if (resultx.equals("Ocean-asenkron")) {
+                test1 = true;
+            }
+        } catch (Exception e) {
+            OceanOutput("[1] FAIL: " + e.getMessage());
+        }
+
+        // Test 2: async/await with primitive int (boxing/unboxing check)
+        trying {
+            int val = await fetchInt(21);
+            OceanOutput("[2] Int result: " + val);
+            if (val == 42) {
+                test2 = true;
+            }
+        } catch (Exception e) {
+            OceanOutput("[2] FAIL: " + e.getMessage());
+        }
+
+        // Test 3: async void function
+        trying {
+            await fireAndForget();
+            OceanOutput("[3] Void function completed");
+            test3 = true;
+        } catch (Exception e) {
+            OceanOutput("[3] FAIL: " + e.getMessage());
+        }
+
+        OceanOutput("----------------------------------------------");
+        if (test1 && test2 && test3) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+            OceanOutput("Details -> T1=" + test1 + " T2=" + test2 + " T3=" + test3);
+        }
+    }
+
+    main() {
+        OceanOutput("==============================================");
+        OceanOutput("===          ASYNC/AWAIT BASIC TEST        ===");
+        OceanOutput("==============================================");
+        
+        variable future = runTests();
+        future.join();
+
+        OceanOutput("==============================================");
+    }
+}

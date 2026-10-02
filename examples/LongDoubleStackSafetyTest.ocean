@@ -1,0 +1,248 @@
+package com.resources;
+
+public class LongDoubleStackSafetyTest {
+    public static long sLong = 1000L;
+    public static double sDouble = 50.5;
+
+    public long iLong;
+    public double iDouble;
+
+    public function LongDoubleStackSafetyTest() {
+        iLong = 200L;
+        iDouble = 40.0;
+    }
+
+    public long function testFieldPostInc() {
+        return iLong++;
+    }
+
+    public long function testFieldPreInc() {
+        return ++iLong;
+    }
+
+    public double function testDoubleFieldPostInc() {
+        return iDouble++;
+    }
+
+    public double function testDoubleFieldPreInc() {
+        return ++iDouble;
+    }
+
+    public static long function finallyReturnLong(long val) {
+        trying {
+            return val * 2L;
+        } finally {
+            long temp = 999L;
+        }
+    }
+
+    public static double function finallyReturnDouble(double val) {
+        trying {
+            return val + 10.25;
+        } finally {
+            double temp = 888.5;
+        }
+    }
+
+    public static void function main(String[] args) {
+        // 1. Local Variables Long & Double
+        long a = 100L;
+        long b = 50L;
+        long sum = a + b;
+        long sub = a - b;
+        long mul = a * b;
+        long div = a / b;
+        long mod = a % 30L;
+
+        if (sum != 150L || sub != 50L || mul != 5000L || div != 2L || mod != 10L) {
+            OceanOutput("FAILED: Local long arithmetic");
+            return;
+        }
+
+        // Local Long Increment / Decrement
+        long postA = a++;
+        if (postA != 100L || a != 101L) {
+            OceanOutput("FAILED: Local long post-increment");
+            return;
+        }
+
+        long preA = ++a;
+        if (preA != 102L || a != 102L) {
+            OceanOutput("FAILED: Local long pre-increment");
+            return;
+        }
+
+        a += 10L;
+        a -= 5L;
+        a *= 2L;
+        a /= 3L;
+        if (a != 71L) {
+            OceanOutput("FAILED: Local long compound assignment, expected 71 but got " + a);
+            return;
+        }
+
+        // 2. Local Double
+        double d1 = 10.5;
+        double d2 = 2.5;
+        double dSum = d1 + d2;
+        double dSub = d1 - d2;
+        double dMul = d1 * d2;
+        double dDiv = d1 / d2;
+
+        if (dSum != 13.0 || dSub != 8.0 || dMul != 26.25 || dDiv != 4.2) {
+            OceanOutput("FAILED: Local double arithmetic");
+            return;
+        }
+
+        double postD = d1++;
+        if (postD != 10.5 || d1 != 11.5) {
+            OceanOutput("FAILED: Local double post-increment");
+            return;
+        }
+
+        double preD = ++d1;
+        if (preD != 12.5 || d1 != 12.5) {
+            OceanOutput("FAILED: Local double pre-increment");
+            return;
+        }
+
+        d1 += 2.5;
+        d1 -= 1.0;
+        d1 *= 2.0;
+        d1 /= 4.0;
+        if (d1 != 7.0) {
+            OceanOutput("FAILED: Local double compound assignment");
+            return;
+        }
+
+        // 3. Static Field Long & Double
+        LongDoubleStackSafetyTest.sLong = 500L;
+        long postStatic = LongDoubleStackSafetyTest.sLong++;
+        if (postStatic != 500L || LongDoubleStackSafetyTest.sLong != 501L) {
+            OceanOutput("FAILED: Static long post-increment");
+            return;
+        }
+
+        long preStatic = ++LongDoubleStackSafetyTest.sLong;
+        if (preStatic != 502L || LongDoubleStackSafetyTest.sLong != 502L) {
+            OceanOutput("FAILED: Static long pre-increment");
+            return;
+        }
+
+        LongDoubleStackSafetyTest.sDouble = 100.0;
+        double postStaticD = LongDoubleStackSafetyTest.sDouble++;
+        if (postStaticD != 100.0 || LongDoubleStackSafetyTest.sDouble != 101.0) {
+            OceanOutput("FAILED: Static double post-increment");
+            return;
+        }
+
+        double preStaticD = ++LongDoubleStackSafetyTest.sDouble;
+        if (preStaticD != 102.0 || LongDoubleStackSafetyTest.sDouble != 102.0) {
+            OceanOutput("FAILED: Static double pre-increment");
+            return;
+        }
+
+        // 4. Instance Field Long & Double
+        LongDoubleStackSafetyTest holder = new LongDoubleStackSafetyTest();
+        long instPostL = holder.testFieldPostInc();
+        if (instPostL != 200L || holder.iLong != 201L) {
+            OceanOutput("FAILED: Instance long post-increment");
+            return;
+        }
+
+        long instPreL = holder.testFieldPreInc();
+        if (instPreL != 202L || holder.iLong != 202L) {
+            OceanOutput("FAILED: Instance long pre-increment");
+            return;
+        }
+
+        double instPostD = holder.testDoubleFieldPostInc();
+        if (instPostD != 40.0 || holder.iDouble != 41.0) {
+            OceanOutput("FAILED: Instance double post-increment");
+            return;
+        }
+
+        double instPreD = holder.testDoubleFieldPreInc();
+        if (instPreD != 42.0 || holder.iDouble != 42.0) {
+            OceanOutput("FAILED: Instance double pre-increment");
+            return;
+        }
+
+        // 5. Single Dimensional Arrays Long & Double
+        long[] lArr = new long[3];
+        lArr[0] = 10L;
+        lArr[1] = 20L;
+        lArr[2] = 30L;
+
+        long postArrL = lArr[0]++;
+        if (postArrL != 10L || lArr[0] != 11L) {
+            OceanOutput("FAILED: Long array post-increment");
+            return;
+        }
+
+        long preArrL = ++lArr[0];
+        if (preArrL != 12L || lArr[0] != 12L) {
+            OceanOutput("FAILED: Long array pre-increment");
+            return;
+        }
+
+        lArr[1] += 15L;
+        if (lArr[1] != 35L) {
+            OceanOutput("FAILED: Long array compound +=, got " + lArr[1]);
+            return;
+        }
+
+        double[] dArr = new double[2];
+        dArr[0] = 5.5;
+        dArr[1] = 10.0;
+
+        double postArrD = dArr[0]++;
+        if (postArrD != 5.5 || dArr[0] != 6.5) {
+            OceanOutput("FAILED: Double array post-increment");
+            return;
+        }
+
+        double preArrD = ++dArr[0];
+        if (preArrD != 7.5 || dArr[0] != 7.5) {
+            OceanOutput("FAILED: Double array pre-increment");
+            return;
+        }
+
+        dArr[1] *= 2.5;
+        if (dArr[1] != 25.0) {
+            OceanOutput("FAILED: Double array compound *=");
+            return;
+        }
+
+        // 6. String Concat with Long & Double
+        long valLong = 123456789L;
+        double valDouble = 3.14159;
+        String s1 = "Count: " + valLong;
+        String s2 = valDouble + " seconds";
+        String s3 = valLong + " and " + valDouble;
+
+        if (!s1.equals("Count: 123456789") || !s2.equals("3.14159 seconds") || !s3.equals("123456789 and 3.14159")) {
+            OceanOutput("FAILED: String concatenation with long/double");
+            return;
+        }
+
+        // 7. Ternary Expressions
+        bool condition = true;
+        long ternL = condition ? 111L : 222L;
+        double ternD = condition ? 1.5 : 2.5;
+        if (ternL != 111L || ternD != 1.5) {
+            OceanOutput("FAILED: Ternary long/double");
+            return;
+        }
+
+        // 8. Try-Finally Return
+        long finL = finallyReturnLong(25L);
+        double finD = finallyReturnDouble(10.0);
+        if (finL != 50L || finD != 20.25) {
+            OceanOutput("FAILED: Finally return long/double, finL=" + finL + ", finD=" + finD);
+            return;
+        }
+
+        OceanOutput("STATUS: PASSED");
+    }
+}

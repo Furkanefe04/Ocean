@@ -1,0 +1,220 @@
+package com.masterpiece;
+
+import java.lang.Class;
+import java.lang.reflect.Method;
+import java.lang.reflect.Field;
+import java.lang.annotation.Annotation;
+
+// 1. Custom Annotations
+public annotation Entity {
+    String tableName();
+}
+
+public annotation Secured {
+    String[] roles() default {"USER"};
+}
+
+public annotation Id {
+    bool autoIncrement() default true;
+}
+
+public annotation Column {
+    String name() default "";
+}
+
+// 2. Sealed Interface & Sealed Classes
+public sealed interface PaymentMethod restricts CreditCard, Crypto {
+    public double function processPayment(double amount);
+}
+
+public final class CreditCard implements PaymentMethod {
+    public String cardNumber;
+
+    public function CreditCard(String card) {
+        cardNumber = card;
+    }
+
+    public double function processPayment(double amount) {
+        return amount * 1.02;
+    }
+}
+
+public final class Crypto implements PaymentMethod {
+    public String walletAddress;
+
+    public function Crypto(String wallet) {
+        walletAddress = wallet;
+    }
+
+    public double function processPayment(double amount) {
+        return amount * 0.99;
+    }
+}
+
+// 3. Data Class
+data class OrderItem(String title, double price, int quantity);
+// 4. Generic Repository Class with Generic Method
+public class Repository<T> {
+    public T item;
+
+    public function Repository(T initialItem) {
+        item = initialItem;
+    }
+
+    public T function getItem() {
+        return item;
+    }
+
+    public <E> E function transform(E input) {
+        return input;
+    }
+}
+
+// 5. Annotated Entity Model
+@Entity(tableName = "orders_db")
+@Secured(roles = {"ADMIN", "MANAGER"})
+public class OceanMasterpieceAllFeaturesTest {
+
+    @Id(autoIncrement = true)
+    @Column(name = "order_id")
+    public int id;
+
+    @Column(name = "customer_name")
+    public String customer;
+
+    @Secured(roles = {"SUPERVISOR"})
+    public double function calculateTotal(double basePrice, PaymentMethod payment) {
+        double feeOrDiscount = payment.processPayment(basePrice);
+        return feeOrDiscount;
+    }
+
+    public static async String function fetchAsyncMessage() {
+        return "ASYNC_SUCCESS";
+    }
+
+    static main() {
+        OceanOutput("==================================================");
+        OceanOutput("=== OCEAN COMPILER MASTERPIECE INTEGRATION TEST ===");
+        OceanOutput("==================================================");
+
+        bool annotationTestOk = false;
+        bool sealedClassTestOk = false;
+        bool genericDataClassOk = false;
+        bool safeCallAndSwitchOk = false;
+        bool asyncTestOk = false;
+
+        // --- TEST SECTION 1: Custom Annotations & Reflection ---
+        trying {
+            OceanMasterpieceAllFeaturesTest instance = new OceanMasterpieceAllFeaturesTest();
+            variable clazz = instance.getClass();
+            variable loader = clazz.getClassLoader();
+
+            variable entityAnnoClass = loader.loadClass("com.masterpiece.Entity");
+            variable securedAnnoClass = loader.loadClass("com.masterpiece.Secured");
+
+            Entity entityAnno = (Entity) clazz.getAnnotation(entityAnnoClass);
+            Secured securedAnno = (Secured) clazz.getAnnotation(securedAnnoClass);
+
+            if (entityAnno != null && securedAnno != null) {
+                String table = entityAnno.tableName();
+                String[] roles = securedAnno.roles();
+
+                OceanOutput("[1] Discovered Entity Table: " + table);
+                OceanOutput("[1] Discovered Roles: " + roles[0] + ", " + roles[1]);
+
+                if (table.equals("orders_db") && roles[0].equals("ADMIN") && roles[1].equals("MANAGER")) {
+                    annotationTestOk = true;
+                }
+            }
+        } catch (Exception e) {
+            OceanOutput("[1] Annotation Reflection Failed: " + e.getMessage());
+        }
+
+        // --- TEST SECTION 2: Sealed Interface & Polymorphism ---
+        trying {
+            PaymentMethod cc = new CreditCard("4111-2222-3333-4444");
+            PaymentMethod crypto = new Crypto("0xDEADBEEF12345");
+
+            double ccAmount = cc.processPayment(100.0);
+            double cryptoAmount = crypto.processPayment(100.0);
+
+            OceanOutput("[2] CreditCard Processed Amount: " + ccAmount);
+            OceanOutput("[2] Crypto Processed Amount: " + cryptoAmount);
+
+            variable paymentClass = cc.getClass().getInterfaces()[0];
+            bool isPaymentSealed = paymentClass.isSealed();
+            Class[] permittedSubclasses = paymentClass.getPermittedSubclasses();
+
+            OceanOutput("[2] PaymentMethod isSealed: " + isPaymentSealed);
+            OceanOutput("[2] Permitted Subclasses Count: " + permittedSubclasses.length);
+
+            if (ccAmount == 102.0 && cryptoAmount == 99.0 && isPaymentSealed && permittedSubclasses.length == 2) {
+                sealedClassTestOk = true;
+            }
+        } catch (Exception e) {
+            OceanOutput("[2] Sealed Class Test Failed: " + e.getMessage());
+        }
+
+        // --- TEST SECTION 3: Data Classes & Generics ---
+        trying {
+            OrderItem item1 = new OrderItem("Laptop", 1500.0, 2);
+            Repository<OrderItem> repo = new Repository<OrderItem>(item1);
+
+            OrderItem retrieved = repo.getItem();
+            String transformedStr = (String) repo.transform("SUCCESS_TRANSFORM");
+
+            OceanOutput("[3] DataClass Item: " + retrieved.getTitle() + " x" + retrieved.getQuantity() + " @ $" + retrieved.getPrice());
+            OceanOutput("[3] Generic Method Result: " + transformedStr);
+
+            if (retrieved.getTitle().equals("Laptop") && retrieved.getPrice() == 1500.0 && transformedStr.equals("SUCCESS_TRANSFORM")) {
+                genericDataClassOk = true;
+            }
+        } catch (Exception e) {
+            OceanOutput("[3] Generics & DataClass Test Failed: " + e.getMessage());
+        }
+
+        // --- TEST SECTION 4: Safe Calls, Null Coalescing & Switch ---
+        trying {
+            String? nullStr = null;
+            String fallback = nullStr ?? "DEFAULT_FALLBACK";
+
+            int option = 2;
+            String modeStr = switch (option) {
+                case 1 -> "BASIC"
+                case 2 -> "ADVANCED"
+                default -> "UNKNOWN"
+            };
+
+            OceanOutput("[4] Null Coalescing Result: " + fallback);
+            OceanOutput("[4] Switch Expression Result: " + modeStr);
+
+            if (fallback.equals("DEFAULT_FALLBACK") && modeStr.equals("ADVANCED")) {
+                safeCallAndSwitchOk = true;
+            }
+        } catch (Exception e) {
+            OceanOutput("[4] SafeCall & Switch Test Failed: " + e.getMessage());
+        }
+
+        // --- TEST SECTION 5: Async / Await ---
+        trying {
+            variable future = fetchAsyncMessage();
+            String msg = (String) future.join();
+            OceanOutput("[5] Async Message: " + msg);
+            if (msg.equals("ASYNC_SUCCESS")) {
+                asyncTestOk = true;
+            }
+        } catch (Exception e) {
+            OceanOutput("[5] Async Test Failed: " + e.getMessage());
+        }
+
+        // --- VERIFICATION SUMMARY ---
+        OceanOutput("--------------------------------------------------");
+        if (annotationTestOk && sealedClassTestOk && genericDataClassOk && safeCallAndSwitchOk && asyncTestOk) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+            OceanOutput("Details -> Annotations: " + annotationTestOk + ", Sealed: " + sealedClassTestOk + ", Generics: " + genericDataClassOk + ", Switch/Null: " + safeCallAndSwitchOk + ", Async: " + asyncTestOk);
+        }
+        OceanOutput("==================================================");
+    }
+}

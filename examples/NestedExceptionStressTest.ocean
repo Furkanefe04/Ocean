@@ -1,0 +1,161 @@
+class NestedExceptionStressTest {
+
+    main() {
+
+        variable exceptionOK = false;
+        variable finallyCount = 0;
+        variable branch = 0;
+
+        OceanOutput("===== NESTED EXCEPTION STRESS TEST =====");
+
+        variable seed = 40;
+
+        trying {
+
+            trying {
+
+                trying {
+
+                    trying {
+
+                        if(seed % 3 == 0) {
+                            throw new IllegalArgumentException("illegal");
+                        }
+                        else if(seed % 2 == 0) {
+                            throw new RuntimeException("runtime");
+                        }
+                        else {
+                            throw new Exception("generic");
+                        }
+
+                    }
+                    catch(IllegalArgumentException e) {
+                        OceanOutput("INNER: IllegalArgumentException");
+                        branch = 1;
+                        throw e;
+                    }
+                    finally {
+                        finallyCount++;
+                        OceanOutput("FINALLY-1");
+                    }
+
+                }
+                catch(RuntimeException e) {
+                    OceanOutput("MIDDLE-1: RuntimeException");
+                    branch = branch + 10;
+                    throw e;
+                }
+                finally {
+                    finallyCount++;
+                    OceanOutput("FINALLY-2");
+                }
+
+            }
+            catch(Exception e) {
+                OceanOutput("MIDDLE-2: Exception");
+                branch = branch + 100;
+                throw e;
+            }
+            finally {
+                finallyCount++;
+                OceanOutput("FINALLY-3");
+            }
+
+        }
+        catch(Exception e) {
+            OceanOutput("OUTER: Exception");
+            exceptionOK = true;
+            OceanOutput("MESSAGE:", e.getMessage());
+        }
+        finally {
+            finallyCount++;
+            OceanOutput("FINALLY-4");
+        }
+
+
+        //-----------------------------------
+        // Second independent exception chain
+        //-----------------------------------
+
+        variable secondOK = false;
+
+        trying {
+
+            trying {
+
+                trying {
+
+                    throw new NullPointerException("null-chain");
+
+                }
+                catch(IllegalArgumentException e) {
+                    OceanOutput("WRONG CATCH");
+                }
+
+            }
+            catch(RuntimeException e) {
+                OceanOutput("SECOND: RuntimeException");
+                secondOK = true;
+            }
+
+        }
+        catch(Exception e) {
+            OceanOutput("WRONG OUTER CATCH");
+        }
+
+
+        //-----------------------------------
+        // Exception after nested computation
+        //-----------------------------------
+
+        variable arithmetic = 0;
+
+        trying {
+
+            arithmetic = 100 / 5;
+
+            trying {
+
+                arithmetic = arithmetic * 2;
+
+                if(arithmetic == 40) {
+                    throw new RuntimeException("arithmetic-chain");
+                }
+
+            }
+            catch(RuntimeException e) {
+
+                OceanOutput("ARITHMETIC CATCH");
+                arithmetic = arithmetic + 2;
+            }
+
+        }
+        catch(Exception e) {
+
+            OceanOutput("WRONG ARITHMETIC OUTER CATCH");
+            arithmetic = -1;
+        }
+
+
+        //-----------------------------------
+        // Final validation
+        //-----------------------------------
+
+        OceanOutput("branch:", branch);
+        OceanOutput("finallyCount:", finallyCount);
+        OceanOutput("arithmetic:", arithmetic);
+
+        if(
+        exceptionOK &&
+        secondOK &&
+        branch == 110 &&
+        finallyCount == 4 &&
+        arithmetic == 42
+        ) {
+            OceanOutput("STATUS: PASSED");
+        }
+        else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

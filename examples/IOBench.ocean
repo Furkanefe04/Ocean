@@ -1,0 +1,53 @@
+package com.resources;
+import java.util.List;
+import java.lang.StringBuilder;
+import java.lang.System;
+import java.io.FileOutputStream;
+import java.io.FileInputStream;
+import java.io.File;
+import java.lang.Exception;
+
+class IOBench {
+    static main() {
+        trying {
+            long totalSize = 1073741824L; // 1GB
+            int bufferSize = 65536; // 64KB
+            byte[] buffer = new byte[bufferSize];
+            String filename = "io_test_ocean.bin";
+            
+            long start = System.currentTimeMillis();
+
+            // Write
+            FileOutputStream out = new FileOutputStream(filename);
+            long iterations = totalSize / (long)bufferSize;
+            int maxIters = (int)iterations;
+            for (int i from 1 to maxIters with increasing 1) {
+                out.write(buffer);
+            }
+            out.close();
+            
+            // Read
+            long totalRead = 0;
+            FileInputStream in = new FileInputStream(filename);
+            while (in.read(buffer) != -1) {
+                totalRead = totalRead + (long)bufferSize;
+            }
+            in.close();
+            
+            long end = System.currentTimeMillis();
+            OceanOutput("OCEAN IO Total: " + totalRead + " bytes, Time: " + (end - start) + " ms");
+            
+            File f = new File(filename);
+            f.delete();
+
+            if (totalRead == 1073676288L) {
+                OceanOutput("STATUS: PASSED");
+            } else {
+                OceanOutput("STATUS: FAILED");
+            }
+        } catch (Exception e) {
+            OceanOutput("Error: " + e.getMessage());
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

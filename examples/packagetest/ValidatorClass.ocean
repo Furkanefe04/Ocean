@@ -1,0 +1,18 @@
+package com.pkg3;
+
+import com.pkg4.FormatterClass;
+
+public class ValidatorClass {
+    main() {
+        OceanOutput("--- VALIDATOR CLASS ---");
+        String val = args[0]; // hata çıkarabiliyor
+        String origin = args[1];
+        OceanOutput("ValidatorClass validating: " + val + " passed by: " + origin);
+
+        String[] newArgs = new String[2];
+        newArgs[0] = val + " -> Validated";
+        newArgs[1] = "Validator";
+
+        FormatterClass.main(newArgs);
+    }
+}

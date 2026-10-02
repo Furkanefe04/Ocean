@@ -1,0 +1,98 @@
+package com.grand;
+
+import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
+import com.google.common.collect.ImmutableMap;
+
+interface Evaluator<T> {
+    T function evaluate(T input);
+}
+
+abstract class BaseEvaluator<T> implements Evaluator<T> {
+    String name;
+    function BaseEvaluator(String name) {
+        this.name = name;
+    }
+    String function getName() {
+        return name;
+    }
+}
+
+class StringEvaluator extends BaseEvaluator<String> {
+    function StringEvaluator(String name) {
+        super(name);
+    }
+    @Override
+    String function evaluate(String input) {
+        return StringUtils.reverse(input) + "_" + getName();
+    }
+}
+
+class KeyValueHolder<K, V> {
+    K key;
+    V val;
+    function KeyValueHolder(K k, V v) {
+        key = k;
+        val = v;
+    }
+    K function getKey() {
+        return key;
+    }
+    V function getValue() {
+        return val;
+    }
+}
+
+class GrandIntegrationStressTest {
+    main() {
+        OceanOutput("=== GRAND INTEGRATION STRESS TEST START ===");
+
+        // 1. Interfaces & Polymorphism with Generics
+        Evaluator<String> eval = new StringEvaluator("ReverseEval");
+        String evalResult = eval.evaluate("compiler");
+        OceanOutput("evaluator_result: " + evalResult); // Expected: relipmoc_ReverseEval
+
+        // 2. Lexical Scope Shadowing in Loops
+        /*int shadowVal = 777;
+        for (int i from 1 to 1 with increasing 1) {
+            int shadowVal = 888;
+            if (true) {
+                int shadowVal = 999;
+                OceanOutput("loop_shadow_inner: " + shadowVal); // Expected: 999
+            }
+            OceanOutput("loop_shadow_middle: " + shadowVal); // Expected: 888
+        }
+        OceanOutput("loop_shadow_outer: " + shadowVal); // Expected: 777*/
+
+        // 3. Deeply Nested Generics
+        variable holder = new KeyValueHolder<String, KeyValueHolder<Integer, String>>("outerKey", new KeyValueHolder<Integer, String>(42, "innerVal"));
+        OceanOutput("holder_outer_key: " + holder.getKey()); // Expected: outerKey
+        OceanOutput("holder_inner_key: " + holder.getValue().getKey()); // Expected: 42
+        OceanOutput("holder_inner_val: " + holder.getValue().getValue()); // Expected: innerVal
+
+        // 4. Joda-Time Interop
+        variable dt = new DateTime(2026, 7, 1, 3, 0);
+        int year = dt.getYear();
+        int month = dt.getMonthOfYear();
+        OceanOutput("joda_year_month: " + year + "-" + month); // Expected: 2026-7
+
+        // 5. Guava Interop
+        variable map = ImmutableMap.of("A", 1, "B", 2);
+        OceanOutput("guava_map_value: " + map.get("B")); // Expected: 2
+
+        // 6. Nested Collection literal
+        OceanList<OceanMap<String, OceanList<Object>>> complexList = [{
+            "strings": ["hello", "world"],
+            "integers": [100, 200]
+        }];
+        OceanOutput("complex_nested_list_val: " + complexList.get(0).get("strings").getLast()); // Expected: world
+
+        if (evalResult.equals("relipmoc_ReverseEval") && year == 2026 && month == 7) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+
+        OceanOutput("=== GRAND INTEGRATION STRESS TEST COMPLETED ===");
+    }
+}

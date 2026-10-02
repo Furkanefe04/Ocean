@@ -1,0 +1,25 @@
+package com.trading.core;
+
+import java.util.ArrayList;
+
+public class OrderListWrapper<T> {
+    public ArrayList<T> list;
+
+    public static <E> OrderListWrapper<E> function create() {
+        OrderListWrapper<E> w = new OrderListWrapper<E>();
+        w.list = new ArrayList<E>();
+        return w;
+    }
+
+    public void function add(T item) {
+        list.add(item);
+    }
+
+    public T function get(int idx) {
+        return (T) list.get(idx);
+    }
+
+    public int function size() {
+        return list.size();
+    }
+}

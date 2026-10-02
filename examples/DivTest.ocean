@@ -1,0 +1,16 @@
+package com.resources;
+import java.math.BigDecimal;
+
+class DivTest {
+    static void function main() {
+        variable a = new BigDecimal("1");
+        variable b = new BigDecimal("3");
+        variable resultx = a / b;
+        OceanOutput($"1 / 3 = {resultx}");
+        if (resultx.getClass().getSimpleName().equals("BigDecimal") && resultx.toString().equals("0.3333333333333333333333333333333333")) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

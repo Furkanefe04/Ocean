@@ -1,0 +1,5 @@
+class DifferentClassName {
+    static main() {
+        // Bu kod derlenmemelidir
+    }
+}

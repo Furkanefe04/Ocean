@@ -1,0 +1,51 @@
+package com.resources;
+
+import com.resources.PriceEngine;
+import com.resources.OrderBook;
+import com.resources.Wallet;
+
+class CryptoExchangeSim {
+    static bool function runSim(int iterations) {
+        variable engine = new PriceEngine(20000, 1000);
+        variable exchange = new OrderBook("OceanX", 2);
+        variable wAlice = new Wallet("Alice", 10000000);
+        variable wBob = new Wallet("Bob", 500000);
+        variable wCharlie = new Wallet("Charlie", 2000000);
+        variable wHacker = new Wallet("Hacker", 90000);
+
+        for(int day from 0 to iterations with increasing 1) {
+            engine.tick();
+            variable btcPrice = engine.getBTCPrice();
+            variable ethPrice = engine.getETHPrice();
+            variable mod = day % 4;
+
+            if(mod == 1) {
+                exchange.buyBTC(wAlice, 50, btcPrice);
+                exchange.buyETH(wBob, 100, ethPrice);
+            }
+            if(mod == 2) {
+                exchange.sellBTC(wCharlie, 30, btcPrice);
+                exchange.buyBTC(wHacker, 10, btcPrice);
+            }
+            if(mod == 3) {
+                exchange.sellETH(wAlice, 40, ethPrice);
+                exchange.sellBTC(wBob, 20, btcPrice);
+            }
+            if(mod == 0) {
+                exchange.buyETH(wCharlie, 80, ethPrice);
+            }
+        }
+        OceanOutput("Simulasyon tamamlandi. Final Bakiyeler:");
+        OceanOutput("Alice TRY: " + wAlice.getBalanceTRY());
+        OceanOutput("Bob BTC: " + wBob.getBalanceBTC());
+        return (wAlice.getBalanceTRY() == 9999847 && wBob.getBalanceBTC() == 0);
+    }
+
+    main() {
+        if (runSim(10)) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

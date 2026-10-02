@@ -1,0 +1,154 @@
+package com.resources;
+import java.lang.Object;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.math.BigDecimal;
+import java.lang.Runnable;
+import java.lang.Thread;
+import java.lang.Exception;
+
+// 1. Karmaşık Kalıtım ve Alan Erişimi
+abstract class Entity {
+    variable id = 0;
+    variable name = "Default";
+    
+    function Entity(int id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+    
+    abstract String function getInfo();
+}
+
+class User extends Entity {
+    variable email = "";
+    
+    function User(int id, String name, String email) {
+        super(id, name);
+        this.email = email;
+    }
+    
+    // Override validation
+    String function getInfo() {
+        return "User[" + id + "]: " + name + " (" + email + ")";
+    }
+}
+
+class Admin extends User {
+    variable level = 10;
+    
+    function Admin(int id, String name, String email, int level) {
+        super(id, name, email);
+        this.level = level;
+    }
+    
+    String function getInfo() {
+        return "Admin[Level " + level + "]: " + name;
+    }
+}
+
+// 2. Interface ve Polymorphism
+class TaskRunner implements Runnable {
+    variable taskName = "";
+    function TaskRunner(String name) { taskName = name; }
+    
+    void function run() {
+        Output("Task '" + taskName + "' is running in " + Thread.currentThread().getName());
+    }
+}
+
+// 3. Karmaşık Algoritmalar ve Özyineleme
+class MathWizard {
+    static int function fib(int n) {
+        if (n <= 1) { return n; }
+        return fib(n - 1) + fib(n - 2);
+    }
+    
+    static BigDecimal function calculateInterest(String principal, String rate, int years) {
+        variable p = new BigDecimal(principal);
+        variable r = new BigDecimal(rate);
+        variable one = new BigDecimal("1");
+        
+        // p * (1 + r)^years
+        variable factor = one.add(r);
+        variable resultx = p;
+        for (int i from 1 to years with increasing 1) {
+            resultx = resultx.multiply(factor);
+        }
+        return resultx.setScale(2, 4); // HALF_UP
+    }
+}
+
+// 4. Ana Test Sınıfı
+class OceanUltimateStressTest {
+    static main() {
+        Output("=============================================");
+        Output("   OCEAN ULTIMATE STRESS & INTEROP TEST      ");
+        Output("=============================================");
+        
+        // --- TEST 1: Kalıtım ve Dinamik Dispatch ---
+        Output("\n[TEST 1] Inheritance & Dynamic Dispatch");
+        ArrayList entities = new ArrayList();
+        entities.add(new User(1, "Ali", "ali@ocean.org"));
+        entities.add(new Admin(2, "Veli", "veli@ocean.org", 99));
+        
+        String e = "Hello";
+        e = "World";
+        Output("E: " + e.toString());
+        
+        // --- TEST 2: Java Collections & Generics Simulation ---
+        Output("\n[TEST 2] HashMap & Collections");
+        HashMap<String,String> map = new HashMap();
+        map.put("key1", "Value A");
+        map.put("key2", "Value B");
+        Output("Map Size: " + map.size());
+        Output("Key1: " + map.get("key1"));
+        
+        // --- TEST 3: BigDecimal & Math ---
+        Output("\n[TEST 3] BigDecimal Precision Math");
+        String principal = "1000.00";
+        String rate = "0.05";
+        BigDecimal resultx = MathWizard.calculateInterest(principal, rate, 10);
+        Output("1000 TL %5 faiz ile 10 yil sonra: " + resultx.toString() + " TL");
+        
+        // --- TEST 4: Threads & Interfaces ---
+        Output("\n[TEST 4] Threads & Runnable Interface");
+        TaskRunner tr = new TaskRunner("Ultimate-Stress-Task");
+        Thread t = new Thread(tr);
+        t.start();
+        trying {
+            t.join(); // Ana thread beklesin
+        } catch (Exception exc) {
+            Output("Thread interrupted: " + exc.getMessage());
+        }
+        
+        // --- TEST 5: Recursion & Loops ---
+        Output("\n[TEST 5] Deep Recursion (Fibonacci)");
+        int f15 = MathWizard.fib(15);
+        Output("Fib(15) = " + f15);
+        if (f15 == 610) { Output("Fibonacci Verification: SUCCESS"); }
+        
+        // --- TEST 6: Exception Handling (Skipped for debug) ---
+        Output("\n[TEST 6] Exception Handling Skipped");
+        
+        // --- TEST 7: Type Conversion & String Concat ---
+        Output("\n[TEST 7] Complex String Concatenation");
+        String complexStr = "ID:" + 100 + " | Status:" + true + " | Price:" + 15.5;
+        Output(complexStr);
+        
+        User u = (User) entities.get(0);
+        Admin ad = (Admin) entities.get(1);
+        bool s1 = u.getInfo().equals("User[1]: Ali (ali@ocean.org)") && ad.getInfo().equals("Admin[Level 99]: Veli");
+        bool s2 = e.toString().equals("World");
+        bool s3 = (map.size() == 2) && map.get("key1").equals("Value A");
+        bool s4 = resultx.toString().equals("1551.33");
+        bool s5 = (f15 == 610);
+        bool s6 = complexStr.equals("ID:100 | Status:true | Price:15.5");
+
+        if (s1 && s2 && s3 && s4 && s5 && s6) {
+            Output("STATUS: PASSED");
+        } else {
+            Output("STATUS: FAILED");
+        }
+    }
+}

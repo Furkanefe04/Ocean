@@ -1,0 +1,37 @@
+package examples;
+
+data class Point(int x, int y)
+
+data class Circle(Point center, double radius)
+
+class DataClassPattern {
+    public static String function describe(Object? shape) {
+        return switch (shape) {
+            case null -> "Null shape"
+            case Circle(Point(int cx, int cy), double r) when r > 10.0 ->
+                $"Large Circle at ({cx}, {cy}) with radius {r}"
+            case Circle(Point(int cx, int cy), double r) ->
+                $"Circle at ({cx}, {cy}) with radius {r}"
+            case Point(int x, int y) when x == y ->
+                $"Diagonal point at ({x}, {y})"
+            case Point(int x, int y) ->
+                $"Point at ({x}, {y})"
+            default ->
+                "Unknown shape"
+        };
+    }
+
+    main() {
+        OceanOutput("=== Ocean Data Class Pattern Matching ===");
+        value pt1 = new Point(5, 5);
+        value pt2 = new Point(3, 7);
+        value bigCircle = new Circle(new Point(0, 0), 15.5);
+        value smallCircle = new Circle(new Point(1, 2), 4.0);
+
+        OceanOutput(describe(null));
+        OceanOutput(describe(pt1));
+        OceanOutput(describe(pt2));
+        OceanOutput(describe(bigCircle));
+        OceanOutput(describe(smallCircle));
+    }
+}

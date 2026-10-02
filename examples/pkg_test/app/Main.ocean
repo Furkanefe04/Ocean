@@ -1,0 +1,19 @@
+package app;
+
+import math.Calculator;
+
+class Main {
+    main() {
+        int result = Calculator.add(10, 20);
+        OceanOutput("10 + 20 = ");
+        OceanOutput(result);
+        
+        int product = Calculator.multiply(5, 6);
+        OceanOutput("5 * 6 = ");
+        OceanOutput(product);
+        
+        int sq = Calculator.square(7);
+        OceanOutput("7^2 = ");
+        OceanOutput(sq);
+    }
+}

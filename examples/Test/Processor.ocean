@@ -1,0 +1,17 @@
+package Test;
+
+abstract class Processor<T <:Data,U> {
+    String name;
+    int threads;
+    // T = data
+    // U = product
+    function Processor(String name,int threads){
+        this.name = name;
+        this.threads = threads;
+    }
+
+    abstract U function process(T pData) throws ProcessorException;
+
+    abstract bool function control(T pData);
+
+}

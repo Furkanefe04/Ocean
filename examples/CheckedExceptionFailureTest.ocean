@@ -1,0 +1,12 @@
+package com.resources;
+import java.lang.Thread;
+
+class CheckedExceptionFailureTest {
+    static void function doSleepUnsafe() {
+        Thread.sleep(10L); // Should fail: unhandled checked exception
+    }
+
+    static main() {
+        doSleepUnsafe();
+    }
+}

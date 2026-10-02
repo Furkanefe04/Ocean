@@ -1,0 +1,22 @@
+package com.resources;
+    class SingletonTest {
+    static SingletonTest instance;
+
+    static main() {
+        bool firstIsNull = (SingletonTest.instance == null);
+        if (SingletonTest.instance != null) {
+            OceanOutput("Singleton instance is not null");
+        }
+        else{
+            OceanOutput("Singleton instance is null");
+            instance = new SingletonTest();
+            if (SingletonTest.instance != null) OceanOutput("nesne olusturuldu");
+        }
+        bool secondIsNotNull = (SingletonTest.instance != null);
+        if (firstIsNull && secondIsNotNull) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

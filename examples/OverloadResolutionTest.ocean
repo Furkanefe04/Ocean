@@ -1,0 +1,76 @@
+package tests;
+
+import java.lang.Integer;
+import java.lang.Number;
+
+class OverloadResolutionTest {
+
+    // 1. Primitive Widening
+    static String function testWidening(long l) {
+        return "long";
+    }
+
+    static String function testWidening(double d) {
+        return "double";
+    }
+
+    // 2. Reference Type Specificity
+    static String function testSpecificity(Number n) {
+        return "Number";
+    }
+
+    static String function testSpecificity(Integer i) {
+        return "Integer";
+    }
+
+    // 3. Autoboxing/Unboxing
+    static String function testAutoboxing(Integer i) {
+        return "Integer";
+    }
+
+    static String function testUnboxing(int i) {
+        return "int";
+    }
+
+    // 4. Varargs vs Exact/Fixed Match
+    static String function testVarargs(int a, int b) {
+        return "fixed";
+    }
+
+    static String function testVarargs(int... args) {
+        return "varargs";
+    }
+
+    static main() {
+        OceanOutput("=== OverloadResolutionTest START ===");
+
+        // Test Widening: int widening to long vs double
+        // In Java rules, widening from int (I) prefers long (J) over double (D)
+        variable widRes = testWidening(42);
+        OceanOutput("Widening result: " + widRes);
+
+        // Test Specificity: Integer is more specific than Number
+        variable specRes = testSpecificity(new Integer(10));
+        OceanOutput("Specificity result: " + specRes);
+
+        // Test Autoboxing: passing int to Integer
+        variable boxRes = testAutoboxing(100);
+        OceanOutput("Autoboxing result: " + boxRes);
+
+        // Test Unboxing: passing Integer to int
+        variable unboxRes = testUnboxing(new Integer(200));
+        OceanOutput("Unboxing result: " + unboxRes);
+
+        // Test Varargs vs Fixed: fixed matches should be preferred
+        variable varargResFixed = testVarargs(1, 2);
+        variable varargResVar = testVarargs(1, 2, 3);
+        OceanOutput("Varargs fixed result: " + varargResFixed);
+        OceanOutput("Varargs varargs result: " + varargResVar);
+
+        if (widRes == "long" && specRes == "Integer" && boxRes == "Integer" && unboxRes == "int" && varargResFixed == "fixed" && varargResVar == "varargs") {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

@@ -1,0 +1,30 @@
+package com.resources;
+
+public class Parent {
+    public String function testOverload(String s) {
+        return "Parent.String: " + s;
+    }
+}
+
+public class Child extends Parent {
+    public String function testOverload(Object o) {
+        return "Child.Object: " + o.toString();
+    }
+}
+
+public class HierarchyOverloadTest {
+    main() {
+        variable c = new Child();
+        variable res1 = c.testOverload("hello");
+        variable res2 = c.testOverload(123);
+
+        OceanOutput("Res1: " + res1);
+        OceanOutput("Res2: " + res2);
+
+        if (res1 == "Parent.String: hello" && res2 == "Child.Object: 123") {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

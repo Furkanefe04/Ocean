@@ -1,0 +1,9 @@
+package com.resources;
+
+class ArrayTypeMismatchTest {
+    main() {
+        int[] arr = new int[5];
+        arr[0] = "hello"; // Invalid: String to int array
+        OceanOutput("Assigned hello to int array!");
+    }
+}

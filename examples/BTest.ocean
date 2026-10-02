@@ -1,0 +1,17 @@
+public class BTest {
+
+    public static value testValue = 500;
+    main(){
+        BTest bt = new BTest();
+        bt.printValue();
+        if (testValue == 500) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+
+    void function printValue(){
+        OceanOutput("Value : "+testValue);
+    }
+}

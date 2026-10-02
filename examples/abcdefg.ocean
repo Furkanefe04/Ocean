@@ -1,0 +1,16 @@
+package com.resources;
+
+public class abcdefg {
+    main(){
+        variable a = 50;
+        variable b = 50000000000000000000000000000000000000000000;
+        variable c = a + b;
+        OceanOutput("Hello World!");
+        OceanOutput(c);
+        if (c == 50000000000000000000000000000000000000000050) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

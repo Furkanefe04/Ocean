@@ -1,0 +1,1026 @@
+package ocean.tests.deep;
+
+import java.util.List;
+import java.util.Set;
+import java.util.Map;
+import java.util.ArrayList;
+
+
+// ====================================================================
+// OCEAN DEEP COMPILER TORTURE TEST
+// ====================================================================
+
+public class OceanDeepCompilerTest {
+
+    static int passed = 0;
+    static int failed = 0;
+
+
+    // ================================================================
+    // CHECK INFRASTRUCTURE
+    // ================================================================
+
+    static void function check(bool condition, String name) {
+
+        if (condition) {
+            passed++;
+            OceanOutput($"[PASS] {name}");
+        } else {
+            failed++;
+            OceanOutput($"[FAIL] {name}");
+        }
+    }
+
+
+    static void function checkInt(int actual, int expected, String name) {
+        check(actual == expected, name);
+    }
+
+
+    static void function checkLong(long actual, long expected, String name) {
+        check(actual == expected, name);
+    }
+
+
+    static void function checkDouble(double actual, double expected, String name) {
+        check(actual == expected, name);
+    }
+
+
+    static void function checkString(String actual, String expected, String name) {
+        check(actual == expected, name);
+    }
+
+
+    static void function checkBool(bool actual, bool expected, String name) {
+        check(actual == expected, name);
+    }
+
+
+    // ================================================================
+    // MAIN
+    // ================================================================
+
+    static main() {
+
+        OceanOutput("==============================================");
+        OceanOutput(" OCEAN DEEP COMPILER TORTURE TEST");
+        OceanOutput("==============================================");
+
+
+        // ============================================================
+        // 1. EXPRESSION PRECEDENCE
+        // ============================================================
+
+        int expression = ((12 + 8) * 3) - ((100 / 4) % 7) + (2 << 3) - (64 >> 2);
+
+        checkInt(expression, 56,"complex arithmetic precedence");
+
+
+        // ============================================================
+        // 2. COMPOUND ASSIGNMENT CHAIN
+        // ============================================================
+
+        variable compound = 100;
+
+        compound += 50;
+        compound -= 20;
+        compound *= 2;
+        compound /= 5;
+        compound %= 13;
+
+        checkInt(compound, 0, "compound assignment chain");
+
+
+        // ============================================================
+        // 3. PREFIX / POSTFIX SEMANTICS
+        // ============================================================
+
+        variable counter = 10;
+
+        int postA = counter++;
+        int postB = counter--;
+        int preA = ++counter;
+        int preB = --counter;
+
+        checkInt(postA, 10, "postfix increment value");
+
+        checkInt(postB, 11, "postfix decrement value");
+
+        checkInt(preA, 11, "prefix increment value");
+
+        checkInt(preB, 10, "prefix decrement value");
+
+
+        // ============================================================
+        // 4. BITWISE EXPRESSION TREE
+        // ============================================================
+
+        int bitResult = ((15 & 7) | 8) ^ 3;
+
+        checkInt(bitResult, 12, "nested bitwise expression");
+
+
+        // ============================================================
+        // 5. TERNARY NESTING
+        // ============================================================
+
+        int ternaryValue = (counter > 20)? 100: ((counter > 5)? 50: 10);
+
+        checkInt(ternaryValue, 50, "nested ternary");
+
+
+        // ============================================================
+        // 6. CAST
+        // ============================================================
+
+        double decimalValue = 91.75D;
+
+        int castValue = (int) decimalValue;
+
+        checkInt(castValue, 91, "explicit cast");
+
+
+        // ============================================================
+        // 7. STRING ARITHMETIC / INTERPOLATION
+        // ============================================================
+
+        String first = "Ocean";
+        String second = "Compiler";
+
+        String combined = first + " " + second;
+
+        checkString(combined, "Ocean Compiler", "String concatenation");
+
+
+        String interpolated = $"[{first}:{second}:{counter + 5}]";
+
+        checkString(interpolated, "[Ocean:Compiler:15]", "nested interpolation expression");
+
+
+        // ============================================================
+        // 8. NULLABLE CHAIN
+        // ============================================================
+
+        String? nullableText = null;
+
+        String fallback = nullableText ?? "fallback";
+
+        checkString(fallback, "fallback", "nullable coalescing");
+
+
+        int? nullableLength = nullableText?.length();
+
+        check(nullableLength == null, "nullable safe call");
+
+
+        // ============================================================
+        // 9. ARRAY + INCLUSIVE SLICE
+        // ============================================================
+
+        variable source = {10, 20, 30, 40, 50, 60};
+
+
+        // Ocean slice: START and END are BOTH included.
+        int[] slice = source[1..3];
+
+
+        // Expected: 20, 30, 40
+        checkInt(slice.length, 3, "inclusive array slice length");
+
+        checkInt(slice[0], 20, "inclusive array slice first");
+
+        checkInt(slice[1],30, "inclusive array slice middle");
+
+        checkInt(slice[2], 40, "inclusive array slice last");
+
+
+        // ============================================================
+        // 10. LIST + INCLUSIVE SLICE
+        // ============================================================
+
+        variable words = ["zero", "one", "two", "three", "four"];
+
+        List<String> wordSlice = words[1..3];
+
+
+        checkInt(wordSlice.size(), 3, "inclusive List slice length");
+
+        checkString(wordSlice.get(0), "one", "inclusive List slice first");
+
+        checkString(wordSlice.get(2), "three", "inclusive List slice last");
+
+
+        // ============================================================
+        // 11. FOR FROM/TO + ACCUMULATION
+        // ============================================================
+
+        variable sum = 0;
+
+        for (int i from 1 to 10 with increasing 1) {
+            sum += i;
+        }
+
+        checkInt(sum, 45, "for increasing accumulation");
+
+
+        // ============================================================
+        // 12. DECREASING LOOP
+        // ============================================================
+
+        variable reverseSum = 0;
+
+        for (int i from 10 to 0 with decreasing 2) {
+            reverseSum += i;
+        }
+
+        checkInt(reverseSum, 30, "for decreasing accumulation");
+
+
+        // ============================================================
+        // 13. NESTED LOOP + LABEL
+        // ============================================================
+
+        variable combinations = 0;
+
+        outer: for (int i from 1 to 5 with increasing 1) {
+            inner: for (int j from 1 to 5 with increasing 1) {
+                if (j == 2) skip inner;
+                if (i == 4 && j == 4) stop outer;
+                combinations++;
+            }
+        }
+
+        check(combinations > 0, "nested labeled loops");
+
+
+        // ============================================================
+        // 14. WHILE + DO WHILE
+        // ============================================================
+
+        variable whileValue = 0;
+
+        while (whileValue < 10) {
+            whileValue += 2;
+        }
+
+        checkInt(whileValue, 10, "while loop");
+
+
+        do {
+            whileValue--;
+        } while (whileValue > 7);
+
+        checkInt(whileValue, 7, "do while loop");
+
+
+        // ============================================================
+        // 15. SWITCH STATEMENT
+        // ============================================================
+
+        variable switchResult = "";
+        int switchInput = 20;
+
+        switch (switchInput) {
+
+            case 10:
+                switchResult = "TEN";
+                stop;
+
+            case 20:
+                switchResult = "TWENTY";
+                stop;
+
+            default:
+                switchResult = "OTHER";
+        }
+
+        checkString(switchResult, "TWENTY", "switch statement");
+
+
+        // ============================================================
+        // 16. SWITCH EXPRESSION
+        // ============================================================
+
+        variable switchExpression =
+            switch (switchInput) {
+
+                case 10 -> "LOW"
+                case 20 -> "MEDIUM"
+                case 30 -> "HIGH"
+                default -> "UNKNOWN"
+            };
+
+        checkString(switchExpression, "MEDIUM", "switch expression");
+
+
+        // ============================================================
+        // 17. SWITCH BLOCK RESULT
+        // ============================================================
+
+        variable detailedSwitch =
+            switch (switchInput) {
+
+                case 20 -> {
+                    variable prefix = "VALUE";
+                    variable number = 42;
+
+                    result $"${prefix}_{number}";
+                }
+
+                default -> "UNKNOWN"
+            };
+
+        checkString(detailedSwitch, "$VALUE_42", "switch block result"
+        );
+
+
+        // ============================================================
+        // 18. OBJECT CREATION — EXPLICIT NEW
+        // ============================================================
+
+        Engine engine = new Engine("OceanEngine", 3);
+
+        checkString(engine.name, "OceanEngine", "explicit new constructor String");
+
+        checkInt(engine.version, 3, "explicit new constructor int");
+
+
+        // ============================================================
+        // 19. INSTANCE METHOD
+        // ============================================================
+
+        int engineResult = engine.calculate(10, 20);
+
+        checkInt(engineResult, 33, "instance method return");
+
+
+        // ============================================================
+        // 20. CONSTRUCTOR CHAINING
+        // ============================================================
+
+        Engine defaultEngine = new Engine("Default");
+
+        checkString(defaultEngine.name, "Default", "constructor chaining name");
+
+        checkInt(defaultEngine.version, 0, "constructor chaining default value");
+
+
+        // ============================================================
+        // 21. STATIC FIELD / STATIC METHOD
+        // ============================================================
+
+        checkInt(Engine.globalValue, 1000, "static field");
+
+        int staticResult = Engine.addGlobal(25);
+
+        checkInt(staticResult, 1025, "static method");
+
+
+        // ============================================================
+        // 22. PRIMARY CONSTRUCTOR
+        // ============================================================
+
+        Person person = new Person("Furkan", 25);
+
+        checkString(person.name, "Furkan", "primary constructor String");
+
+        checkInt(person.age, 25, "primary constructor int");
+
+
+        // ============================================================
+        // 23. INHERITANCE
+        // ============================================================
+
+        Employee employee = new Employee("OceanDev", 100);
+
+        checkString(employee.name, "OceanDev", "inherited field");
+
+        checkInt(employee.salary, 100, "child field");
+
+        checkInt(employee.totalValue(), 110, "inherited + child method");
+
+
+        // ============================================================
+        // 24. DATA CLASS
+        // ============================================================
+
+        User userA = new User(1, "Alice");
+
+        User userB = new User(1, "Alice");
+
+        check(userA.equals(userB), "data class equals");
+
+        User userC = userA.copy();
+
+        check(userA.equals(userC), "data class copy");
+
+        checkString(userA.name, "Alice", "data class field access");
+
+
+        // ============================================================
+        // 25. GENERIC CLASS
+        // ============================================================
+
+        Box<String> stringBox = new Box<String>("GENERIC");
+
+        checkString(stringBox.get(), "GENERIC", "generic String return");
+
+
+        Box<int> integerBox = new Box<int>(123);
+
+        checkInt(integerBox.get(), 123, "generic primitive return");
+
+
+        // ============================================================
+        // 26. GENERIC RETURN TYPE
+        // ============================================================
+
+        GenericFactory factory = new GenericFactory();
+
+        String generated = factory.identity("Ocean");
+
+        checkString(generated, "Ocean", "generic method return type");
+
+
+        int generatedInt = factory.identity(777);
+
+        checkInt(generatedInt, 777, "generic method primitive inference");
+
+
+        // ============================================================
+        // 27. GENERIC ARRAY
+        // ============================================================
+
+        variable genericArray = {"A", "B", "C"};
+
+        int arrayCount = factory.count(genericArray);
+
+        checkInt(arrayCount, 3, "generic array parameter");
+
+
+        // ============================================================
+        // 28. UPPER BOUND
+        // ============================================================
+
+        NumberBox<Integer> numberBox = new NumberBox<Integer>(500);
+
+        checkInt(numberBox.valueAsInt(), 500, "generic upper bound");
+
+
+        // ============================================================
+        // 29. COVARIANCE
+        // ============================================================
+
+        Producer<String> stringProducer = new Producer<String>("Covariant");
+
+        Producer<CharSequence> sequenceProducer = stringProducer;
+
+        checkString( sequenceProducer.get().toString(),"Covariant", "generic covariance");
+
+
+        // ============================================================
+        // 30. CONTRAVARIANCE
+        // ============================================================
+
+        Consumer<CharSequence> sequenceConsumer = new Consumer<CharSequence>();
+
+        Consumer<String> childConsumer = sequenceConsumer;
+
+        childConsumer.consume("Contravariant");
+
+        check(true, "generic contravariance");
+
+
+        // ============================================================
+        // 31. COMBINED VARIANCE + UPPER BOUND
+        // ============================================================
+
+        NumberProducer<Integer> numberProducer = new NumberProducer<Integer>(900);
+
+        NumberProducer<Number> generalProducer = numberProducer;
+
+        checkInt(generalProducer.getInt(), 900, "combined covariance + upper bound");
+
+
+        // ============================================================
+        // 32. MAP LITERAL
+        // ============================================================
+
+        Map<String, int> table = {"A": 10, "B": 20, "C": 30};
+
+        checkInt(table.get("B"), 20, "Map literal");
+
+
+        // ============================================================
+        // 33. SET LITERAL
+        // ============================================================
+
+        Set<String> set = #{"Ocean", "Java", "Ocean","Compiler"};
+
+        checkInt(set.size(), 3, "Set uniqueness");
+
+
+        // ============================================================
+        // 34. EXTENSION METHOD
+        // ============================================================
+
+        int extensionValue = 12.square();
+
+        checkInt(extensionValue, 144, "primitive extension method");
+
+
+        String extensionText = "Ocean".decorate();
+
+        checkString(extensionText, "<Ocean>", "String extension method");
+
+
+        // ============================================================
+        // 35. DATA CLASS EXTENSION
+        // ============================================================
+
+        String userLabel = userA.label();
+
+        checkString(userLabel, "Alice#1", "data class extension method");
+
+
+        // ============================================================
+        // 36. PATTERN MATCHING
+        // ============================================================
+
+        Object object = new Engine("Pattern", 9);
+
+        variable patternMatched = false;
+
+        if (object instanceof Engine e) {
+            patternMatched = e.version == 9;
+        }
+
+        checkBool(patternMatched, true, "instanceof pattern matching");
+
+
+        // ============================================================
+        // 37. EXCEPTION + FINALLY
+        // ============================================================
+
+        variable caught = false;
+        variable finallyExecuted = false;
+
+        trying {
+            throw new IllegalArgumentException("expected");
+        } catch (IllegalArgumentException exc) {
+            caught = true;
+        } finally {
+            finallyExecuted = true;
+        }
+
+        checkBool(caught, true, "exception catch");
+
+        checkBool(finallyExecuted, true, "finally execution");
+
+
+        // ============================================================
+        // 38. MULTI CATCH
+        // ============================================================
+
+        variable multiCaught = false;
+        trying {
+            throw new NullPointerException("expected");
+        } catch (IllegalArgumentException | NullPointerException ex) {
+            multiCaught = true;
+        }
+
+        checkBool(multiCaught, true, "multi catch");
+
+
+        // ============================================================
+        // 39. LOCK
+        // ============================================================
+
+        Counter counterObject = new Counter();
+
+        counterObject.increment();
+        counterObject.increment();
+        counterObject.lockedIncrement();
+
+        checkInt(counterObject.get(), 3, "lock block");
+
+
+        // ============================================================
+        // 40. SYNC METHOD
+        // ============================================================
+
+        counterObject.syncIncrement();
+        counterObject.syncIncrement();
+
+        checkInt(counterObject.get(), 5, "sync method");
+
+
+        // ============================================================
+        // 41. ASYNC / AWAIT
+        // ============================================================
+
+        variable future = AsyncWorker.load("Ocean");
+
+        String asyncResult = future.join();
+
+        checkString(asyncResult, "ASYNC_Ocean", "async await");
+
+
+        // ============================================================
+        // 42. STATIC NESTED CLASS
+        // ============================================================
+
+        Outer.StaticNested nested = new Outer.StaticNested(77);
+
+        checkInt(nested.getValue(), 77, "static nested class");
+
+
+        // ============================================================
+        // 43. INNER CLASS + OUTER ACCESS
+        // ============================================================
+
+        Outer outer = new Outer(500);
+
+        Outer.Inner inner = outer.createInner();
+
+        checkInt(inner.readOuter(), 500, "inner class outer member access");
+
+
+        // ============================================================
+        // 44. INNER CLASS METHOD MUTATION
+        // ============================================================
+
+        inner.addToOuter(25);
+
+        checkInt(outer.val, 525, "inner class outer mutation");
+
+
+        // ============================================================
+        // 45. NULLABLE COLLECTION
+        // ============================================================
+
+        List<String>? nullableList = null;
+
+        List<String> safeList = nullableList ?? ["fallback", "value"];
+
+        checkInt(safeList.size(), 2, "nullable collection fallback");
+
+
+        // ============================================================
+        // 46. COMPLEX NESTED FUNCTION CALL
+        // ============================================================
+
+        int complex = factory.identity(engine.calculate(employee.totalValue(), numberBox.valueAsInt()));
+        checkInt(complex, 613, "nested generic + instance calls");
+
+
+        // ============================================================
+        // FINAL STATUS
+        // ============================================================
+
+        OceanOutput("");
+        OceanOutput("==============================================");
+        OceanOutput($"PASSED CHECKS: {passed}");
+        OceanOutput($"FAILED CHECKS: {failed}");
+        OceanOutput("==============================================");
+
+        if (failed == 0) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}
+
+
+// ====================================================================
+// ENGINE
+// ====================================================================
+
+public class Engine {
+
+    public String name;
+    public int version;
+
+    public static int globalValue = 1000;
+
+
+    // Constructor: NO return type.
+    public function Engine(String name, int version) {
+        this.name = name;
+        this.version = version;
+    }
+
+
+    // Constructor chaining: NO return type.
+    public function Engine(String name) {
+        this(name, 0);
+    }
+
+
+    // Normal function: RETURN TYPE IS REQUIRED.
+    public int function calculate(int a, int b) {
+        return a + b + version;
+    }
+
+
+    public static int function addGlobal(int val) {
+        return globalValue + val;
+    }
+}
+
+
+// ====================================================================
+// PRIMARY CONSTRUCTOR
+// ====================================================================
+
+public class Person(String name, int age) {
+    public variable name;
+    public variable age;
+
+    public function Person(String name, int age){
+        this.name = name;
+        this.age = age;
+    }
+
+    public String function description() {
+        return $"{name}:{age}";
+    }
+}
+
+
+// ====================================================================
+// INHERITANCE
+// ====================================================================
+
+public class Employee extends Person {
+
+    variable salary;
+
+    public function Employee(String name, int salary){
+        super(name,0);
+        this.salary = salary;
+    }
+
+    public int function totalValue() {
+        return salary + 10;
+    }
+}
+
+
+// ====================================================================
+// DATA CLASS
+// ====================================================================
+
+public data class User(int id, String name);
+
+
+// ====================================================================
+// GENERIC BOX
+// ====================================================================
+
+public class Box<T> {
+
+    private T val;
+
+
+    public function Box(T val) {
+        this.val = val;
+    }
+
+
+    public T function get() {
+        return val;
+    }
+}
+
+
+// ====================================================================
+// GENERIC METHOD HOST
+// ====================================================================
+
+public class GenericFactory {
+
+    public <T> T function identity(T val) {
+        return val;
+    }
+
+
+    public <T> int function count(T[] values) {
+
+        int res = 0;
+
+        for (T val in values) {
+            res++;
+        }
+
+        return res;
+    }
+}
+
+
+// ====================================================================
+// UPPER BOUND
+// ====================================================================
+
+public class NumberBox<T <: Number> {
+
+    private T val;
+
+
+    public function NumberBox(T val) {
+        this.val = val;
+    }
+
+
+    public int function valueAsInt() {
+        return val.intValue();
+    }
+}
+
+
+// ====================================================================
+// COVARIANT PRODUCER
+// ====================================================================
+
+public class Producer<+T> {
+
+    private T val;
+
+
+    public function Producer(T val) {
+        this.val = val;
+    }
+
+
+    public T function get() {
+        return val;
+    }
+}
+
+
+// ====================================================================
+// CONTRAVARIANT CONSUMER
+// ====================================================================
+
+public class Consumer<-T> {
+
+    public function Consumer() {
+    }
+
+
+    public void function consume(T val){
+        OceanOutput($"Consumed: {val}");
+    }
+}
+
+
+// ====================================================================
+// COVARIANT + UPPER BOUND
+// ====================================================================
+
+public class NumberProducer<+T <: Number> {
+
+    private T val;
+
+
+    public function NumberProducer(T val) {
+        this.val = val;
+    }
+
+
+    public int function getInt() {
+        return val.intValue();
+    }
+}
+
+
+// ====================================================================
+// EXTENSION METHODS
+// ====================================================================
+
+public class OceanExtensions {
+
+
+    public int int.function square() {
+        return this * this;
+    }
+
+
+    public String String.function decorate() {
+        return $"<{this}>";
+    }
+
+
+    public String User.function label() {
+        return $"{this.name}#{this.id}";
+    }
+}
+
+
+// ====================================================================
+// COUNTER
+// ====================================================================
+
+public class Counter {
+
+    private int val = 0;
+
+    private Object monitor = new Object();
+
+    public sync void function syncIncrement() {
+        val++;
+    }
+
+
+    public void function increment() {
+        val++;
+    }
+
+
+    public void function lockedIncrement() {
+
+        lock (monitor) {
+            val++;
+        }
+    }
+
+
+    public int function get() {
+        return this.val;
+    }
+}
+
+
+// ====================================================================
+// ASYNC
+// ====================================================================
+
+public class AsyncWorker {
+
+    public static async String function load(String val) {
+        String res = $"ASYNC_{val}";
+
+        return res;
+    }
+}
+
+
+// ====================================================================
+// OUTER / INNER CLASS
+// ====================================================================
+
+public class Outer {
+
+    public int val;
+
+
+    public function Outer(int val) {
+        this.val = val;
+    }
+
+
+    public Outer.Inner function createInner() {
+        return new Outer.Inner();
+    }
+
+
+    // ------------------------------------------------------------
+    // NON-STATIC INNER CLASS
+    // ------------------------------------------------------------
+
+    public class Inner {
+
+        public function Inner() {
+        }
+
+        public int function readOuter() {
+            return Outer.this.val;
+        }
+
+
+        public void function addToOuter(int amount) {
+            Outer.this.val += amount;
+        }
+    }
+
+
+    // ------------------------------------------------------------
+    // STATIC NESTED CLASS
+    // ------------------------------------------------------------
+
+    public static class StaticNested {
+
+        private int val;
+
+        public function StaticNested(int val) {
+            this.val = val;
+        }
+
+
+        public int function getValue() {
+            return val;
+        }
+    }
+}

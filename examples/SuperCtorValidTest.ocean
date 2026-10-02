@@ -1,0 +1,27 @@
+package com.resources;
+
+class Parent {
+    int x;
+    function Parent(int a) {
+        x = a;
+    }
+}
+
+class Child extends Parent {
+    function Child(int a) {
+        super(a + 10);
+    }
+}
+
+class SuperCtorValidTest {
+    main() {
+        variable c = new Child(5);
+        OceanOutput("=== SUPER CTOR VALID TEST START ===");
+        OceanOutput("Child x: " + c.x);
+        if (c.x == 15) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

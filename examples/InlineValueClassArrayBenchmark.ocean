@@ -1,0 +1,47 @@
+package com.resources;
+
+import java.util.Objects;
+
+@Inline
+class UserId {
+    public int id;
+    function UserId(int id) {
+        this.id = id;
+    }
+}
+
+class InlineValueClassArrayBenchmark {
+
+    static main() {
+        OceanOutput("=== INLINE VALUE CLASS ARRAY BENCHMARK START ===");
+        long start = System.nanoTime();
+
+        int size = 5000000; // 5 Milyon Elemanlı Dizi
+        UserId[] userArray = new UserId[size];
+
+        // 1. Fill Array with @Inline Value Instances (Zero Heap Object Allocation)
+        int i = 0;
+        while (i < size) {
+            userArray[i] = new UserId(i);
+            i = i + 1;
+        }
+
+        // 2. Iterate and Sum Array Elements
+        long sum = 0;
+        int j = 0;
+        while (j < size) {
+            sum = sum + userArray[j].id;
+            j = j + 1;
+        }
+
+        long durationMs = (System.nanoTime() - start) / 1000000;
+        OceanOutput("Duration (@Inline Array): " + durationMs + " ms");
+        OceanOutput("Sum: " + sum);
+
+        if (sum > 0) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

@@ -1,0 +1,29 @@
+package packagetest;
+
+interface MyInterface {
+    String function test();
+}
+
+class MyParent {
+    String function test() {
+        return "PARENT_CLASS";
+    }
+}
+
+class MyChild extends MyParent implements MyInterface {
+    // Child does not override test(), inherits parent's implementation
+}
+
+class ClassWinsPriorityTest {
+    static main() {
+        MyChild c = new MyChild();
+        String resultx = c.test();
+        OceanOutput("Result: " + resultx);
+        
+        if (resultx == "PARENT_CLASS") {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

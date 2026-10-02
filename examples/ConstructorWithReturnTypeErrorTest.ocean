@@ -1,0 +1,11 @@
+class ConstructorWithReturnTypeErrorTest {
+    variable s;
+    String function ConstructorWithReturnTypeErrorTest(String s){
+        this.s = s;
+    }
+
+    main(String[] args) {
+        ConstructorWithReturnTypeErrorTest c = new ConstructorWithReturnTypeErrorTest("deneme");
+        OceanOutput(c.s);
+    }
+}

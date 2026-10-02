@@ -1,0 +1,197 @@
+package tests;
+
+import java.lang.AutoCloseable;
+import java.lang.Runnable;
+import java.lang.Exception;
+import java.lang.NullPointerException;
+import java.lang.IllegalArgumentException;
+
+class MyResource implements AutoCloseable {
+    @Override
+    public void function close() {
+        OceanOutput("Resource closed.");
+    }
+}
+
+class SuperClass {
+    Object function getInfo() {
+        return "SuperInfo";
+    }
+}
+
+class SubClass extends SuperClass {
+    // Covariant return type (String instead of Object)
+    String function getInfo() {
+        return "SubInfo";
+    }
+}
+
+class Animal {
+}
+
+class Dog extends Animal {
+    int barkCount;
+    function Dog(int barkCount) {
+        this.barkCount = barkCount;
+    }
+}
+
+interface MathOp {
+    int function compute(int a, int b);
+}
+
+class StringExtensions {
+    public void String.function printUpper() {
+        OceanOutput(this.toUpperCase());
+    }
+}
+
+class Box<T> {
+    variable val;
+    function Box(Object val) {
+        this.val = val;
+    }
+    Object function getVal() {
+        return val;
+    }
+}
+
+class UltimateFeatureTest {
+    // sync field (volatile)
+    public sync int valField = 0;
+    
+    // static initializer block
+    public static int staticVal;
+    static {
+        staticVal = 42;
+    }
+
+    // lock method (synchronized)
+    public lock void function increment() {
+        this.valField = this.valField + 1;
+    }
+
+    // Varargs method
+    static int function sum(int... numbers) {
+        variable s = 0;
+        for (variable n in numbers) {
+            s = s + n;
+        }
+        return s;
+    }
+
+    // Nested Class
+    class Inner {
+        void function test() {
+            OceanOutput("Nested class instantiated successfully!");
+        }
+    }
+
+    static main() {
+        OceanOutput("--- Ultimate Feature Test ---");
+
+        // 1. Static Initializer
+        OceanOutput("Static value (should be 42): " + staticVal);
+        
+        // 2. Concurrency (sync field, lock method, lock statement)
+        variable testObj = new UltimateFeatureTest();
+        testObj.increment();
+        lock(testObj) {
+            OceanOutput("Incremented value: " + testObj.valField);
+        }
+
+        // 3. Varargs
+        variable sumVal = UltimateFeatureTest.sum(1, 2, 3, 4, 5);
+        OceanOutput("Varargs sum (should be 15): " + sumVal);
+
+        // 4. Switch Expression
+        variable num = 2;
+        variable msg = switch(num) {
+            case 1 -> "One"
+            case 2 -> "Two"
+            default -> "Other"
+        };
+        OceanOutput("Switch expression: " + msg);
+
+        // 5. Try-with-resources and Multi-catch
+        trying (MyResource r = new MyResource()) {
+            OceanOutput("Inside trying block.");
+            throw new IllegalArgumentException("Test error");
+        } catch (NullPointerException | IllegalArgumentException e) {
+            OceanOutput("Caught exception: " + e.getMessage());
+        }
+
+        // 6. Instanceof & Smart Cast / Pattern Matching
+        variable anim = (Animal) new Dog(3);
+        if (anim instanceof Dog d) {
+            OceanOutput("Pattern matching Dog bark count (should be 3): " + d.barkCount);
+        }
+
+        // 7. Lambdas
+        MathOp op = (int a, int b) -> a * b;
+        OceanOutput("Lambda execution (6 * 7 = 42): " + op.compute(6, 7));
+
+        // 8. Anonymous Inner Classes
+        Runnable run = new Runnable() {
+            public void function run() {
+                OceanOutput("Inside anonymous run.");
+            }
+        };
+        run.run();
+
+        // 9. Covariant Return Type
+        SuperClass sub = new SubClass();
+        OceanOutput("Covariant return getInfo: " + sub.getInfo());
+
+        // 10. Extension method usage
+        "hello world".printUpper();
+
+        // 11. Bounded Generics
+        Box<String> box = new Box("Generic Box Item");
+        OceanOutput("Generic Box item: " + box.getVal());
+
+        // 12. Nested Class Instantiation
+        variable innerObj = new UltimateFeatureTest.Inner();
+        innerObj.test();
+
+        // 13. Ternary Expression
+        variable ternaryRes = (1 < 2) ? "Ternary True" : "Ternary False";
+        OceanOutput("Ternary test: " + ternaryRes);
+
+        // 14. Range-based For Loop
+        variable rangeSum = 0;
+        for (variable i from 1 to 4 with increasing 1) {
+            rangeSum = rangeSum + i;
+        }
+        OceanOutput("Range-for sum (1+2+3=6): " + rangeSum);
+
+        // 15. While Loop
+        variable wCount = 0;
+        while (wCount < 3) {
+            wCount = wCount + 1;
+        }
+        OceanOutput("While loop final count (should be 3): " + wCount);
+
+        // 16. Array Allocation and Access
+        variable arr = new int[3];
+        arr[0] = 100;
+        arr[1] = 200;
+        arr[2] = 300;
+        OceanOutput("Array indexing (should be 200): " + arr[1]);
+
+        // 17. Increment and Decrement Operators
+        variable incVal = 10;
+        incVal++;
+        OceanOutput("After ++ (should be 11): " + incVal);
+        incVal--;
+        OceanOutput("After -- (should be 10): " + incVal);
+
+        // 18. Bitwise and Logical Operators
+        variable bitAnd = 5 & 3; // 1
+        variable logOr = true || false;
+        OceanOutput("Bitwise AND (5 & 3 = 1): " + bitAnd);
+        OceanOutput("Logical OR (true || false = true): " + logOr);
+
+        OceanOutput("--- Ultimate Test Passed Successfully ---");
+    }
+}

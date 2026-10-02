@@ -1,0 +1,13 @@
+package com.resources;
+
+class ParentClass {
+}
+
+interface ChildInterface extends ParentClass {
+}
+
+class InterfaceExtendsClassTest {
+    static main() {
+        OceanOutput("InterfaceExtendsClassTest ran!");
+    }
+}

@@ -1,0 +1,25 @@
+package tests;
+
+class ReturnPathErrorTest {
+    main() {}
+
+    int function badReturn(int val) {
+        if (val > 10) {
+            return 1;
+        }
+    }
+
+    int function badSwitch(int val) {
+        switch (val) {
+            case 1 -> {
+                return 10;
+            }
+            case 2 -> {
+                stop;
+            }
+            default -> {
+                return 30;
+            }
+        }
+    }
+}

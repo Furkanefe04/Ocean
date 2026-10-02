@@ -1,0 +1,15 @@
+package com.resources;
+
+public class NonStaticInnerFromStaticContextErrorTest {
+    public int x = 10;
+
+    public class Inner {
+        public int function getX() {
+            return x;
+        }
+    }
+
+    public static void function main(String[] args) {
+        Inner inner = new Inner();
+    }
+}

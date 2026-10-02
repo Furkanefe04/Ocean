@@ -1,0 +1,45 @@
+
+
+class Person {
+    public String name;
+
+    public function Person(String name) {
+        this.name = name;
+    }
+    public String function getName() {
+        return name;
+    }
+}
+
+class NestedTest {
+    public static String function testChained() {
+        OceanMap<String, OceanList<Person>> map = new OceanMap();
+        OceanList<Person> team = new OceanList();
+        team.add(new Person("Alice"));
+        team.add(new Person("Bob"));
+        map.put("devs", team);
+
+        // Chained access without manual cast: map.get("devs").get(1).getName()
+        return map.get("devs").get(1).getName();
+    }
+
+    public static String function testListIndex() {
+        OceanMap<String, OceanList<Person>> map = new OceanMap();
+        OceanList<Person> team = new OceanList();
+        team.add(new Person("Charlie"));
+        map.put("ops", team);
+        // List index access: map.get("ops")[0].getName()
+        return map.get("ops")[0].getName();
+    }
+
+    main() {
+        String x = testChained();
+        String y = testListIndex();
+        OceanOutput(x + " : " + y);
+        if (x.equals("Bob") && y.equals("Charlie")) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

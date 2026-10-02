@@ -1,0 +1,24 @@
+package tests;
+
+class MultiCatchVerificationTest {
+    static String? function getNull() {
+        return null;
+    }
+
+    static main() {
+        bool caught = false;
+        trying {
+            String s = (String) getNull();
+            s.length();
+        } catch (NullPointerException | ArithmeticException e) {
+            OceanOutput("Multi-catch caught: " + e.getClass().getSimpleName());
+            caught = true;
+        }
+
+        if (caught) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

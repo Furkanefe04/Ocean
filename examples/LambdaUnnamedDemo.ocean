@@ -1,0 +1,25 @@
+package com.resources.unnamed;
+
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+
+class LambdaUnnamedDemo {
+    public static void function main(String[] args) {
+        // 1. İkinci parametresi göz ardı edilen lambda
+        BiFunction<Integer, Integer, Integer> multiplier = (x, _) -> x * 10;
+        OceanOutput("Multiplier (5, 999): " + multiplier(5, 999)); // Çıktı: 50
+        // 2. Her iki parametresi de göz ardı edilen lambda
+        BiFunction<Integer, Integer, Integer> fixedSupplier = (_, _) -> 42;
+        OceanOutput("Fixed Supplier: " + fixedSupplier(10, 20)); // Çıktı: 42
+        // 3. Tek parametreli consumer lambda
+        variable notifier = (Consumer) ( _ ) -> OceanOutput("Bildirim: Yeni mesaj alındı!");
+        notifier("Bu içerik kullanılmıyor");
+        int mul = multiplier(5, 999);
+        int fixed = fixedSupplier(10, 20);
+        if (mul == 50 && fixed == 42) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

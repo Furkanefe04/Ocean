@@ -1,0 +1,152 @@
+package com.resources;
+
+import java.util.function.Function;
+import java.util.function.BiFunction;
+
+public interface OceanPipeline<In, Out> {
+    public Out function process(In data);
+}
+
+public interface ReverseCurried<R, T> {
+    public R function applyCurried(T input);
+}
+
+public class LambdaCalculator {
+    private int factor = 10;
+
+    public Function<Integer, Function<Integer, Integer>> function getCurriedMultiplier(int baseOffset) {
+        return (a) -> (b) -> (a + b + baseOffset) * factor;
+    }
+
+    public Function<Integer, Function<Integer, Function<Integer, Integer>>> function get3LevelCurried(int base) {
+        return (a) -> (b) -> (c) -> (a + b + c + base) * factor;
+    }
+}
+
+public class MultiLevelNestedLambdaTest {
+
+    public static void function testTwoLevelNestedCapture() {
+        int x = 100;
+        int y = 200;
+        Function<Integer, Function<Integer, Integer>> curried2 = (a) -> (b) -> a + b + x + y;
+        Function<Integer, Integer> step1 = curried2.apply(15);
+        Integer res = step1.apply(25);
+        // 15 + 25 + 100 + 200 = 340
+        if (!res.equals(340)) {
+            OceanOutput("FAILED: testTwoLevelNestedCapture expected 340 but got " + res);
+            return;
+        }
+    }
+
+    public static void function testFourLevelDeepNestedCapture() {
+        int baseOffset = 5;
+        Function<Integer, Function<Integer, Function<Integer, Function<Integer, Integer>>>> curried4 =
+            (a) -> (b) -> (c) -> (d) -> (a * 1000) + (b * 100) + (c * 10) + d + baseOffset;
+
+        Function<Integer, Function<Integer, Function<Integer, Integer>>> s1 = curried4.apply(1);
+        Function<Integer, Function<Integer, Integer>> s2 = s1.apply(2);
+        Function<Integer, Integer> s3 = s2.apply(3);
+        Integer finalVal = s3.apply(4);
+
+        // 1000 + 200 + 30 + 4 + 5 = 1239
+        if (!finalVal.equals(1239)) {
+            OceanOutput("FAILED: testFourLevelDeepNestedCapture expected 1239 but got " + finalVal);
+            return;
+        }
+    }
+
+    public static void function testNestedLambdaWithThisCapture() {
+        LambdaCalculator calc = new LambdaCalculator();
+        Function<Integer, Function<Integer, Integer>> curried = calc.getCurriedMultiplier(5);
+        Function<Integer, Integer> step1 = curried.apply(2);
+        Integer res = step1.apply(3);
+        // (2 + 3 + 5) * 10 = 100
+        if (!res.equals(100)) {
+            OceanOutput("FAILED: testNestedLambdaWithThisCapture expected 100 but got " + res);
+            return;
+        }
+
+        Function<Integer, Function<Integer, Function<Integer, Integer>>> curried3 = calc.get3LevelCurried(10);
+        Integer res3 = curried3.apply(1).apply(2).apply(3);
+        // (1 + 2 + 3 + 10) * 10 = 160
+        if (!res3.equals(160)) {
+            OceanOutput("FAILED: testNestedLambdaWithThisCapture (3 level) expected 160 but got " + res3);
+            return;
+        }
+    }
+
+    public static void function testNestedBlockLambdasWithLoops() {
+        int multiplier = 3;
+        Function<Integer, Function<Integer, Integer>> blockCurried = (int count) -> {
+            return (int addend) -> {
+                int sum = 0;
+                for (int i from 0 to count with increasing 1) {
+                    sum = sum + (i * multiplier);
+                }
+                return sum + addend;
+            };
+        };
+
+        // for i=0 to 4 (exclusive): 0*3 + 1*3 + 2*3 + 3*3 = 0 + 3 + 6 + 9 = 18 + 10 = 28
+        Integer resultx = blockCurried.apply(4).apply(10);
+        if (!resultx.equals(28)) {
+            OceanOutput("FAILED: testNestedBlockLambdasWithLoops expected 28 but got " + resultx);
+            return;
+        }
+    }
+
+    public static void function testCustomOceanInterfaceCurrying() {
+        int bonus = 500;
+        OceanPipeline<Integer, OceanPipeline<String, OceanPipeline<Integer, String>>> pipeline = 
+            (count) -> (prefix) -> (multiplier) -> prefix + ": " + ((count * multiplier) + bonus);
+
+        String val = pipeline.process(5).process("Total").process(20);
+        if (!val.equals("Total: 600")) {
+            OceanOutput("FAILED: testCustomOceanInterfaceCurrying expected 'Total: 600' but got " + val);
+            return;
+        }
+
+        // Reverse generic parameter order: ReverseCurried<R, T>
+        ReverseCurried<ReverseCurried<Integer, Integer>, Integer> rev = 
+            (a) -> (b) -> a + b + 50;
+        Integer r2 = rev.applyCurried(10).applyCurried(20);
+        if (!r2.equals(80)) {
+            OceanOutput("FAILED: testCustomOceanInterfaceCurrying (reverse) expected 80 but got " + r2);
+            return;
+        }
+    }
+
+    public static void function main(String[] args) {
+        LambdaCalculator calc = new LambdaCalculator();
+        Function<Integer, Function<Integer, Integer>> curried = calc.getCurriedMultiplier(5);
+        int res1 = curried.apply(2).apply(3);
+        // (2 + 3 + 5) * 10 = 100
+
+        Function<Integer, Function<Integer, Integer>> curried2 = (a) -> (b) -> a + b + 100 + 200;
+        int res2 = curried2.apply(15).apply(25);
+        // 15 + 25 + 100 + 200 = 340
+
+        Function<Integer, Function<Integer, Integer>> blockCurried = (int count) -> {
+            return (int addend) -> {
+                int sum = 0;
+                for (int i from 0 to count with increasing 1) {
+                    sum = sum + (i * 3);
+                }
+                return sum + addend;
+            };
+        };
+        int res3 = blockCurried.apply(4).apply(10);
+        // 28
+
+        String val = "Total: 600";
+        OceanPipeline<Integer, OceanPipeline<String, OceanPipeline<Integer, String>>> pipeline =
+            (count) -> (prefix) -> (multiplier) -> prefix + ": " + ((count * multiplier) + 500);
+        String res4 = pipeline.process(5).process("Total").process(20);
+
+        if (res1 == 100 && res2 == 340 && res3 == 28 && res4.equals(val)) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

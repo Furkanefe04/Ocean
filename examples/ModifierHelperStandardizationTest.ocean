@@ -1,0 +1,17 @@
+
+data class PersonData(String name, int age);
+
+class ModifierHelperStandardizationTest {
+    main() {
+        PersonData p = new PersonData("Ocean Developer", 25);
+        OceanOutput("Data class test: " + p.getName() + " (" + p.getAge() + ")");
+        p.setName("Furkan");
+        p.setAge(22);
+        if (p.getName().equals("Furkan") && p.getAge() == 22){
+            OceanOutput("STATUS: PASSED");
+        }
+        else{
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

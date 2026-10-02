@@ -1,0 +1,156 @@
+plugins {
+    id 'java'
+    id 'antlr'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+}
+
+group = 'ocean'
+version = '1.0-SNAPSHOT'
+
+shadowJar {
+    archiveBaseName.set('Ocean')
+    archiveClassifier.set('all')
+    archiveVersion.set('')
+    manifest {
+        attributes 'Main-Class': 'ocean.compiler.OceanRunner'
+    }
+}
+tasks.register("runAllTest", Exec) {
+    dependsOn 'shadowJar'
+    commandLine(
+            "powershell.exe",
+            "-ExecutionPolicy", "Bypass",
+            "-File", file("test_logical_correctness.ps1").absolutePath
+    )
+}
+
+
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    antlr "org.antlr:antlr4:4.13.1"
+    implementation "org.antlr:antlr4-runtime:4.13.1"
+    implementation "org.ow2.asm:asm:9.6"
+    implementation "org.ow2.asm:asm-util:9.6"
+    // Test için deneysel importlar
+    implementation 'org.apache.commons:commons-lang3:3.18.0'
+    implementation 'commons-beanutils:commons-beanutils:1.11.0'
+    implementation "com.google.code.gson:gson:2.10.1"
+    implementation "com.fasterxml.jackson.core:jackson-databind:2.16.1"
+    implementation "com.google.guava:guava:33.0.0-jre"
+    implementation "com.squareup.okhttp3:okhttp:4.12.0"
+    implementation "joda-time:joda-time:2.12.5"
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.1'
+}
+
+test {
+    useJUnitPlatform()
+    exclude 'benchmarks/**'
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/main/java', 'src/generated/java']
+        }
+    }
+}
+
+tasks.named('generateGrammarSource', AntlrTask).configure {
+    outputDirectory = file('src/generated/java')
+    arguments = ['-visitor']
+}
+compileJava.dependsOn generateGrammarSource
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+tasks.register('run', JavaExec) {
+    dependsOn classes
+    mainClass = 'ocean.compiler.OceanRunner'
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
+    if (project.hasProperty('quiet')) {
+        systemProperty 'quiet', 'true'
+    }
+    doFirst {
+        if (project.hasProperty('oceanArgs')) {
+            String oceanArgsStr = project.getProperty('oceanArgs')
+            args = oceanArgsStr.split("\\s+").toList()
+        }
+    }
+}
+
+tasks.register('runV3', JavaExec) {
+    dependsOn classes
+    mainClass = 'ocean.compiler.OceanRunnerV3'
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
+    if (project.hasProperty('quiet')) {
+        systemProperty 'quiet', 'true'
+    }
+    doFirst {
+        if (project.hasProperty('oceanArgs')) {
+            String oceanArgsStr = project.getProperty('oceanArgs')
+            args = oceanArgsStr.split("\\s+").toList()
+        }
+    }
+}
+
+tasks.register('runOcean', JavaExec) {
+    mainClass = 'ocean.compiler.OceanRunner'
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
+    if (project.hasProperty('oceanArgs')) {
+        args = project.getProperty('oceanArgs').split("\\s+").toList()
+    }
+}
+
+tasks.register('copyOceanDeps', Copy) {
+    from configurations.runtimeClasspath
+    into 'build/ocean_deps'
+}
+
+tasks.register('buildAndTest'){
+    dependsOn 'test'
+    dependsOn 'runAllTest'
+}
+
+tasks.register('packageSdk', Zip) {
+    dependsOn shadowJar
+    archiveBaseName.set('ocean')
+    archiveVersion.set('1.0.0')
+    archiveClassifier.set('')
+    destinationDirectory.set(file("$buildDir/distributions"))
+
+    into("ocean-1.0.0") {
+        into('bin') {
+            from('ocean.bat')
+            from('ocean')
+            fileMode = 0755
+        }
+        into('lib') {
+            from(shadowJar.archiveFile)
+        }
+        into('examples') {
+            from('examples')
+        }
+        from('README.md')
+        from('LICENSE')
+        from('BENCHMARK.md')
+    }
+}
+
+tasks.register('distSdk') {
+    dependsOn 'packageSdk'
+}
+
+

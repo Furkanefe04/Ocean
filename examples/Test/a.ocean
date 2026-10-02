@@ -1,0 +1,29 @@
+package Test;
+
+import java.io.IOException;
+import java.io.FileNotFoundException;
+import java.io.FileInputStream;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+class a {
+    main(){
+        Integer a =5;
+        Integer b = 10;
+        String c = "";
+        bool d = true;
+        int e = 0;
+        List<Integer> val = [10,20,30];
+        OceanOutput(val);
+    }
+
+}
+public class Animal {}
+public class Dog extends Animal {}
+public class Cat extends Animal {}
+interface q {
+    value x = 100;
+}
+
+

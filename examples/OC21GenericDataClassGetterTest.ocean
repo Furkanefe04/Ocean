@@ -1,0 +1,29 @@
+data class GenericPair<T, U>(T first, U second);
+
+class OC21GenericDataClassGetterTest {
+    public static void function main(String[] args) {
+        GenericPair<String, int> pair = new GenericPair<String, int>("hello ocean", 42);
+        
+        // Calling String method directly on getFirst() without explicit cast
+        int len = pair.getFirst().length();
+        if (len != 11) {
+            OceanOutput("FAILED: len != 11, was " + len);
+            System.exit(1);
+        }
+
+        String upper = pair.getFirst().toUpperCase();
+        if (!upper.equals("HELLO OCEAN")) {
+            OceanOutput("FAILED: upper != HELLO OCEAN");
+            System.exit(1);
+        }
+
+        int sec = pair.getSecond() + 10;
+        if (sec != 52) {
+            OceanOutput("FAILED: sec != 52");
+            System.exit(1);
+        }
+
+        OceanOutput("OC-21 Generic Data Class Getter Test: PASSED");
+        OceanOutput("STATUS: PASSED");
+    }
+}

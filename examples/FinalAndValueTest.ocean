@@ -1,0 +1,21 @@
+class FinalAndValueTest {
+    final int fieldConst = 42;
+    value fieldVal = 100;
+
+    main() {
+        final int a = 10;
+        value b = 20;
+        int c = 30;
+        variable d = 40;
+        OceanOutput(a);
+        OceanOutput(b);
+        OceanOutput(c);
+        OceanOutput(d);
+        if (a == 10 && b == 2 && c == 30 && d == 40) {
+            OceanOutput("STATUS: PASSED");
+        }
+        else {
+            OceanOutput("STATUS: PASSED");
+        }
+    }
+}

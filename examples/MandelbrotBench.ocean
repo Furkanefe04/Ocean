@@ -1,0 +1,40 @@
+package com.resources;
+    class MandelbrotBench {
+    static main() {
+        int width = 1000;
+        int height = 1000;
+        int maxIter = 1000;
+        int totalIterations = 0;
+
+        OceanOutput("--- Mandelbrot Benchmark (1000x1000, 1000 iterations) ---");
+        variable startTime = System.nanoTime();
+
+        for (int y from 0 to  height with increasing 1) {
+            double c_im = (y - height / 2.0) * 4.0 / height;
+            for (int x from 0 to width with increasing 1) {
+                double c_re = (x - width / 2.0) * 4.0 / width;
+                double z_re = 0.0;
+                double z_im = 0.0;
+                int iter = 0;
+                
+                while (iter < maxIter && (z_re * z_re + z_im * z_im) <= 4.0) {
+                    double new_re = z_re * z_re - z_im * z_im + c_re;
+                    z_im = 2.0 * z_re * z_im + c_im;
+                    z_re = new_re;
+                    iter++;
+                }
+                totalIterations = totalIterations + iter;
+            }
+        }
+
+        variable endTime = System.nanoTime();
+        double durationMs = (endTime - startTime) / 1000000.0;
+
+        OceanOutput("Time: " + durationMs + " ms");
+        if (totalIterations == 97927415) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

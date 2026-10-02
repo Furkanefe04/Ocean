@@ -1,0 +1,61 @@
+package com.resources;
+import java.lang.Runnable;
+
+interface HelperFactory {
+    RefHelper function create(String msg);
+}
+
+interface HelperPrinter {
+    void function print(RefHelper instance);
+}
+
+class RefHelper {
+    variable message = "";
+    
+    function RefHelper(String msg) {
+        message = msg;
+    }
+    
+    void function printMessage() {
+        Output(message);
+    }
+}
+
+class MethodRefTest {
+    void function sayHello() {
+        Output("Hello from Method Reference!");
+    }
+    
+    static void function staticSayHello() {
+        Output("Hello from static Method Reference!");
+    }
+    
+    main() {
+        variable test = new MethodRefTest();
+        
+        // 1. Bound instance reference
+        variable r = (Runnable) test::sayHello;
+        r();
+        
+        variable runnablex = (Runnablex) test::sayHello;
+        runnablex();
+        
+        // 2. Static method reference
+        variable rStatic = (Runnable) MethodRefTest::staticSayHello;
+        rStatic();
+        
+        // 3. Constructor reference
+        variable factory = (HelperFactory) RefHelper::new;
+        variable helper = factory.create("Hello from Constructor Reference!");
+        
+        // 4. Unbound instance method reference
+        variable printer = (HelperPrinter) RefHelper::printMessage;
+        printer.print(helper);
+
+        if (helper != null && "Hello from Constructor Reference!".equals(helper.message)) {
+            Output("STATUS: PASSED");
+        } else {
+            Output("STATUS: FAILED");
+        }
+    }
+}

@@ -1,0 +1,9 @@
+class StaticContextErrorTest {
+    int deneme = 10;
+    static int d = 20;
+    main(){
+        d = 10;
+        deneme = 20;
+        OceanOutput(deneme);
+    }
+}

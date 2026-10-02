@@ -1,0 +1,33 @@
+package Test;
+
+class x64Processor extends Processor<Data,Integer> {
+    int threadInSleep;
+    function x64Processor(String name,int threads){
+        super(name,threads);
+        threadInSleep = threads;
+    }
+
+    @Override
+    Integer function process(Data pData) throws ProcessorException {
+        if(threadInSleep==0) throw new ProcessorException("Insufficient core",this);
+        threadInSleep--;
+        OceanOutput(super.name +" sleep cores : "+threadInSleep);
+        if(control(pData)){
+            trying{
+                Thread.sleep(100);
+                threadInSleep++;
+            }
+            catch(Exception e){
+                OceanOutput(e.getMessage());
+            }
+            return (Integer)((String)(pData.command)).length();
+        }
+        threadInSleep++;
+        throw new ProcessorException("Cannot process RISC data by x64 processor",this);
+    }
+
+    @Override
+    bool function control(Data pData){
+        return pData.commandLenght == 6;
+    }
+}

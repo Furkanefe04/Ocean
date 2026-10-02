@@ -1,0 +1,91 @@
+package com.resources;
+    class SearchSortBenchmark {
+    static void function quickSort(int[] arr, int low, int high) {
+        if (low < high) {
+            int pi = partition(arr, low, high);
+            quickSort(arr, low, pi - 1);
+            quickSort(arr, pi + 1, high);
+        }
+    }
+
+    static int function partition(int[] arr, int low, int high) {
+        int pivot = arr[high];
+        int i = low - 1;
+        for (int j from low to high with increasing 1) {
+            if (arr[j] < pivot) {
+                i = i + 1;
+                int temp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = temp;
+            }
+        }
+        int temp2 = arr[i + 1];
+        arr[i + 1] = arr[high];
+        arr[high] = temp2;
+        return i + 1;
+    }
+
+    static int function binarySearch(int[] arr, int target) {
+        int low = 0;
+        int high = arr.length - 1;
+        while (low <= high) {
+            int mid = low + (high - low) / 2;
+            if (arr[mid] == target) { return mid; }
+            if (arr[mid] < target) { low = mid + 1; }
+            else { high = mid - 1; }
+        }
+        return -1; 
+    }
+
+    static int function runBench(int sortN, int searchN) {
+        int[] arr = new int[sortN];
+        for (int i from 0 to sortN with increasing 1) {
+            arr[i] = sortN - i;
+        }
+        quickSort(arr, 0, sortN - 1);
+
+        int[] searchArr = new int[searchN];
+        for (int i from 0 to searchN with increasing 1) {
+            searchArr[i] = i * 2;
+        }
+        int checksum = 0;
+        for (int i from 0 to 99 with increasing 1) {
+            checksum = checksum + binarySearch(searchArr, i * 1000);
+        }
+        return checksum;
+    }
+
+    main() {
+        int sortN = 10000;
+        int searchN = 1000000;
+        int trials = 5;
+        int warmUp = 5;
+
+        OceanOutput("--- Ocean Search & Sort (Quicksort 10K, BSearch 1M) Benchmark ---");
+
+        for (int i from 1 to warmUp with increasing 1) {
+            runBench(sortN, searchN);
+        }
+
+        long totalTimeNs = 0;
+        bool pass = true;
+        for (int i from 1 to trials with increasing 1) {
+            long start = System.nanoTime();
+            int check = runBench(sortN, searchN);
+            if (check != 2425500) {
+                pass = false;
+            }
+            long end = System.nanoTime();
+            long durationNs = end - start;
+            totalTimeNs = totalTimeNs + durationNs;
+            OceanOutput("Trial " + i + ": " + (durationNs / 1000000) + " ms (check=" + check + ")");
+        }
+
+        OceanOutput("Average Time: " + (totalTimeNs / trials / 1000000) + " ms");
+        if (pass) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

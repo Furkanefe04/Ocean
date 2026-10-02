@@ -1,0 +1,314 @@
+﻿package com.resources;
+
+// =========================================================================
+// 1. DATA CLASS, ENUM VE ARAYÜZ HİYERARŞİSİ
+// =========================================================================
+
+interface IPayload {
+    String function getPayloadId();
+    int function getPriority();
+}
+
+interface ISecurePayload extends IPayload {
+    String function getSecuritySignature();
+}
+
+enum PipelinePhase {
+    INGESTION(1, "GIRIS"),
+    VALIDATION(2, "DOGRULAMA"),
+    TRANSFORMATION(3, "DONUSUM"),
+    DISPATCH(4, "DAGITIM");
+
+    int phaseCode;
+    String phaseName;
+
+    function PipelinePhase(int code, String name) {
+        phaseCode = code;
+        phaseName = name;
+    }
+
+    int function getPhaseCode() { return phaseCode; }
+    String function getPhaseName() { return phaseName; }
+}
+
+data class BasePayload(String payloadId, int priority) implements IPayload;
+
+data class QuantumSecurePayload(String payloadId, int priority, String securitySignature) implements ISecurePayload;
+
+data class TelemetrySecurePayload(String payloadId, int priority, String securitySignature, String nodeCluster) implements ISecurePayload;
+
+// =========================================================================
+// 2. ERİŞİM BELİRLEYİCİLERİ & ENKAPSÜLASYON (Access Modifiers & Encapsulation)
+// =========================================================================
+
+class QuantumVault {
+    private String privateSecretKey;
+    private int operationCounter;
+    protected String securityDomain;
+
+    public function QuantumVault(String secretKey, String domain) {
+        privateSecretKey = secretKey;
+        securityDomain = domain;
+        operationCounter = 0;
+    }
+
+    private String function computeHash() {
+        return $"HASH_{privateSecretKey}_{operationCounter}";
+    }
+
+    public String function signData(String data) {
+        operationCounter = operationCounter + 1;
+        String hash = computeHash();
+        return $"[SIGNED: {data} # {hash}]";
+    }
+
+    public int function getOperationCount() {
+        return operationCounter;
+    }
+
+    public String function getDomain() {
+        return securityDomain;
+    }
+}
+
+// =========================================================================
+// 3. EXTENSION METHODS (Genişletme Metotları)
+// =========================================================================
+
+class QuantumExtensions {
+    public String QuantumSecurePayload.function formatAuditTrail() {
+        return $"[AUDIT: id={this.getPayloadId()}, prio={this.getPriority()}, sig={this.getSecuritySignature()}]";
+    }
+
+    public int PipelinePhase.function computeRiskScore(int baseWeight) {
+        return this.getPhaseCode() * baseWeight;
+    }
+}
+
+// =========================================================================
+// 4. SAM INTERFACE VE VARYANS SINIFLARI (-In, +Out)
+// =========================================================================
+
+interface IPayloadTransformer<InPayload, OutPayload> {
+    OutPayload function transform(InPayload input);
+}
+
+class FlowProducer<+T> {
+    private T item;
+
+    public function FlowProducer(T pItem) {
+        item = pItem;
+    }
+
+    public T function produce() {
+        return item;
+    }
+}
+
+class FlowSink<-T> {
+    private int receivedCount;
+    private String lastSummary;
+
+    public function FlowSink() {
+        receivedCount = 0;
+        lastSummary = "EMPTY";
+    }
+
+    public void function consume(T pItem) {
+        receivedCount = receivedCount + 1;
+        if (pItem instanceof IPayload p) {
+            lastSummary = p.getPayloadId();
+        }
+    }
+
+    public int function getCount() { return receivedCount; }
+    public String function getLastSummary() { return lastSummary; }
+}
+
+class AsyncPipelineJunction<-In, +Out> {
+    private Out fixedResult;
+
+    public function AsyncPipelineJunction(Out result) {
+        fixedResult = result;
+    }
+
+    public Out function process(In input) {
+        return fixedResult;
+    }
+}
+
+// =========================================================================
+// 5. ASENKRON İŞLEMLER VE ANA TEST SINIFI
+// =========================================================================
+
+class QuantumEnginePipelineStressTest {
+
+    public static String function evaluatePhase(PipelinePhase phase) {
+        return switch (phase) {
+            case PipelinePhase.INGESTION -> "Phase 1: Ingest"
+            case PipelinePhase.VALIDATION -> "Phase 2: Validate"
+            case PipelinePhase.TRANSFORMATION -> "Phase 3: Transform"
+            case PipelinePhase.DISPATCH -> "Phase 4: Dispatch"
+            default -> "Unknown Phase"
+        };
+    }
+
+    public static async String function runIngestionAsync(String rawId) {
+        String prefix = "INGESTED_";
+        return prefix + rawId;
+    }
+
+    public static async QuantumSecurePayload function buildSecurePayloadAsync(String payloadId, int priority, String sig) {
+        QuantumSecurePayload payload = new QuantumSecurePayload(payloadId, priority, sig);
+        return payload;
+    }
+
+    public static async void function runAsyncSuite() {
+        OceanOutput("=================================================");
+        OceanOutput("     QUANTUM ENGINE PIPELINE STRESS TEST         ");
+        OceanOutput("=================================================");
+        int totalPassed = 0;
+
+        // -----------------------------------------------------------------
+        // [TEST 1] Erişim Belirleyicileri ve Enkapsülasyon Doğrulaması
+        // -----------------------------------------------------------------
+        QuantumVault vault = new QuantumVault("SECRET_ALPHA", "SEC_CLUSTER_1");
+        String signResult1 = vault.signData("TRANSACTION_001");
+        String signResult2 = vault.signData("TRANSACTION_002");
+
+        if (vault.getOperationCount() == 2 && signResult1.contains("HASH_SECRET_ALPHA_1") && signResult2.contains("HASH_SECRET_ALPHA_2")) {
+            OceanOutput("[PASS 1] Erişim Belirleyicileri ve Enkapsülasyon Doğrulaması Başarılı.");
+            totalPassed++;
+        }
+
+        // -----------------------------------------------------------------
+        // [TEST 2] Data Class'lar, Equals, HashCode ve Copy Mekanizması
+        // -----------------------------------------------------------------
+        QuantumSecurePayload p1 = new QuantumSecurePayload("Q_PAYLOAD_100", 5, "SIG_XYZ_999");
+        QuantumSecurePayload p2 = p1.copy();
+        QuantumSecurePayload p3 = new QuantumSecurePayload("Q_PAYLOAD_100", 5, "SIG_XYZ_999");
+        TelemetrySecurePayload tele1 = new TelemetrySecurePayload("TELE_200", 10, "SIG_TELE_001", "EU_CENTRAL");
+
+        if (p1.equals(p2) && p1.equals(p3) && p1.hashCode() == p3.hashCode() && tele1.getNodeCluster() == "EU_CENTRAL") {
+            OceanOutput("[PASS 2] Data Class Alanları, Equals ve Copy Doğrulaması Başarılı.");
+            totalPassed++;
+        }
+
+        // -----------------------------------------------------------------
+        // [TEST 3] Extension Methodlar ve Enum Entegrasyonu
+        // -----------------------------------------------------------------
+        String auditStr = p1.formatAuditTrail();
+        PipelinePhase phaseVal = PipelinePhase.TRANSFORMATION;
+        int riskScore = phaseVal.computeRiskScore(25);
+
+        if (auditStr == "[AUDIT: id=Q_PAYLOAD_100, prio=5, sig=SIG_XYZ_999]" && riskScore == 75) {
+            OceanOutput("[PASS 3] Extension Methodlar ve Enum Entegrasyonu Başarılı.");
+            totalPassed++;
+        }
+
+        // -----------------------------------------------------------------
+        // [TEST 4] Switch Expression (Enum Eşleme)
+        // -----------------------------------------------------------------
+        String phase1Name = evaluatePhase(PipelinePhase.INGESTION);
+        String phase4Name = evaluatePhase(PipelinePhase.DISPATCH);
+
+        if (phase1Name == "Phase 1: Ingest" && phase4Name == "Phase 4: Dispatch") {
+            OceanOutput("[PASS 4] Switch Expression (Enum Eşleme) Başarılı.");
+            totalPassed++;
+        }
+
+        // -----------------------------------------------------------------
+        // [TEST 5] Kovaryans (+T) Polimorfik Atama ve Tüketim
+        // -----------------------------------------------------------------
+        FlowProducer<TelemetrySecurePayload> teleProducer = new FlowProducer<TelemetrySecurePayload>(tele1);
+        FlowProducer<ISecurePayload> secureProducer = teleProducer; // Covariant assignment
+        FlowProducer<IPayload> baseProducer = secureProducer;       // Covariant assignment
+
+        IPayload emittedPayload = baseProducer.produce();
+        if (emittedPayload.getPayloadId() == "TELE_200" && emittedPayload.getPriority() == 10) {
+            OceanOutput("[PASS 5] Kovaryant Üretici (+T) Polimorfik Atama Başarılı.");
+            totalPassed++;
+        }
+
+        // -----------------------------------------------------------------
+        // [TEST 6] Kontravaryans (-T) ve Tüketici Hatları
+        // -----------------------------------------------------------------
+        FlowSink<IPayload> generalSink = new FlowSink<IPayload>();
+        FlowSink<ISecurePayload> secureSink = generalSink;      // Contravariant assignment
+        FlowSink<TelemetrySecurePayload> teleSink = secureSink; // Contravariant assignment
+
+        teleSink.consume(tele1);
+        secureSink.consume(p1);
+
+        if (generalSink.getCount() == 2 && generalSink.getLastSummary() == "Q_PAYLOAD_100") {
+            OceanOutput("[PASS 6] Kontravaryant Tüketici (-T) Boru Hattı Başarılı.");
+            totalPassed++;
+        }
+
+        // -----------------------------------------------------------------
+        // [TEST 7] Lambda ve SAM Arayüz Entegrasyonu
+        // -----------------------------------------------------------------
+        IPayloadTransformer<QuantumSecurePayload, String> transformer = (QuantumSecurePayload p) -> {
+            return p.formatAuditTrail();
+        };
+        String lambdaResult = transformer.transform(p1);
+
+        if (lambdaResult.contains("Q_PAYLOAD_100") && lambdaResult.contains("SIG_XYZ_999")) {
+            OceanOutput("[PASS 7] Lambda ve SAM Arayüz Entegrasyonu Başarılı.");
+            totalPassed++;
+        }
+
+        // -----------------------------------------------------------------
+        // [TEST 8] İki Yönlü Varyans (-In, +Out) Kavşağı
+        // -----------------------------------------------------------------
+        AsyncPipelineJunction<IPayload, TelemetrySecurePayload> junc = new AsyncPipelineJunction<IPayload, TelemetrySecurePayload>(tele1);
+        AsyncPipelineJunction<ISecurePayload, IPayload> polyJunc = junc; // Contravariant In, Covariant Out
+
+        IPayload juncOut = polyJunc.process(p1);
+        if (juncOut.getPayloadId() == "TELE_200") {
+            OceanOutput("[PASS 8] İki Yönlü Varyans (-In, +Out) Kavşağı Başarılı.");
+            totalPassed++;
+        }
+
+        // -----------------------------------------------------------------
+        // [TEST 9] Null Güvenliği, Safe Call (?.) ve Null Coalescing (??)
+        // -----------------------------------------------------------------
+        QuantumSecurePayload? optPayload = p1;
+        QuantumSecurePayload? nullPayload = null;
+
+        String safeId1 = optPayload?.getPayloadId() ?? "UNKNOWN";
+        String safeId2 = nullPayload?.getPayloadId() ?? "FALLBACK_ID";
+
+        if (safeId1 == "Q_PAYLOAD_100" && safeId2 == "FALLBACK_ID") {
+            OceanOutput("[PASS 9] Null Güvenliği, Safe Call (?.) ve Null Coalescing (??) Başarılı.");
+            totalPassed++;
+        }
+
+        // -----------------------------------------------------------------
+        // [TEST 10] Asenkron Yürütme Motoru (Async / Await)
+        // -----------------------------------------------------------------
+        variable f1 = runIngestionAsync("STREAM_9000");
+        String asyncRaw = await f1;
+
+        variable f2 = buildSecurePayloadAsync(asyncRaw, 8, "SIG_ASYNC_TOKEN");
+        QuantumSecurePayload asyncPayload = await f2;
+
+        if (asyncPayload.getPayloadId() == "INGESTED_STREAM_9000" && asyncPayload.getPriority() == 8 && asyncPayload.getSecuritySignature() == "SIG_ASYNC_TOKEN") {
+            OceanOutput("[PASS 10] Asenkron (Async / Await) Reaktif Motor Başarılı.");
+            totalPassed++;
+        }
+
+        OceanOutput("-------------------------------------------------");
+        OceanOutput($"Toplam Başarılı Test Aşaması: {totalPassed} / 10");
+
+        if (totalPassed == 10) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+
+    static main() {
+        runAsyncSuite().join();
+    }
+}

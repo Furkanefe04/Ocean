@@ -1,0 +1,96 @@
+package com.resources;
+    class CountingSortTest {
+
+    static int function countingSort(int[] arr, int n, int maxVal) {
+        variable count = new int[maxVal + 1];
+        variable output = new int[n];
+
+        // Sayma
+        for (int i from 0 to n with increasing 1) {
+            count[arr[i]] = count[arr[i]] + 1;
+        }
+
+        // Kumulatif toplam (Bitis dahil olmasi icin + 1)
+        for (int i from 1 to maxVal + 1 with increasing 1) {
+            count[i] = count[i] + count[i - 1];
+        }
+
+        // Sondan basa yerlestir (stable sort)
+        variable j = n - 1;
+        while (j >= 0) {
+            variable val = arr[j];
+            count[val] = count[val] - 1;
+            output[count[val]] = val;
+            j = j - 1;
+        }
+
+        // Geri kopyala
+        for (int i from 0 to n with increasing 1) {
+            arr[i] = output[i];
+        }
+
+        return 1;
+    }
+
+    static main() {
+        OceanOutput("==============================================");
+        OceanOutput("  COUNTING SORT BENCHMARK");
+        OceanOutput("==============================================");
+
+        variable size = 10000;
+        variable maxVal = 10000;
+        variable arr = new int[size];
+
+        // Diziyi doldur (deterministik pseudo-random)
+        for (int i from 0 to size with increasing 1) {
+            arr[i] = ((i * 7 + 13) * 31) % (maxVal + 1);
+        }
+
+        OceanOutput("Dizi olusturuldu: " + size + " eleman, max=" + maxVal);
+        OceanOutput("Ilk 10 eleman (once):");
+        for (int i from 0 to 10 with increasing 1) {
+            OceanOutput("  [" + i + "] = " + arr[i]);
+        }
+
+        // Sort
+        OceanOutput("");
+        OceanOutput("Counting Sort baslatiliyor...");
+        countingSort(arr, size, maxVal);
+        OceanOutput("Counting Sort tamamlandi.");
+
+        // Dogrulama
+        OceanOutput("");
+        OceanOutput("Ilk 10 eleman (sonra):");
+        for (int i from 0 to 10 with increasing 1) {
+            OceanOutput("  [" + i + "] = " + arr[i]);
+        }
+
+        variable sorted = 1;
+        for (int i from 0 to size - 1 with increasing 1) {
+            if (arr[i] > arr[i + 1]) {
+                sorted = 0;
+            }
+        }
+
+        OceanOutput("");
+        if (sorted == 1) {
+            OceanOutput("DOGRULAMA: BASARILI - Dizi dogru siralanmis!");
+        } else {
+            OceanOutput("DOGRULAMA: HATALI - Dizi siralanmamis!");
+        }
+
+        // Checksum
+        variable chk = 0;
+        for (int i from 0 to size with increasing 1) {
+            chk = chk ^ arr[i];
+        }
+        OceanOutput("XOR Checksum = " + chk);
+
+        OceanOutput("==============================================");
+        if (sorted == 1 && chk == 10154) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

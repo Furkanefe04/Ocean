@@ -1,0 +1,112 @@
+package com.resources;
+
+import java.util.Comparator;
+
+@FunctionalInterface
+public interface ItemMapper<IN, OUT> {
+    public OUT function map(IN item);
+}
+
+@FunctionalInterface
+public interface ItemFilter<T> {
+    public bool function accept(T item);
+}
+
+public interface RootService<T> {
+    public String function getServiceId();
+    public int function processCount();
+}
+
+public interface AsyncProcessorService<T, R> extends RootService<T> {
+    public OceanList<R> function mapBatch(OceanList<T> inputs, ItemMapper<T, R> mapper);
+}
+
+public class UltimateSAMAndHierarchyStressTest implements AsyncProcessorService<String, String> {
+
+    @Override
+    public String function getServiceId() {
+        return "ULTIMATE_SAM_SERVICE_V1";
+    }
+
+    @Override
+    public int function processCount() {
+        return 100;
+    }
+
+    @Override
+    public OceanList<String> function mapBatch(OceanList<String> inputs, ItemMapper<String, String> mapper) {
+        variable resultx = [];
+        for (int i from 0 to inputs.size() with increasing 1) {
+            String mapped = mapper.map((String) inputs.get(i));
+            resultx.add(mapped);
+        }
+        return resultx;
+    }
+
+    public static OceanList<String> function filterList(OceanList<String> inputs, ItemFilter<String> filter) {
+        variable filtered = [];
+        for (int i from 0 to inputs.size() with increasing 1) {
+            String item = (String) inputs.get(i);
+            if (filter.accept(item)) {
+                filtered.add(item);
+            }
+        }
+        return filtered;
+    }
+
+    main() {
+        OceanOutput("=== ULTIMATE SAM & HIERARCHY STRESS TEST START ===");
+
+        UltimateSAMAndHierarchyStressTest service = new UltimateSAMAndHierarchyStressTest();
+        OceanOutput("Service ID: " + service.getServiceId() + ", Count: " + service.processCount());
+
+        variable rawData = ["apple", "banana", "cherry", "date", "elderberry"];
+
+        // Test Custom SAM Mapper
+        ItemMapper<String, String> formatter = new ItemMapper<String, String>() {
+            @Override
+            public String function map(String item) {
+                return "[" + item.toUpperCase() + "]";
+            }
+        };
+
+        variable mappedResult = service.mapBatch(rawData, formatter);
+        OceanOutput("Mapped list size: " + mappedResult.size() + ", first: " + mappedResult.get(0));
+
+        // Test Custom SAM Filter
+        ItemFilter<String> filterLongNames = new ItemFilter<String>() {
+            @Override
+            public bool function accept(String item) {
+                return item.length() > 5;
+            }
+        };
+
+        variable filteredResult = filterList(rawData, filterLongNames);
+        OceanOutput("Filtered list size: " + filteredResult.size() + ", first: " + filteredResult.get(0));
+
+        // Primitive specialization + sorting test
+        variable numberList = [99, 12, 45, 3, 78, 23];
+        numberList.sort(new Comparator<Integer>() {
+            @Override
+            public int function compare(Integer o1, Integer o2) {
+                return o1.compareTo(o2);
+            }
+        });
+
+        int minVal = (int) numberList.get(0);
+        int maxVal = (int) numberList.get(5);
+        OceanOutput("Sorted numbers min: " + minVal + ", max: " + maxVal);
+
+        // Final verification checks
+        bool c1 = service.getServiceId().equals("ULTIMATE_SAM_SERVICE_V1");
+        bool c2 = mappedResult.size() == 5 && mappedResult.get(0).equals("[APPLE]");
+        bool c3 = filteredResult.size() == 3 && filteredResult.get(0).equals("banana");
+        bool c4 = minVal == 3 && maxVal == 99;
+
+        if (c1 && c2 && c3 && c4) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

@@ -1,0 +1,11 @@
+package com.resources;
+
+class ObjectRelationalErrorTest {
+    static main() {
+        Object left = new Object();
+        Object right = new Object();
+        if (left >= right) {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

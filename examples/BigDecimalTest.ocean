@@ -1,0 +1,48 @@
+package com.resources;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
+class BigDecimalTest {
+    static void function main() {
+        OceanOutput("--- BigDecimal 4 Islem Testi ---");
+
+        variable a = new BigDecimal("20.5");
+        variable b = new BigDecimal("5.0");
+        
+        OceanOutput("A: " + a.toString());
+        OceanOutput("B: " + b.toString());
+
+        // 1. Toplama (+)
+        variable sum = a.add(b);
+        OceanOutput("Toplama (A + B): " + sum.toString());
+
+        // 2. Cikarma (-)
+        variable diff = a.subtract(b);
+        OceanOutput("Cikarma (A - B): " + diff.toString());
+
+        // 3. Carpma (*)
+        variable prod = a.multiply(b);
+        OceanOutput("Carpma (A * B): " + prod.toString());
+
+        // 4. Bolme (/)
+        // Not: Bolme islemi BigDecimal'da genellikle hassasiyet ve yuvarlama modu gerektirir.
+        // RoundingMode.HALF_UP Java'da 4 değerine eşittir (legacy int desteği için).
+        variable quot = a.divide(b, 2, RoundingMode.HALF_UP);
+        OceanOutput("Bolme (A / B) [Scale=2]: " + quot.toString());
+
+        OceanOutput("\n--- Karma Islem ---");
+        // (A + B) * (A - B)
+        variable resultx = a.add(b).multiply(a.subtract(b));
+        OceanOutput("(A+B) * (A-B): " + resultx.toString());
+
+        if (sum.compareTo(new BigDecimal("25.5")) == 0 &&
+            diff.compareTo(new BigDecimal("15.5")) == 0 &&
+            prod.compareTo(new BigDecimal("102.50")) == 0 &&
+            quot.compareTo(new BigDecimal("4.10")) == 0 &&
+            resultx.compareTo(new BigDecimal("395.25")) == 0) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

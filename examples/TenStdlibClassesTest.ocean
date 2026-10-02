@@ -1,0 +1,82 @@
+package com.resources;
+
+class TenStdlibClassesTest {
+
+    static main() {
+        OceanOutput("=== TEN NEW DYNAMIC STDLIB CLASSES TEST ===");
+
+        // 1. OceanStack
+        variable stack = new OceanStack<String>();
+        stack.push("Alpha");
+        stack.push("Beta");
+        stack.push("Gamma");
+        String top = stack.pop();
+        OceanOutput("1. OceanStack size: " + stack.size() + ", popped: " + top);
+
+        // 2. OceanQueue
+        variable queue = new OceanQueue<Integer>();
+        queue.enqueue(100);
+        queue.enqueue(200);
+        queue.enqueue(300);
+        int first = queue.dequeue();
+        OceanOutput("2. OceanQueue size: " + queue.size() + ", dequeued: " + first);
+
+        // 3. OceanPair
+        variable pair = OceanPair.of("User", 42);
+        OceanOutput("3. OceanPair key: " + pair.getKey() + ", val: " + pair.getValue());
+
+        // 4. OceanTriple
+        variable triple = OceanTriple.of("HTTP", 200, true);
+        OceanOutput("4. OceanTriple first: " + triple.getFirst() + ", second: " + triple.getSecond() + ", third: " + triple.getThird());
+
+        // 5. OceanMath
+        long fact = OceanMath.factorial(5);
+        long gcdVal = OceanMath.gcd(48, 18);
+        bool primeCheck = OceanMath.isPrime(29);
+        OceanOutput("5. OceanMath factorial(5): " + fact + ", gcd(48, 18): " + gcdVal + ", isPrime(29): " + primeCheck);
+
+        // 6. OceanStringBuilder
+        variable sb = new OceanStringBuilder("Hello");
+        sb.append(" ").append("Ocean").append("!");
+        OceanOutput("6. OceanStringBuilder: " + sb.toString());
+
+        // 7. OceanBitSet
+        variable bitset = new OceanBitSet();
+        bitset.set(1);
+        bitset.set(3);
+        bitset.set(5);
+        OceanOutput("7. OceanBitSet cardinality: " + bitset.cardinality() + ", get(3): " + bitset.get(3));
+
+        // 8. OceanCounter
+        variable counter = new OceanCounter<String>();
+        counter.add("Apple");
+        counter.add("Apple");
+        counter.add("Banana");
+        OceanOutput("8. OceanCounter Apple count: " + counter.getCount("Apple") + ", mostCommon: " + counter.mostCommon());
+
+        // 9. OceanResult
+        variable res = OceanResult.ok("SUCCESS");
+        OceanOutput("9. OceanResult isOk: " + res.isOk() + ", val: " + res.getValue());
+
+        // 10. OceanOptional
+        variable opt = OceanOptional.of("FOUND");
+        OceanOutput("10. OceanOptional isPresent: " + opt.isPresent() + ", get: " + opt.get());
+
+        // Verification checks
+        if (stack.size() == 2 && top.equals("Gamma") &&
+            queue.size() == 2 && first == 100 &&
+            pair.getKey().equals("User") && pair.getValue().equals(42) &&
+            triple.getFirst().equals("HTTP") && triple.getSecond().equals(200) && (bool)triple.getThird() == true &&
+            fact == (long) 120 && gcdVal == (long) 6 && primeCheck == true &&
+            sb.toString().equals("Hello Ocean!") &&
+            bitset.cardinality() == 3 && bitset.get(3) == true &&
+            counter.getCount("Apple") == 2 && counter.mostCommon().equals("Apple") &&
+            res.isOk() == true && res.getValue().equals("SUCCESS") &&
+            opt.isPresent() == true && opt.get().equals("FOUND"))
+        {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

@@ -1,0 +1,22 @@
+package tests;
+
+import java.io.IOException;
+
+class CheckedExceptionSuccessTest {
+    main() {
+        trying {
+            throwChecked();
+        } catch (IOException e) {
+            OceanOutput("Caught IOException successfully");
+        }
+    }
+
+    static void function throwChecked() throws IOException {
+        trying {
+            throw new IOException("Checked error");
+        } catch (IOException ex) {
+            OceanOutput("Caught ex locally");
+            throw ex;
+        }
+    }
+}

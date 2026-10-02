@@ -1,0 +1,31 @@
+package com.resources;
+
+class CatchReturnFinallyTest {
+    static int finallyRun = 0;
+
+    static int function testMethod(int x) {
+        trying {
+            if (x > 0) {
+                int div = 10 / 0; // Trigger ArithmeticException
+            }
+            return 1;
+        } catch (ArithmeticException e) {
+            return 2; // Return from catch
+        } finally {
+            finallyRun = 1;
+        }
+    }
+
+    main() {
+        OceanOutput("=== CATCH RETURN FINALLY TEST START ===");
+        finallyRun = 0;
+        int res = testMethod(5);
+        OceanOutput("Result: " + res);
+        OceanOutput("FinallyRun: " + finallyRun);
+        if (res == 2 && finallyRun == 1) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

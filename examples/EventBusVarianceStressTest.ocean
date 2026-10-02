@@ -1,0 +1,294 @@
+﻿package com.resources;
+
+// =========================================================================
+// 1. OLAY (EVENT) TİP HİYERARŞİSİ (4 Seviye)
+// BaseEvent -> UserEvent -> LoginEvent -> AdminLoginEvent
+//                       \-> OrderEvent
+// =========================================================================
+
+class BaseEvent {
+    int eventId;
+    int timestamp;
+
+    function BaseEvent(int pId, int pTime) {
+        eventId = pId;
+        timestamp = pTime;
+    }
+
+    int function getEventId() { return eventId; }
+    int function getTimestamp() { return timestamp; }
+    String function getCategory() { return "BASE"; }
+}
+
+class UserEvent extends BaseEvent {
+    String username;
+
+    function UserEvent(int pId, int pTime, String pUser) {
+        super(pId, pTime);
+        username = pUser;
+    }
+
+    String function getUsername() { return username; }
+    @Override
+    String function getCategory() { return "USER"; }
+}
+
+class LoginEvent extends UserEvent {
+    String ipAddress;
+
+    function LoginEvent(int pId, int pTime, String pUser, String pIp) {
+        super(pId, pTime, pUser);
+        ipAddress = pIp;
+    }
+
+    String function getIpAddress() { return ipAddress; }
+    @Override
+    String function getCategory() { return "LOGIN"; }
+}
+
+class AdminLoginEvent extends LoginEvent {
+    int authLevel;
+
+    function AdminLoginEvent(int pId, int pTime, String pUser, String pIp, int pLevel) {
+        super(pId, pTime, pUser, pIp);
+        authLevel = pLevel;
+    }
+
+    int function getAuthLevel() { return authLevel; }
+    @Override
+    String function getCategory() { return "ADMIN_LOGIN"; }
+}
+
+class OrderEvent extends UserEvent {
+    int amount;
+
+    function OrderEvent(int pId, int pTime, String pUser, int pAmount) {
+        super(pId, pTime, pUser);
+        amount = pAmount;
+    }
+
+    int function getAmount() { return amount; }
+    @Override
+    String function getCategory() { return "ORDER"; }
+}
+
+// =========================================================================
+// 2. VARYANS TABANLI OLAY DAĞITIM VE DÖNÜŞÜM MODÜLLERİ
+// =========================================================================
+
+// Kontravaryant Olay Dinleyicisi (EventHandler<-E>)
+class EventHandler<-E> {
+    int handledCount = 0;
+    String lastHandledCategory = "NONE";
+
+    function EventHandler() { }
+
+    void function handle(E eventItem) {
+        handledCount++;
+    }
+
+    int function getHandledCount() { return handledCount; }
+}
+
+// Kovaryant Olay Kaynağı / Üreticisi (EventSource<+E>)
+class EventSource<+E> {
+    E currentEvent;
+
+    function EventSource(E pEvent) {
+        currentEvent = pEvent;
+    }
+
+    E function poll() {
+        return currentEvent;
+    }
+}
+
+// Fonksiyonel Dönüştürücü / Monadik Eşleyici (Transformer<-In, +Out>)
+class Transformer<-In, +Out> {
+    Out sampleOutput;
+
+    function Transformer(Out pSample) {
+        sampleOutput = pSample;
+    }
+
+    Out function transform(In input) {
+        return sampleOutput;
+    }
+}
+
+// Kovaryant Değer Taşıyıcısı (Maybe<+T>)
+class Maybe<+T> {
+    T val;
+    bool hasVal;
+
+    function Maybe(T pVal, bool pHas) {
+        val = pVal;
+        hasVal = pHas;
+    }
+
+    T function get() { return val; }
+    bool function isPresent() { return hasVal; }
+}
+
+// İki Olayı Birleştiren Fonksiyonel Kafes (-A, -B, +Res)
+class EventCombiner<-A, -B, +Res> {
+    Res combinedResult;
+
+    function EventCombiner(Res pRes) {
+        combinedResult = pRes;
+    }
+
+    Res function combine(A a, B b) {
+        return combinedResult;
+    }
+}
+
+// İnvaryant Anahtar, Kovaryant Değer Saklayıcısı (EventCache<Key, +Val>)
+class EventCache<Key, +Val> {
+    Val cachedVal;
+    Key cachedKey;
+
+    function EventCache(Key pKey, Val pVal) {
+        cachedKey = pKey;
+        cachedVal = pVal;
+    }
+
+    Val function getValue() { return cachedVal; }
+    Key function getKey() { return cachedKey; }
+}
+
+// =========================================================================
+// 3. EVENT BUS VARYANS STRESS TESTİ
+// =========================================================================
+
+class EventBusVarianceStressTest {
+    static main() {
+        OceanOutput("=================================================");
+        OceanOutput("   EVENT BUS & FUNCTIONAL VARIANCE STRESS TEST   ");
+        OceanOutput("=================================================");
+        int totalPassed = 0;
+
+        AdminLoginEvent rootAdmin = new AdminLoginEvent(501, 1700000000, "SuperAdmin", "192.168.1.1", 99);
+        OrderEvent orderEvt = new OrderEvent(701, 1700000500, "Customer1", 450);
+
+        // -----------------------------------------------------------------
+        // [SENARYO 1] Olay Üreticisinde Çok Seviyeli Kovaryant Genişleme (+E)
+        // EventSource<AdminLoginEvent> -> EventSource<LoginEvent> -> EventSource<UserEvent> -> EventSource<BaseEvent>
+        // -----------------------------------------------------------------
+        EventSource<AdminLoginEvent> srcAdmin = new EventSource<AdminLoginEvent>(rootAdmin);
+        EventSource<LoginEvent> src1 = srcAdmin;
+        EventSource<UserEvent> src2 = src1;
+        EventSource<BaseEvent> srcBase = src2;
+
+        BaseEvent polled = srcBase.poll();
+        if (polled.getEventId() == 501 && polled.getCategory() == "ADMIN_LOGIN") {
+            OceanOutput("[PASS 1] Çok Seviyeli EventSource Kovaryans Genişlemesi Başarılı.");
+            totalPassed++;
+        }
+
+        // -----------------------------------------------------------------
+        // [SENARYO 2] Olay Dinleyicisinde Çok Seviyeli Kontravaryant Genişleme (-E)
+        // EventHandler<BaseEvent> -> EventHandler<UserEvent> -> EventHandler<LoginEvent> -> EventHandler<AdminLoginEvent>
+        // (Genel BaseEvent dinleyicisi, AdminLoginEvent dinleyicisi olarak çalışabilir!)
+        // -----------------------------------------------------------------
+        EventHandler<BaseEvent> baseHandler = new EventHandler<BaseEvent>();
+        EventHandler<UserEvent> h1 = baseHandler;
+        EventHandler<LoginEvent> h2 = h1;
+        EventHandler<AdminLoginEvent> adminHandler = h2;
+
+        adminHandler.handle(rootAdmin);
+        if (baseHandler.getHandledCount() == 1) {
+            OceanOutput("[PASS 2] Genel Dinleyicinin Özel Olayı Dinlemesi (Kontravaryans) Başarılı.");
+            totalPassed++;
+        }
+
+        // -----------------------------------------------------------------
+        // [SENARYO 3] Çift Olay Birleştirici Varyansı: EventCombiner<-A, -B, +Res>
+        // EventCombiner<BaseEvent, UserEvent, AdminLoginEvent>
+        //   -> EventCombiner<UserEvent, LoginEvent, UserEvent>
+        //   -> EventCombiner<AdminLoginEvent, AdminLoginEvent, BaseEvent>
+        // -----------------------------------------------------------------
+        EventCombiner<BaseEvent, UserEvent, AdminLoginEvent> comb1 =
+            new EventCombiner<BaseEvent, UserEvent, AdminLoginEvent>(rootAdmin);
+
+        EventCombiner<UserEvent, LoginEvent, UserEvent> comb2 = comb1;
+        EventCombiner<AdminLoginEvent, AdminLoginEvent, BaseEvent> comb3 = comb2;
+
+        BaseEvent combRes = comb3.combine(rootAdmin, rootAdmin);
+        if (combRes.getEventId() == 501 && combRes.getCategory() == "ADMIN_LOGIN") {
+            OceanOutput("[PASS 3] Çift Girdili EventCombiner Fonksiyonel Varyansı Başarılı.");
+            totalPassed++;
+        }
+
+        // -----------------------------------------------------------------
+        // [SENARYO 4] Monadik Maybe<+T> Kovaryant Sarmalama ve Çıkarım
+        // Maybe<AdminLoginEvent> -> Maybe<UserEvent> -> Maybe<BaseEvent>
+        // -----------------------------------------------------------------
+        Maybe<AdminLoginEvent> mbAdmin = new Maybe<AdminLoginEvent>(rootAdmin, true);
+        Maybe<UserEvent> mbUser = mbAdmin;
+        Maybe<BaseEvent> mbBase = mbUser;
+
+        if (mbBase.isPresent() && mbBase.get().getEventId() == 501) {
+            OceanOutput("[PASS 4] Monadik Maybe<+T> Kovaryans Zincirlemesi Başarılı.");
+            totalPassed++;
+        }
+
+        // -----------------------------------------------------------------
+        // [SENARYO 5] İnvaryant Anahtar / Kovaryant Değer Belleği (EventCache<Key, +Val>)
+        // EventCache<String, AdminLoginEvent> -> EventCache<String, BaseEvent>
+        // -----------------------------------------------------------------
+        EventCache<String, AdminLoginEvent> cache1 =
+            new EventCache<String, AdminLoginEvent>("AUTH_KEY_01", rootAdmin);
+
+        EventCache<String, BaseEvent> cache2 = cache1;
+        if (cache2.getKey() == "AUTH_KEY_01" && cache2.getValue().getEventId() == 501) {
+            OceanOutput("[PASS 5] EventCache<Key, +Val> İnvaryant/Kovaryant Hibrit Yapısı Başarılı.");
+            totalPassed++;
+        }
+
+        // -----------------------------------------------------------------
+        // [SENARYO 6] Çapraz Kardeş Olay Dağıtımı (OrderEvent vs AdminLoginEvent)
+        // EventCombiner<BaseEvent, BaseEvent, String>
+        //   -> EventCombiner<OrderEvent, AdminLoginEvent, String>
+        // -----------------------------------------------------------------
+        EventCombiner<BaseEvent, BaseEvent, String> crossComb1 =
+            new EventCombiner<BaseEvent, BaseEvent, String>("CROSS_EVENTS_OK");
+
+        EventCombiner<OrderEvent, AdminLoginEvent, String> crossComb2 = crossComb1;
+        String crossResult = crossComb2.combine(orderEvt, rootAdmin);
+
+        if (crossResult == "CROSS_EVENTS_OK") {
+            OceanOutput("[PASS 6] Çapraz Kardeş Olay Dinleyicisi (Cross-Branch Combine) Başarılı.");
+            totalPassed++;
+        }
+
+        // -----------------------------------------------------------------
+        // [SENARYO 7] 3 Katmanlı İç İçe Olay Akışı
+        // EventSource<EventSource<EventSource<AdminLoginEvent>>>
+        //   -> EventSource<EventSource<EventSource<BaseEvent>>>
+        // -----------------------------------------------------------------
+        EventSource<EventSource<EventSource<AdminLoginEvent>>> deepSrc1 =
+            new EventSource<EventSource<EventSource<AdminLoginEvent>>>(
+                new EventSource<EventSource<AdminLoginEvent>>(
+                    new EventSource<AdminLoginEvent>(rootAdmin)
+                )
+            );
+
+        EventSource<EventSource<EventSource<BaseEvent>>> deepSrcTop = deepSrc1;
+        BaseEvent finalPolled = deepSrcTop.poll().poll().poll();
+
+        if (finalPolled.getEventId() == 501 && finalPolled.getCategory() == "ADMIN_LOGIN") {
+            OceanOutput("[PASS 7] 3 Seviyeli İç İçe EventSource Akışı Başarılı.");
+            totalPassed++;
+        }
+
+        OceanOutput("-------------------------------------------------");
+        OceanOutput($"Toplam Başarılı Test Aşaması: {totalPassed} / 7");
+
+        if (totalPassed == 7) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

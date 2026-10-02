@@ -1,0 +1,40 @@
+package com.resources;
+
+interface MyDrawable {
+    void function draw();
+}
+
+enum Color {
+    RED, GREEN, BLUE
+}
+
+class MyShape implements MyDrawable {
+    void function draw() {
+        OceanOutput("Drawing in " + Color.GREEN);
+    }
+}
+
+class InterfaceEnumTest {
+    String deneme ="abc";
+    static main() {
+        MyShape s = new MyShape();
+        s.draw();
+        MyDrawable myDrawable = new MyDrawable(){
+            @Override
+            void function draw(){
+                OceanOutput("deneme");
+            }
+        };
+        OceanOutput("Enum value: " + Color.RED);
+        OceanOutput("Enum name: " + Color.BLUE.name());
+        OceanOutput("Enum ordinal: " + Color.GREEN.ordinal());
+        variable vals = Color.values();
+        OceanOutput("Values length: " + vals.length);
+
+        if (Color.BLUE.name() == "BLUE" && Color.GREEN.ordinal() == 1 && vals.length == 3) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

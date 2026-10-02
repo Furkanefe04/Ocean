@@ -1,0 +1,12 @@
+package error_tests;
+
+class ComparisonErrorTest {
+    static main() {
+        String s = "hello";
+        int x = 5;
+        // String < int is not allowed
+        if (s < x) {
+            OceanOutput("Hata");
+        }
+    }
+}

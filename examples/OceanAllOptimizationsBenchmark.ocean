@@ -1,0 +1,57 @@
+package com.resources;
+
+import java.util.Objects;
+
+
+class OceanAllOptimizationsBenchmark {
+
+    private int function calcHelper(int a, int b) {
+        return (a * 3 + b * 7) % 1000;
+    }
+
+    static main() {
+        OceanOutput("=== OCEAN ALL OPTIMIZATIONS BENCHMARK START ===");
+        long start = System.nanoTime();
+
+        // 1. AOT Constant Folding (String & Math method folding)
+        String sUpper = "ocean compiler".toUpperCase();
+        String sLower = "OCEAN COMPILER".toLowerCase();
+        String sRep = "abc".repeat(3);
+        String sSub = "ocean compiler".substring(0, 5);
+        int foldedMath = Math.abs(-42) + Math.min(15, 30) + (int) Math.sqrt(25.0);
+
+        // 2. Collection Pre-allocation & Literal Operations
+        OceanList list = [10, 20, 30, 40, 50];
+        OceanMap map = {"key1": 100, "key2": 200, "key3": 300};
+
+        // 3. High-Frequency Loop with Method Inlining & Short-Circuit Jumps
+        OceanAllOptimizationsBenchmark bench = new OceanAllOptimizationsBenchmark();
+        int sum = 0;
+        int i = 0;
+        int loopCount = 50000000; // 50 Milyon Iteration
+
+        while (i < loopCount) {
+            int stepVal = bench.calcHelper(i, sum);
+            // Direct Short-Circuit Branching: no boolean pushed to stack
+            if (i > 0 && stepVal >= 0 && (i % 2 == 0 || stepVal % 2 == 0)) {
+                sum = (sum + stepVal) % 1000000;
+            } else {
+                sum = (sum + 1) % 1000000;
+            }
+            i = i + 1;
+        }
+
+        long durationMs = (System.nanoTime() - start) / 1000000;
+        OceanOutput("Ocean Execution Time: " + durationMs + " ms");
+        OceanOutput("Final Sum: " + sum);
+        OceanOutput("Folded Math Result: " + foldedMath);
+        OceanOutput("List Size: " + list.size());
+        OceanOutput("Map Size: " + map.size());
+
+        if (sum > 0 && foldedMath == 62 && list.size() == 5 && map.size() == 3) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

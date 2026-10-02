@@ -1,0 +1,16 @@
+package com.resources;
+    class SimpleMethodGeneric {
+    static <T> T function id(T x) {
+        return x;
+    }
+    main() {
+        OceanOutput("Start");
+        variable r = id("Hello");
+        OceanOutput(r);
+        if (r == "Hello") {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

@@ -1,0 +1,37 @@
+data class Group(String name, String... members);
+
+class OC22DataClassVarargsTest {
+    public static void function main(String[] args) {
+        // Multiple varargs elements
+        Group g1 = new Group("Admins", "Alice", "Bob", "Charlie");
+        if (!g1.getName().equals("Admins")) {
+            OceanOutput("FAILED: name was " + g1.getName());
+            System.exit(1);
+        }
+        if (g1.getMembers().length != 3) {
+            OceanOutput("FAILED: members length was " + g1.getMembers().length);
+            System.exit(1);
+        }
+        if (!g1.getMembers()[0].equals("Alice") || !g1.getMembers()[2].equals("Charlie")) {
+            OceanOutput("FAILED: members content mismatch");
+            System.exit(1);
+        }
+
+        // Single varargs element
+        Group g2 = new Group("Solo", "Dave");
+        if (g2.getMembers().length != 1) {
+            OceanOutput("FAILED: solo length was " + g2.getMembers().length);
+            System.exit(1);
+        }
+
+        // Zero varargs elements
+        Group g3 = new Group("Empty");
+        if (g3.getMembers().length != 0) {
+            OceanOutput("FAILED: empty length was " + g3.getMembers().length);
+            System.exit(1);
+        }
+
+        OceanOutput("OC-22 Data Class Varargs Test: PASSED");
+        OceanOutput("STATUS: PASSED");
+    }
+}

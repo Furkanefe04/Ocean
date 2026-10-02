@@ -1,0 +1,9 @@
+package tests;
+
+import java.io.IOException;
+
+class CheckedExceptionErrorTest {
+    main() {
+        throw new IOException("Unhandled checked exception");
+    }
+}

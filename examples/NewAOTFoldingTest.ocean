@@ -1,0 +1,44 @@
+package com.resources;
+
+import java.util.Objects;
+
+class NewAOTFoldingTest {
+    static main() {
+        OceanOutput("=== NEW AOT FOLDING TEST START ===");
+
+        // 1. New Math Constant Foldings
+        double powVal = Math.pow(2.0, 5.0);           // 32.0
+        long roundVal = Math.round(4.6);               // 5L
+        double floorVal = Math.floor(4.9);             // 4.0
+        double ceilVal = Math.ceil(4.1);               // 5.0
+        double logVal = Math.log(1.0);                 // 0.0
+        double log10Val = Math.log10(100.0);           // 2.0
+        double expVal = Math.exp(0.0);                 // 1.0
+        double sinVal = Math.sin(0.0);                 // 0.0
+        double cosVal = Math.cos(0.0);                 // 1.0
+
+        // 2. New String Constant Foldings
+        bool containsVal = "ocean compiler".contains("compiler");   // true
+        int idxVal = "ocean compiler".indexOf("compiler");          // 6
+        int lastIdxVal = "ocean compiler".lastIndexOf("c");         // 6
+        int charCode = "ocean".charAt(1);                          // 'c' -> 99
+        bool isBlankVal = "   ".isBlank();                         // true
+        bool isEmptyVal = "".isEmpty();                             // true
+        String stripped = "  ocean  ".strip();                      // "ocean"
+
+        OceanOutput("powVal: " + powVal);
+        OceanOutput("roundVal: " + roundVal);
+        OceanOutput("containsVal: " + containsVal);
+        OceanOutput("idxVal: " + idxVal);
+        OceanOutput("charCode: " + charCode);
+
+        if (powVal == 32.0 && roundVal == 5 && floorVal == 4.0 && ceilVal == 5.0 &&
+            logVal == 0.0 && log10Val == 2.0 && expVal == 1.0 && sinVal == 0.0 && cosVal == 1.0 &&
+            containsVal && idxVal == 6 && lastIdxVal == 6 && charCode == 99 &&
+            isBlankVal && isEmptyVal && stripped.equals("ocean")) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

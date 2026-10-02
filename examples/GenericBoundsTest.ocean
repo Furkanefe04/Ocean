@@ -1,0 +1,23 @@
+package com.resources;
+    class NumberContainer<T <: Number> {
+    T valuex;
+    public void function set(T v) {
+        valuex = v;
+    }
+}
+
+class GenericBoundsTest {
+    static main() {
+        variable n = new NumberContainer<Integer>(); // OK
+        n.set(123);
+        
+        // This should cause a compiler error
+        // variable s = new NumberContainer<String>();
+        
+        if (n.valuex == 123) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

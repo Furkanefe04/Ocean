@@ -1,0 +1,107 @@
+package com.resources;
+
+public annotation TailRec {
+}
+
+class TailRecHelper {
+    public int multiplier = 3;
+
+    @TailRec
+    public long function countInstance(long n, long acc) {
+        if (n <= 0) {
+            return acc;
+        }
+        return countInstance(n - 1, acc + multiplier);
+    }
+}
+
+public class TailRecTest {
+
+    // 1. Deep recursion test (1,000,000 steps - would StackOverflow without TCO)
+    @TailRec
+    public static long function sumDeep(long n, long acc) {
+        if (n <= 0) {
+            return acc;
+        }
+        return sumDeep(n - 1, acc + 1);
+    }
+
+    // 2. Parallel assignment test (Euclidean GCD where a and b depend on each other)
+    @TailRec
+    public static int function gcd(int a, int b) {
+        if (b == 0) {
+            return a;
+        }
+        return gcd(b, a % b);
+    }
+
+    // 3. Multi-branch tail-recursive calls (Collatz conjecture step count)
+    @TailRec
+    public static int function collatzSteps(int n, int steps) {
+        if (n <= 1) {
+            return steps;
+        }
+        if (n % 2 == 0) {
+            return collatzSteps(n / 2, steps + 1);
+        } else {
+            return collatzSteps(3 * n + 1, steps + 1);
+        }
+    }
+
+    // 4. Ternary return expression tail recursion
+    @TailRec
+    public static long function ternaryFact(long n, long acc) {
+        return n <= 1 ? acc : ternaryFact(n - 1, n * acc);
+    }
+
+    main() {
+        OceanOutput("=== STARTING TAILREC OPTIMIZATION TEST ===");
+
+        // Test 1: Deep Recursion (1,000,000 calls)
+        long start = System.currentTimeMillis();
+        long deepSum = sumDeep(1000000, 0);
+        long duration = System.currentTimeMillis() - start;
+        OceanOutput("1. Deep recursion (1,000,000 calls) result: " + deepSum + " in " + duration + " ms");
+        if (deepSum != 1000000) {
+            OceanOutput("STATUS: FAILED - Deep recursion sum mismatch");
+            return;
+        }
+
+        // Test 2: GCD (Parallel assignment)
+        int gcdRes1 = gcd(48, 18);
+        int gcdRes2 = gcd(1071, 462);
+        OceanOutput("2. GCD(48, 18) = " + gcdRes1 + ", GCD(1071, 462) = " + gcdRes2);
+        if (gcdRes1 != 6 || gcdRes2 != 21) {
+            OceanOutput("STATUS: FAILED - GCD calculation mismatch");
+            return;
+        }
+
+        // Test 3: Collatz Multi-branch
+        int steps27 = collatzSteps(27, 0);
+        OceanOutput("3. Collatz steps for 27 = " + steps27);
+        if (steps27 != 111) {
+            OceanOutput("STATUS: FAILED - Collatz steps mismatch (expected 111, got " + steps27 + ")");
+            return;
+        }
+
+        // Test 4: Instance Method TailRec
+        TailRecHelper helper = new TailRecHelper();
+        long instanceRes = helper.countInstance(100000, 0);
+        OceanOutput("4. Instance method tailrec (100,000 calls * 3) = " + instanceRes);
+        if (instanceRes != 300000) {
+            OceanOutput("STATUS: FAILED - Instance method tailrec mismatch");
+            return;
+        }
+
+        // Test 5: Ternary TailRec
+        long fact5 = ternaryFact(5, 1);
+        OceanOutput("5. Ternary factorial(5) = " + fact5);
+        if (fact5 != 120) {
+            OceanOutput("STATUS: FAILED - Ternary factorial mismatch");
+            return;
+        }
+
+        OceanOutput("=== ALL TAILREC TESTS PASSED SUCCESSFULLY! ===");
+        OceanOutput("STATUS: PASSED");
+    }
+}

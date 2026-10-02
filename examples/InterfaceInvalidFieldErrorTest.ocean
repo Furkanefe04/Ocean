@@ -1,0 +1,11 @@
+package com.resources;
+
+interface MyInterface {
+    int secretCode;
+}
+
+class InterfaceInvalidFieldErrorTest implements MyInterface {
+    main() {
+        OceanOutput("Test");
+    }
+}

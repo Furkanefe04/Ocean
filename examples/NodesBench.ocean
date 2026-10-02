@@ -1,0 +1,47 @@
+package com.resources;
+import java.lang.System;
+class NodesNode {
+    int valuex;
+    NodesNode next;
+
+    function NodesNode(){
+        // empty constructor
+    }
+
+    main(){
+        OceanOutput("deneme 123");
+    }
+}
+
+class NodesBench {
+      main() {
+        int limit = 20000000;
+        long start = System.currentTimeMillis();
+        
+        NodesNode head = new NodesNode();
+        head.valuex = 0;
+        NodesNode curr = head;
+        
+        for (int i from 0 to limit with increasing 1) {
+            NodesNode newNode = new NodesNode();
+            newNode.valuex = i;
+            curr.next = newNode;
+            curr = newNode;
+        }
+        
+        long sum = 0;
+        curr = head;
+        while (curr != null) {
+            sum = sum + curr.valuex;
+            curr = curr.next;
+        }
+        
+        long end = System.currentTimeMillis();
+        OceanOutput("OCEAN Nodes Sum: " + sum + ", Time: " + (end - start) + " ms");
+        if (sum == 199999990000000L) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

@@ -1,0 +1,21 @@
+package tests;
+
+import java.util.function.Supplier;
+
+class MethodRefVerificationTest {
+    String function testMethod() {
+        return "Method Reference OK";
+    }
+    
+    static main() {
+        variable test = new MethodRefVerificationTest();
+        variable r = (Supplier) test::testMethod;
+        String res = r.get().toString();
+        OceanOutput("Result: " + res);
+        if (res.equals("Method Reference OK")) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

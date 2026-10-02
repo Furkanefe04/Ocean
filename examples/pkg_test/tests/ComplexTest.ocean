@@ -1,0 +1,31 @@
+package tests;
+
+public interface Greetable {
+    void function greet(String name);
+}
+
+public abstract class BaseGreeter implements Greetable {
+    String prefix = "Hello, ";
+    
+    public void function greet(String name) {
+        OceanOutput(prefix + name + "!");
+    }
+}
+
+class ComplexTest extends BaseGreeter {
+    static int greetCount = 0;
+    
+    @Override
+    public void function greet(String name) {
+        prefix = "Good morning, ";
+        super.greet(name);
+        greetCount = greetCount + 1;
+    }
+    
+    main() {
+        ComplexTest test = new ComplexTest();
+        test.greet("Ocean User");
+        test.greet("Developer");
+        OceanOutput("Total greets: " + ComplexTest.greetCount);
+    }
+}

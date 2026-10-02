@@ -1,0 +1,65 @@
+interface MultiFeatureSAM {
+    int function execute(int x);
+    
+    default int function addBonus(int x) {
+        return execute(x) + 100;
+    }
+    
+    static int function helper(int x) {
+        return x * 2;
+    }
+}
+
+interface ParentSAM {
+    String function process(String s);
+}
+
+interface InheritedSAM extends ParentSAM {
+    // No new abstract methods declared, inherits process(String)
+}
+
+interface ObjectOverrideSAM {
+    int function runTask(int n);
+    bool function equals(Object other); // Object method, should not count towards SAM
+}
+
+class OC23SAMDetectionTest {
+    public static void function main(String[] args) {
+        // 1. Interface with default and static methods can be targeted by lambda
+        MultiFeatureSAM sam1 = (int x) -> x * 10;
+        int res1 = sam1.execute(5);
+        if (res1 != 50) {
+            OceanOutput("FAILED: res1 != 50");
+            System.exit(1);
+        }
+        int resBonus = sam1.addBonus(5);
+        if (resBonus != 150) {
+            OceanOutput("FAILED: resBonus != 150");
+            System.exit(1);
+        }
+        int staticRes = MultiFeatureSAM.helper(20);
+        if (staticRes != 40) {
+            OceanOutput("FAILED: staticRes != 40");
+            System.exit(1);
+        }
+
+        // 2. Inherited SAM without declared methods
+        InheritedSAM sam2 = (String s) -> "Hello, " + s;
+        String res2 = sam2.process("Ocean");
+        if (!res2.equals("Hello, Ocean")) {
+            OceanOutput("FAILED: res2 != Hello, Ocean");
+            System.exit(1);
+        }
+
+        // 3. Interface with Object method override
+        ObjectOverrideSAM sam3 = (int n) -> n + 7;
+        int res3 = sam3.runTask(3);
+        if (res3 != 10) {
+            OceanOutput("FAILED: res3 != 10");
+            System.exit(1);
+        }
+
+        OceanOutput("OC-23 SAM Detection Test: PASSED");
+        OceanOutput("STATUS: PASSED");
+    }
+}

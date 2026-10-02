@@ -1,0 +1,128 @@
+package com.ultimate;
+
+import java.util.*;
+import com.google.gson.Gson;
+import com.google.common.base.Joiner;
+
+
+class BaseEngine {
+    int valuex = 50;
+
+    int function compute(int x) {
+        return x + valuex;
+    }
+}
+
+class DerivedEngine extends BaseEngine {
+    int valuex = 150;
+
+    @Override
+    int function compute(int x) {
+        return super.compute(x) + valuex;
+    }
+}
+
+class Box<T> {
+    T val;
+    function Box(T val) {
+        this.val = val;
+    }
+    T function get() {
+        return val;
+    }
+}
+
+class SyncCounter {
+    sync int count = 0;
+
+    sync void function increment() {
+        count = count + 1;
+    }
+
+    sync int function getCount() {
+        return count;
+    }
+}
+
+class UltimateIntegrationStressTest {
+
+    main() {
+        OceanOutput("=== ULTIMATE INTEGRATION STRESS TEST START ===");
+
+        // 1. Polymorphism & Inheritance
+        BaseEngine engine = new DerivedEngine();
+        int polyRes = engine.compute(10);
+        OceanOutput("polymorphism_result: " + polyRes); // Expected: 10 + 50 + 150 = 210
+
+        // 2. Lexical Scope Shadowing
+        /*int shadowVar = 100;
+        if (true) {
+            int shadowVar = 200;
+            if (true) {
+                int shadowVar = 300;
+                OceanOutput("shadow_inner: " + shadowVar); // Expected: 300
+            }
+            OceanOutput("shadow_middle: " + shadowVar); // Expected: 200
+        }
+        OceanOutput("shadow_outer: " + shadowVar); // Expected: 100*/
+
+        // 3. Generics & Nested Collections
+        variable box = new Box<Box<Box<String>>>(new Box<Box<String>>(new Box<String>("DeepOceanGenerics")));
+        OceanOutput("generic_nested: " + box.get().get().get());
+
+        OceanList<OceanMap<String, OceanList<Object>>> nestedList = [{"fruits": ["apple", "banana"], "numbers": [10, 20, 30]}];
+        OceanOutput("collection_nested_get: " + nestedList.get(0).get("fruits").getFirst()); // Expected: apple
+        OceanOutput("collection_nested_last: " + nestedList.get(0).get("numbers").getLast()); // Expected: 30
+
+        // 4. Guava Library Interop
+        variable arrayList = new java.util.ArrayList<String>();
+        arrayList.add("Java");
+        arrayList.add("Guava");
+        arrayList.add("Ocean");
+        String joined = Joiner.on(" | ").join(arrayList);
+        OceanOutput("guava_joined_string: " + joined);
+
+        // 5. Gson Library Interop
+        variable gson = new Gson();
+        variable testMap = {
+            "status": "success",
+            "code": 200,
+            "data": ["valid", "parsed"]
+        };
+        String jsonOutput = gson.toJson(testMap);
+        OceanOutput("gson_serialized_json: " + jsonOutput);
+
+        // 6. Concurrency & Synchronization
+        SyncCounter counter = new SyncCounter();
+        variable t1 = new Thread((Runnable) () -> {
+            for (variable i from 0 to 1000 with increasing 1) {
+                counter.increment();
+            }
+        });
+        variable t2 = new Thread((Runnable) () -> {
+            for (variable i from 0 to 1000 with increasing 1) {
+                counter.increment();
+            }
+        });
+
+        t1.start();
+        t2.start();
+
+        trying {
+            t1.join();
+            t2.join();
+        } catch (InterruptedException e) {
+            OceanOutput("Thread interrupted!");
+        }
+
+        OceanOutput("synchronized_counter_value: " + counter.getCount()); // Expected: 2000
+
+        if (polyRes == 210 && counter.getCount() == 2000) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+
+        OceanOutput("=== ULTIMATE INTEGRATION STRESS TEST COMPLETED ===");
+    }
+}

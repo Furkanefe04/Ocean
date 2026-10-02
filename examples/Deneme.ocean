@@ -1,0 +1,122 @@
+package com.resources;
+import java.util.Scanner;
+abstract class abc extends gnl  {
+    variable x = 10;
+    variable y = 10;
+    function abc(int x, int y){
+        super(x,y);
+        this.x = x;
+        this.y = y;
+    }
+    abstract Integer function getX();
+    abstract int function getY();
+    abstract int function denemex();
+
+
+    int function topla() {
+        return x+y+super.abcd+super.a;
+    }
+}
+
+abstract class gnl {
+    variable abcd = 0;
+    variable a = 0;
+    function gnl(int a,int abcd){
+        this.a=a;
+        this.abcd=abcd;
+    }
+    abstract int function topla();
+}
+
+public class Deneme extends abc  {
+    variable z = 0;
+    function Deneme(int x,int y,int z){
+        super(x,y);
+        this.z = z;
+    }
+
+    main(){
+        OceanOutput(args.length);
+        Deneme d = new Deneme(3,9,11);
+        variable x = d.denemex();
+        OceanOutput("Hello World");
+        variable a = 10;
+        variable b = 21.5;
+        variable multiply = a*b;
+        OceanOutput("multiply a and b : "+multiply);
+        OceanOutput("denemex of the Deneme : "+x);
+        OceanOutput("area of the deneme : "+(d.getX()*d.getY()+d.z));
+        OceanOutput("toplama işlemi : "+d.topla());
+        OceanOutput("sqrt of the multiply : "+Math.sqrt(multiply));
+        OceanOutput("Adınızı girin");
+        variable input = OceanInput(System.in);
+        variable ad = input.nextLine();
+        OceanOutput("Merhaba "+ad+" !\nHoşgeldin");
+        variable aList = [1,"deneme","123"];
+        OceanOutput("Listenin elemanları : "+aList);
+        variable isim = aList.get(1)+" "+aList.get(2);
+        OceanOutput("isim : "+isim);
+        variable first = aList.get(0);
+        if (first==1){
+            OceanOutput("ilk eleman sayı olarak belirlendi : DOĞRU");
+        }
+        else {
+            OceanOutput("Hatalı");
+        }
+        for (int sayac from 0 to 1 with increasing 1){
+            for (int sayac2 from 0 to 9 with increasing 1){
+                variable tekrar=0;
+                if (sayac%2==0){
+                    tekrar = sayac2;
+                }
+                else{
+                    tekrar = 9 - sayac2;
+                }
+                String s = "*";
+                s = s.repeat(tekrar);
+                OceanOutput(s);
+            }
+        }
+        value SIFRE = 1234;
+        //OceanOutput("Recusive : "+recursive(1));
+        OceanOutput("Recursive : "+d.recursive(1));
+        OceanOutput("----------------------Şifre Denemesi--------------------------");
+        for (int i from 0 to 2 with increasing 1){
+            OceanOutput("Şifreyi gir");
+            variable password = input.nextInt();
+            if (password == SIFRE){
+                OceanOutput("Şifre doğru \nGiriş Yapıldı");
+                stop;
+            }
+            OceanOutput("Şifre Yanlış tekrar dene");
+        }
+
+    }
+
+    int function denemex() {
+        int returnx = 7;
+        return returnx;
+    }
+
+
+    Integer function getX() {
+        return super.x;
+    }
+
+    int function getY() {
+        return super.y;
+    }
+
+
+    int function topla() {
+        return super.topla()+z;
+    }
+
+    int function recursive(int a){
+        if (a > 2000000){
+            return a;
+        }
+        OceanOutput("Şuan sayı : "+a);
+        return recursive(a*2);
+    }
+}

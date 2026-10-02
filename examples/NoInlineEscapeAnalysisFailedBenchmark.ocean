@@ -1,0 +1,60 @@
+package com.resources;
+
+import java.util.Objects;
+
+// Standard Heap Classes WITHOUT @Inline
+class StandardUserId {
+    public int id;
+    function StandardUserId(int id) {
+        this.id = id;
+    }
+}
+
+class StandardPrice {
+    public double amount;
+    function StandardPrice(double amount) {
+        this.amount = amount;
+    }
+}
+
+class NoInlineEscapeAnalysisFailedBenchmark {
+
+    static main() {
+        OceanOutput("=== ESCAPE ANALYSIS FAILED BENCHMARK (NO @Inline) START ===");
+        long start = System.nanoTime();
+
+        int size = 5000000; // 5 Milyon Elemanlı Dizi (Escaping to Array)
+        StandardUserId[] userArray = new StandardUserId[size];
+        StandardPrice[] priceArray = new StandardPrice[size];
+
+        // 1. Fill Arrays with 10 MILLION Real Heap Objects (Forced Heap Allocation)
+        int i = 0;
+        while (i < size) {
+            userArray[i] = new StandardUserId(i);
+            priceArray[i] = new StandardPrice((double) (i % 100));
+            i = i + 1;
+        }
+
+        // 2. Iterate and Aggregate Escaped Array Elements (Pointer Dereferencing & Cache Misses)
+        long sumIds = 0;
+        double sumPrices = 0.0;
+        int j = 0;
+
+        while (j < size) {
+            sumIds = sumIds + userArray[j].id;
+            sumPrices = sumPrices + priceArray[j].amount;
+            j = j + 1;
+        }
+
+        long durationMs = (System.nanoTime() - start) / 1000000;
+        OceanOutput("Duration (No @Inline Standard Heap Array): " + durationMs + " ms");
+        OceanOutput("Sum IDs: " + sumIds);
+        OceanOutput("Sum Prices: " + sumPrices);
+
+        if (sumIds > 0 && sumPrices > 0.0) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

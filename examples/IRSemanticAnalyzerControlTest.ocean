@@ -1,0 +1,368 @@
+class IRSemanticAnalyzerControlTest {
+
+    int fieldInt = 100;
+    String fieldString = "field";
+    bool fieldBool = true;
+
+    value finalValue = 50;
+
+    // ============================================================
+    // 1. ASSIGNMENT TARGET
+    // ============================================================
+
+    void function assignmentTargetTest() {
+
+        int x = 10;
+
+        x = 20;                  // OK
+        x += 10;                 // OK
+
+        10 = 20;                // ERROR: literal is not assignable
+        "abc" = "def";          // ERROR: literal is not assignable
+        true = false;            // ERROR: literal is not assignable
+
+        getValue() = 20;         // ERROR: method result is not assignable
+
+        finalValue = 100;        // ERROR: final variable
+
+        int[] arr = [1, 2, 3];
+
+        arr[0] = 10;             // OK
+        arr[1] = "x";            // ERROR: incompatible type
+    }
+
+    int function getValue() {
+        return 10;
+    }
+
+
+    // ============================================================
+    // 2. UNARY OPERATORS
+    // ============================================================
+
+    void function unaryTest() {
+
+        int x = 10;
+
+        ++x;                     // OK
+        x++;                     // OK
+        --x;                     // OK
+        x--;                     // OK
+
+        ++100;                   // ERROR: literal
+        100++;                   // ERROR: literal
+        --2147483647;            // ERROR: literal
+        10--;                    // ERROR: literal
+
+        bool b = true;
+        ++b;                     // ERROR: bool is not numeric
+        --b;                     // ERROR
+
+        String s = "abc";
+        ++s;                     // ERROR
+        --s;                     // ERROR
+
+        !b;                      // OK
+        !10;                     // ERROR
+        !"abc";                  // ERROR
+
+        -10;                     // OK
+        -"abc";                  // ERROR
+        -true;                   // ERROR
+    }
+
+
+    // ============================================================
+    // 3. BINARY OPERATORS
+    // ============================================================
+
+    void function binaryTest() {
+
+        int a = 10;
+        int b = 20;
+
+        a + b;                   // OK
+        a - b;                   // OK
+        a * b;                   // OK
+        a / b;                   // OK
+
+        a < b;                   // OK
+        a <= b;                  // OK
+        a > b;                   // OK
+        a >= b;                  // OK
+
+        a == b;                  // OK
+        a != b;                  // OK
+
+        String s1 = "a";
+        String s2 = "b";
+
+        s1 + s2;                 // OK
+        s1 == s2;                // OK
+        s1 != s2;                // OK
+
+        s1 - s2;                 // ERROR
+        s1 * s2;                 // ERROR
+        s1 / s2;                 // ERROR
+
+        s1 < s2;                 // ERROR
+        s1 <= s2;                // ERROR
+        s1 > s2;                 // ERROR
+        s1 >= s2;                // ERROR
+
+        bool p = true;
+        bool q = false;
+
+        p && q;                  // OK
+        p || q;                  // OK
+        p == q;                  // OK
+        p != q;                  // OK
+
+        p + q;                   // ERROR
+        p - q;                   // ERROR
+        p * q;                   // ERROR
+        p / q;                   // ERROR
+
+        a && p;                  // ERROR
+        p && a;                  // ERROR
+        a || p;                  // ERROR
+        p || a;                  // ERROR
+    }
+
+
+    // ============================================================
+    // 4. NULL / REFERENCE TYPES
+    // ============================================================
+
+    void function nullTest() {
+
+        int x = null;             // ERROR
+
+        bool b = null;            // ERROR
+
+        String s = null;          // ERROR if Ocean requires nullable reference syntax
+
+        String? nullableString = null; // OK
+
+        nullableString = "hello"; // OK
+
+        int? nullableInt = null;  // OK if nullable primitives are supported
+
+        String normalString = "x";
+
+        normalString = nullableString; // ERROR if nullable -> non-nullable forbidden
+    }
+
+
+    // ============================================================
+    // 5. METHOD ARGUMENTS
+    // ============================================================
+
+    void function argumentTest() {
+
+        calculate(10, 20);        // OK
+
+        calculate("10", 20);      // ERROR
+        calculate(10, "20");      // ERROR
+        calculate(true, false);   // ERROR
+
+        calculate(10);            // ERROR: missing argument
+        calculate(10, 20, 30);    // ERROR: too many arguments
+
+        unknownMethod(10);        // ERROR: undefined method
+    }
+
+    int function calculate(int a, int b) {
+        return a + b;
+    }
+
+
+    // ============================================================
+    // 6. RETURN SEMANTICS
+    // ============================================================
+
+    void function invalidVoidReturn() {
+
+        return 10;                // ERROR
+    }
+
+    int function invalidIntReturn() {
+
+        return "hello";           // ERROR
+    }
+
+    int function missingReturn(bool condition) {
+
+        if (condition) {
+            return 10;
+        }
+
+        // ERROR: missing return
+    }
+
+    int function completeReturn(bool condition) {
+
+        if (condition) {
+            return 10;
+        } else {
+            return 20;
+        }
+    }
+
+
+    // ============================================================
+    // 7. STATIC CONTEXT
+    // ============================================================
+
+    static void function staticTest() {
+
+        fieldInt = 20;            // ERROR: instance field
+
+        OceanOutput(fieldInt);    // ERROR: instance field
+
+        fieldString = "x";        // ERROR
+
+        int x = 10;
+        x = 20;                   // OK
+    }
+
+
+    // ============================================================
+    // 8. SHADOWING
+    // ============================================================
+
+    void function shadowingTest(int fieldInt) {
+
+        // WARNING: parameter shadows field
+
+        int x = 10;
+
+    {
+        int x = 20;
+        // WARNING
+
+    {
+        int x = 30;
+        // WARNING
+    }
+    }
+
+    {
+        int y = 10;
+        // NO WARNING
+
+    {
+        int z = 20;
+        // NO WARNING
+    }
+    }
+
+    {
+        int fieldString = 10;
+        // WARNING: shadows field
+    }
+    }
+
+
+    // ============================================================
+    // 9. DUPLICATE DECLARATION
+    // ============================================================
+
+    void function duplicateTest() {
+
+        int x = 10;
+        int x = 20;               // ERROR
+
+    {
+        int y = 10;
+        int y = 20;           // ERROR
+    }
+
+    {
+        int x = 30;           // WARNING: outer x shadow
+    }
+
+    {
+        int z = 10;
+    }
+
+    {
+        int z = 20;           // NO WARNING: sibling scope
+    }
+    }
+
+
+    // ============================================================
+    // 10. FIELD ACCESS
+    // ============================================================
+
+    void function fieldAccessTest() {
+
+        OceanOutput(fieldInt);       // OK
+        OceanOutput(fieldString);    // OK
+        OceanOutput(fieldBool);      // OK
+
+        UnknownField x;              // ERROR
+    }
+
+
+    // ============================================================
+    // 11. INHERITANCE / OVERRIDE
+    // ============================================================
+
+    main() {
+
+        Child child = new Child();
+
+        OceanOutput(child.getName());
+        OceanOutput(child.getNumber());
+
+        OceanOutput("Comprehensive semantic test completed");
+    }
+}
+
+
+// ================================================================
+// INHERITANCE TEST
+// ================================================================
+
+class Parent {
+
+    String function getName() {
+        return "parent";
+    }
+
+    int function getNumber() {
+        return 10;
+    }
+
+    int function calculate(int x) {
+        return x * 2;
+    }
+}
+
+
+class Child extends Parent {
+
+    @Override
+    String function getName() {
+        return "child";
+    }
+
+    @Override
+    int function getNumber() {
+        return 20;
+    }
+
+    @Override
+    bool function calculate(int x) {
+        return true;
+        // ERROR: incompatible return type
+    }
+
+    @Override
+    String function doesNotExist() {
+        return "x";
+        // ERROR: no matching parent method
+    }
+}

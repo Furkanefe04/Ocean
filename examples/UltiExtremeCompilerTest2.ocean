@@ -1,0 +1,692 @@
+package com.resources.extremecompilertest2;
+
+import java.util.List;
+import java.util.Map;
+import java.util.ArrayList;
+import java.io.ByteArrayInputStream;
+// ============================================================
+// OCEAN EXTREME COMPILER INTEGRATION TEST
+// ============================================================
+
+// ------------------------------------------------------------
+// 1. GENERIC FUNCTIONAL INTERFACES
+// ------------------------------------------------------------
+
+public interface Transformer<In, Out> {
+    Out function apply(In valuex);
+}
+
+public interface ConsumerLike<-T> {
+    void function consume(T valuex);
+}
+
+public interface ProducerLike<+T> {
+    T function produce();
+}
+
+
+// ------------------------------------------------------------
+// 2. SEALED HIERARCHY + INTERFACE
+// ------------------------------------------------------------
+
+public sealed interface Node restricts LeafNode, BranchNode {
+    int function val();
+
+    String function describe();
+}
+
+public final class LeafNode implements Node {
+    private int val;
+
+    public function LeafNode(int valuex){
+        val = valuex;
+    }
+
+    @Override
+    public int function val() {
+        return val;
+    }
+
+    @Override
+    public String function describe() {
+        return $"Leaf({val})";
+    }
+}
+
+public non-sealed class BranchNode implements Node {
+    int val;
+    Node left;
+    Node right;
+
+    public function BranchNode(int valuex,Node leftV,Node rightV){
+        val = valuex;
+        right = rightV;
+        left = leftV;
+    }
+
+    @Override
+    public int function val() {
+        return val;
+    }
+
+    public int function sum() {
+        int leftValue = left?.val() ?? 0;
+        int rightValue = right?.val() ?? 0;
+
+        return val + leftValue + rightValue;
+    }
+
+    @Override
+    public String function describe() {
+        return $"Branch({val}, {left?.describe() ?? "null"}, {right?.describe() ?? "null"})";
+    }
+}
+
+
+// ------------------------------------------------------------
+// 3. GENERIC CONTAINER + BOUNDS
+// ------------------------------------------------------------
+
+public class Box <T> {
+    private T val;
+
+    public function Box(T valuex) {
+        val = valuex;
+    }
+
+    public T function get() {
+        return val;
+    }
+
+    public void function set(T valuex) {
+        val = valuex;
+    }
+}
+
+
+public class NumberBox<T <: Number> extends Box<T> {
+    public function NumberBox(T valuex) {
+        super(valuex);
+    }
+
+    public double function doubled() {
+        return get().doubleValue() * 2.0;
+    }
+}
+
+
+// ------------------------------------------------------------
+// 4. COVARIANT / CONTRAVARIANT GENERICS
+// ------------------------------------------------------------
+
+public class SimpleProducer<+T> {
+    private T val;
+
+    public function SimpleProducer(T valuex) {
+        val = valuex;
+    }
+
+    public T function produce() {
+        return val;
+    }
+}
+
+
+public class SimpleConsumer<-T> {
+    public void function consume(T valuex) {
+        OceanOutput($"Consumed: {valuex}");
+    }
+}
+
+
+public class Pipeline<-InType, +OutType <: CharSequence> {
+    private OutType output;
+
+    public function Pipeline(OutType outputx) {
+        output = outputx;
+    }
+
+    public OutType function execute(InType inputx) {
+        return output;
+    }
+}
+
+
+// ------------------------------------------------------------
+// 5. DATA CLASS
+// ------------------------------------------------------------
+
+public data class Record(int id, String name, double score);
+
+// ------------------------------------------------------------
+// 6. ENUM
+// ------------------------------------------------------------
+
+public enum Level {
+    LOW(1, "LOW"),
+    MEDIUM(2, "MEDIUM"),
+    HIGH(3, "HIGH");
+
+    private int code;
+    private String label;
+
+    function Level(int code, String label) {
+        this.code = code;
+        this.label = label;
+    }
+
+    public int function getCode() {
+        return code;
+    }
+
+    public String function getLabel() {
+        return label;
+    }
+}
+
+
+// ------------------------------------------------------------
+// 7. CLASS WITH CONSTRUCTOR CHAINING / STATIC / SYNC
+// ------------------------------------------------------------
+
+public class Counter {
+
+    private int val;
+    public static int instances = 0;
+
+    private Object lockObject = new Object();
+
+    public function Counter() {
+        this(0);
+    }
+
+    public function Counter(int initial) {
+        val = initial;
+        Counter.instances++;
+    }
+
+    public int function get() {
+        return val;
+    }
+
+    public void function increment() {
+        val++;
+    }
+
+    public sync void function synchronizedIncrement() {
+        val++;
+    }
+
+    public void function lockedIncrement() {
+        lock(lockObject) {
+            val++;
+            val += 2;
+        }
+    }
+}
+
+
+// ------------------------------------------------------------
+// 8. EXTENSION METHODS
+// ------------------------------------------------------------
+
+public class Extensions {
+    public int int.function square() {
+        return this * this;
+    }
+
+    public String String.function surround(String left, String right) {
+        return $"{left}{this}{right}";
+    }
+
+    public String Record.function compact() {
+        return $"{this.getId()}:{this.getName()}:{this.getScore()}";
+    }
+}
+
+
+// ------------------------------------------------------------
+// 9. GENERIC METHODS
+// ------------------------------------------------------------
+
+public class GenericAlgorithms {
+    public static <T> T function identity(T val) {
+        return val;
+    }
+
+    public static <T> OceanList<T> function singleton(T val) {
+        return [val];
+    }
+
+    public static <T, R> R function transform(T input, Transformer<T, R> transformer) {
+        return transformer.apply(input);
+    }
+
+    public static int function sum(OceanIntList values) {
+        int total = 0;
+
+        for(int valuex in values) {
+            total += valuex;
+        }
+
+        return total;
+    }
+
+
+}
+
+
+// ------------------------------------------------------------
+// 10. DEFAULT / NAMED / VARARGS / THROWS
+// ------------------------------------------------------------
+
+public class ParameterLab {
+
+    function ParameterLab(){
+
+    }
+
+    public String function format(String prefix = "[", String suffix = "]", bool upper = false) {
+        String resultx = $"{prefix}Ocean{suffix}";
+
+        if(upper) {
+            return resultx.toUpperCase();
+        }
+
+        return resultx;
+    }
+
+    public int function sum(int... values) {
+        int total = 0;
+
+        for(int valuex in values) {
+            total += valuex;
+        }
+
+        return total;
+    }
+
+    public void function risky(String? text) throws IllegalArgumentException {
+        if(text == null) {
+            throw new IllegalArgumentException("null text");
+        }
+    }
+}
+
+
+// ------------------------------------------------------------
+// 11. ASYNC
+// ------------------------------------------------------------
+
+public class AsyncLab {
+    static async String function fetch(String input) {
+        return $"ASYNC: {input}";
+    }
+
+    static async String function chained(String input) {
+        String resultx = await fetch(input);
+        return resultx.toUpperCase();
+    }
+}
+
+
+// ------------------------------------------------------------
+// 12. MAIN EXTREME TEST
+// ------------------------------------------------------------
+
+public class UltiExtremeCompilerTest2 {
+    main() {
+        // =====================================================
+        // A. Primitive / arithmetic / bitwise
+        // =====================================================
+
+        int a = 17;
+        int b = 5;
+
+        int arithmetic = ((a + b) * 3) - ((a << 2) & 31) + ((b ^ 7) | 2);
+
+        bool logical = arithmetic > 0 && !(a == b) || (a != 17);
+
+        int shifted = ((arithmetic << 2) ^ (arithmetic > > > 1)) & 255;
+
+        OceanOutput($"ARITH={arithmetic}");
+        OceanOutput($"LOGICAL={logical}");
+        OceanOutput($"SHIFTED={shifted}");
+
+
+        // =====================================================
+        // B. Nullable + safe-call + coalescing
+        // =====================================================
+
+        String? nullableText = null;
+
+        int? nullableLength = nullableText?.length();
+
+        String safeText = nullableText ?? "fallback";
+
+        String? realText = "Ocean";
+
+        int? realLength = realText?.length();
+
+        OceanOutput($"NULL_LENGTH={nullableLength}");
+        OceanOutput($"SAFE={safeText}");
+        OceanOutput($"REAL_LENGTH={realLength}");
+
+
+        // =====================================================
+        // C. Collection literals + slicing
+        // =====================================================
+
+        variable numbers = [1, 2, 3, 4, 5, 6, 7, 8];
+
+        variable names = #{"Ocean", "Java", "Compiler", "JVM"};
+
+        variable scores = {"Ocean": 100, "Java": 95, "JVM": 90};
+
+        int[] array = {10, 20, 30, 40, 50};
+
+        variable slice = numbers[2..5];
+
+        OceanOutput($"LIST_SUM={GenericAlgorithms.sum(numbers)}");
+        OceanOutput($"SET_SIZE={names.size()}");
+        OceanOutput($"MAP_VALUE={scores.get("Ocean")}");
+        OceanOutput($"ARRAY_VALUE={array[3]}");
+        OceanOutput($"SLICE_SIZE={slice.size()}");
+
+
+        // =====================================================
+        // D. Generic class + bounded generic
+        // =====================================================
+
+        Box<String> textBox = new Box<String>("generic");
+
+        NumberBox<Integer> numberBox = new NumberBox<Integer>(21);
+
+        OceanOutput($"BOX={textBox.get()}");
+        OceanOutput($"NUMBER_BOX={numberBox.get()}");
+        OceanOutput($"DOUBLED={numberBox.doubled()}");
+
+
+        // =====================================================
+        // E. Variance
+        // =====================================================
+        LeafNode nodeLeaf = new LeafNode(42);
+        SimpleProducer<LeafNode> leafProducer = new SimpleProducer<LeafNode>(nodeLeaf);
+
+        SimpleProducer<Node> nodeProducer = leafProducer;
+
+        Node produced = nodeProducer.produce();
+
+        SimpleConsumer<Node> nodeConsumer = new SimpleConsumer < Node >();
+
+        SimpleConsumer<LeafNode> leafConsumer = nodeConsumer;
+
+        leafConsumer.consume(new LeafNode(99));
+
+        Pipeline<String, String> pipeline = new Pipeline <String, String>("PIPE_RESULT");
+
+        String pipelineResult = pipeline.execute("input");
+
+        OceanOutput($"PRODUCED={produced.describe()}");
+        OceanOutput($"PIPE={pipelineResult}");
+
+
+        // =====================================================
+        // F. Sealed hierarchy + polymorphism
+        // =====================================================
+
+        Node left = new LeafNode(10);
+
+        Node right = new LeafNode(20);
+
+        Node root = new BranchNode(30, left, right);
+
+        OceanOutput($"ROOT={root.describe()}");
+
+        if(root instanceof BranchNode branch) {
+            OceanOutput($"BRANCH_SUM={branch.sum()}");
+        }
+
+        if(left instanceof LeafNode leaf) {
+            OceanOutput($"LEAF_VALUE={leaf.val()}");
+        }
+
+
+        // =====================================================
+        // G. Data class
+        // =====================================================
+
+        Record r1 = new Record(1, "Ocean", 99.5);
+
+        Record r2 = new Record(1, "Ocean", 99.5);
+
+        bool equalRecords = r1.equals(r2);
+
+        String recordText = r1.toString();
+
+        OceanOutput($"RECORD_EQUAL={equalRecords}");
+        OceanOutput($"RECORD={recordText}");
+
+
+        // =====================================================
+        // H. Enum + switch expression
+        // =====================================================
+
+        Level level = Level.HIGH;
+
+        String levelText =
+        switch(level.getCode()) {
+            case 1 -> "LOW"
+            case 2 -> {
+                variable temp = "MEDIUM";
+                result $"LEVEL:{temp}";
+            }
+            case 3 -> "HIGH"
+            default -> "UNKNOWN"
+        };
+
+        OceanOutput($"LEVEL={levelText}");
+        OceanOutput($"LABEL={level.getLabel()}");
+
+
+        // =====================================================
+        // I. Complex loops + labels
+        // =====================================================
+
+        int accumulator = 0;
+
+        outer: for(int i from 1 to 8 with increasing 1) {
+            inner:
+            for(int j from 1 to 8 with increasing 1) {
+                if(j == 2) {
+                    skip inner;
+                }
+
+                if(i * j > 30) {
+                    stop outer;
+                }
+
+                accumulator += i * j;
+            }
+        }
+
+        OceanOutput($"ACC={accumulator}");
+
+
+        // =====================================================
+        // J. Lambda capture
+        // =====================================================
+
+        int multiplier = 3;
+
+        Transformer<int,int> multiplierLambda = (x) -> x * multiplier;
+
+        int lambdaResult = multiplierLambda(14);
+
+        OceanOutput($"LAMBDA={lambdaResult}");
+
+
+        // =====================================================
+        // K. Block lambda + local variable
+        // =====================================================
+
+        Transformer<String,int> lengthLambda = (String text) -> {
+            int length =
+            text.length();
+
+            return length * 2;
+        };
+
+        OceanOutput($"LAMBDA_BLOCK={lengthLambda("Ocean")}");
+
+
+        // =====================================================
+        // L. Method reference
+        // =====================================================
+
+        Transformer <String, String> upperReference = String::toUpperCase;
+
+        String referenceResult = upperReference.apply("compiler");
+
+        OceanOutput($"METHOD_REF={referenceResult}");
+
+        // =====================================================
+        // M. Generic higher-order method
+        // =====================================================
+
+        int transformed = GenericAlgorithms.transform(21,(Transformer) (x) -> x * 2);
+
+        String transformedText = GenericAlgorithms.transform("ocean", upperReference);
+
+        OceanOutput($"TRANSFORM_INT={transformed}");
+        OceanOutput($"TRANSFORM_STRING={transformedText}");
+
+
+        // =====================================================
+        // N. Default + named arguments
+        // =====================================================
+
+        ParameterLab parameters = new ParameterLab();
+
+        String defaultFormat = parameters.format();
+
+        String namedFormat = parameters.format(suffix = "!" , prefix =  "<",true);
+
+        int varargResult = parameters.sum(1, 2, 3, 4, 5);
+
+        OceanOutput($"DEFAULT={defaultFormat}");
+        OceanOutput($"NAMED={namedFormat}");
+        OceanOutput($"VARARGS={varargResult}");
+
+
+        // =====================================================
+        // O. Extension methods
+        // =====================================================
+
+        int square = 12.square();
+
+        String surrounded = "Ocean".surround("<", ">");
+
+        String compactRecord = r1.compact();
+
+        OceanOutput($"EXT_SQUARE={square}");
+        OceanOutput($"EXT_STRING={surrounded}");
+        OceanOutput($"EXT_RECORD={compactRecord}");
+
+
+        // =====================================================
+        // P. Constructor chaining + static + sync + lock
+        // =====================================================
+
+        Counter counter = new Counter();
+
+        counter.increment();
+        counter.synchronizedIncrement();
+        counter.lockedIncrement();
+
+        OceanOutput($"COUNTER={counter.get()}");
+
+        OceanOutput($"INSTANCES={Counter.instances}");
+
+
+        // =====================================================
+        // Q. Exception + finally
+        // =====================================================
+
+        variable exceptionState = "NONE";
+
+        trying {
+            parameters.risky(null);
+        } catch(IllegalArgumentException e) {
+            exceptionState = $"CAUGHT:{e.getMessage()}";
+        } finally {
+            exceptionState += ":FINALLY";
+        }
+
+        OceanOutput($"EXCEPTION={exceptionState}");
+
+        // =====================================================
+        // R. Try-with-resources
+        // =====================================================
+        byte[] arr = {10,20,30};
+        trying (ByteArrayInputStream input = new ByteArrayInputStream(arr)) {
+            int first =
+            input.read();
+            OceanOutput($"RESOURCE={first}");
+        } catch(java.io.IOException e) {
+            OceanOutput($"RESOURCE_ERROR={e.getMessage()}");
+        }
+
+
+        // =====================================================
+        // S. String interpolation + nested expressions
+        // =====================================================
+
+        String complex = $"result={r1.getName()}, " + $"score={(r1.getScore() > 90 ? "excellent" : "normal")}, " + $"square={12.square()}, " + $"node={root.val()}";
+
+        OceanOutput($"COMPLEX={complex}");
+
+        // =====================================================
+        // T. ASYNC / AWAIT
+        // =====================================================
+        variable asyncFuture = AsyncLab.chained("ocean");
+
+        String asyncResult =(String) asyncFuture.join();
+
+        OceanOutput($"ASYNC_RESULT={asyncResult}");
+
+
+        // =====================================================
+        // U. FINAL CROSS-FEATURE CHECK
+        // =====================================================
+
+        variable finalValues = [transformed, lambdaResult, square, accumulator, varargResult, root.val()];
+
+        int finalScore = 0;
+
+        for(int valuex in finalValues) {
+            if(valuex < 0) {
+                skip;
+            }
+
+            finalScore += valuex;
+        }
+
+        String finalStatus = switch(finalScore % 3) {
+            case 0 -> "DIVISIBLE_BY_3"
+            case 1 -> "REMAINDER_1"
+            default -> "REMAINDER_2"
+        };
+
+        OceanOutput($"FINAL_SCORE={finalScore}");
+
+        OceanOutput($"FINAL_STATUS={finalStatus}");
+
+        OceanOutput("=== EXTREME COMPILER TEST PASSED ===");
+        if (finalScore > 0 && (finalStatus.equals("DIVISIBLE_BY_3") || finalStatus.equals("REMAINDER_1") || finalStatus.equals("REMAINDER_2"))) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

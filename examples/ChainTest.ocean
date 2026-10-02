@@ -1,0 +1,22 @@
+package com.resources;
+
+class ChainTest {
+    static main() {
+        variable secret = new SecretClass();
+        secret.publicCode = 100;
+        
+        // Chained safe call and null coalescing
+        variable code = secret?.publicCode ?? -1;
+        OceanOutput("Code: " + code);
+        
+        SecretClass? nullSecret = null;
+        variable code2 = nullSecret?.publicCode ?? -2;
+        OceanOutput("Code 2: " + code2);
+        
+        if (code == 100 && code2 == -2) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

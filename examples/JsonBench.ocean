@@ -1,0 +1,54 @@
+package com.resources;
+    class JsonData {
+    int id;
+    String name;
+    double valuex;
+}
+
+class JsonBench {
+    static void function parseJson(String json, JsonData data) {
+        int idPos =(int) json.indexOf("\"id\":");
+        if (idPos != -1) {
+            String sub =(String) json.substring(idPos + 5).trim();
+            int comma =(int) sub.indexOf(",");
+            // Ocean supports calling static methods
+            data.id =(int) Integer.parseInt(sub.substring(0, comma));
+        }
+
+        int namePos =(int) json.indexOf("\"name\":");
+        if (namePos != -1) {
+            int start =(int) json.indexOf("\"", namePos + 7);
+            int end =(int) json.indexOf("\"", start + 1);
+            data.name =(String) json.substring(start + 1, end);
+        }
+
+        int valPos =(int) json.indexOf("\"value\":");
+        if (valPos != -1) {
+            String sub =(String) json.substring(valPos + 8).trim();
+            int brace =(int) sub.indexOf("}");
+            data.valuex =(double) Double.parseDouble(sub.substring(0, brace));
+        }
+    }
+
+    static main() {
+        String json = "{\"id\": 12345, \"name\": \"Ocean Language\", \"value\": 98.76}";
+        int limit = 1000000;
+        long start =(long) System.currentTimeMillis();
+
+        double totalValue = 0.0;
+        for (int i from 1 to 1000000 with increasing 1) {
+            JsonData dat = new JsonData();
+            parseJson(json, dat);
+            totalValue =(double) totalValue + dat.valuex;
+        }
+
+        long end =(long) System.currentTimeMillis();
+        OceanOutput("OCEAN JSON Sum: " + totalValue + ", Time: " + (end - start) + " ms");
+
+        if (totalValue > 98759900.0 && totalValue < 98759902.0) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

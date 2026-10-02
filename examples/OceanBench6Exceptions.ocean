@@ -1,0 +1,18 @@
+package com.resources;
+
+class OceanBench6Exceptions {
+    static main() {
+        int n = 100000;
+        int caught = 0;
+        long start = System.nanoTime();
+        for (int i from 0 to n - 1 with increasing 1) {
+            trying {
+                throw new Exception("bench");
+            } catch (Exception e) {
+                caught = caught + 1;
+            }
+        }
+        long end = System.nanoTime();
+        OceanOutput("caught=" + caught + " | time_ms=" + ((end - start) / 1000000));
+    }
+}

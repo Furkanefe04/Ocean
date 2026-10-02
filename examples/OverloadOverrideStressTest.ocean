@@ -1,0 +1,59 @@
+package com.resources;
+
+interface CalculatorDevice {
+    int function calculate(int a, int b);
+}
+
+class StandardCalculator implements CalculatorDevice {
+    int function calculate(int a, int b) {
+        return a + b;
+    }
+
+    String function describe(Object val) {
+        return "Standard Object: " + val.toString();
+    }
+
+    String function describe(String str) {
+        return "Standard String: " + str;
+    }
+}
+
+class ScientificCalculator extends StandardCalculator {
+    @Override
+    int function calculate(int a, int b) {
+        return (a * b) + 10;
+    }
+
+    @Override
+    String function describe(String str) {
+        return "Scientific String: " + str.toUpperCase();
+    }
+}
+
+class OverloadOverrideStressTest {
+    main() {
+        OceanOutput("=== OVERLOAD OVERRIDE STRESS TEST START ===");
+
+        variable calc = new ScientificCalculator();
+
+        // 1. Interface dispatch
+        CalculatorDevice device = calc;
+        int res1 = device.calculate(5, 4);
+        OceanOutput("Interface Calculate (5 * 4 + 10): " + res1); // Expected: 30
+
+        // 2. Overload and Override dispatch
+        String s1 = calc.describe("hello world");
+        OceanOutput("Overridden Describe String: " + s1); // Expected: Scientific String: HELLO WORLD
+
+        Object obj = new Object();
+        String s2 = calc.describe(obj);
+        OceanOutput("Inherited Describe Object non-null: " + (s2 != null)); // Expected: true
+
+        OceanOutput("=== OVERLOAD OVERRIDE STRESS TEST COMPLETED ===");
+        if (res1 == 30 && s1 == "Scientific String: HELLO WORLD" && s2 != null) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

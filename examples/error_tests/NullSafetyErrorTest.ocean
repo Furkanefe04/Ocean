@@ -1,0 +1,8 @@
+package tests;
+
+class NullSafetyErrorTest {
+    main() {
+        String n = null;
+        int len = n.length();
+    }
+}

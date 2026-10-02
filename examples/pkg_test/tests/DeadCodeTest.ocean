@@ -1,0 +1,27 @@
+package tests;
+public class DeadCodeTest {
+    main() {
+        // Test 1: Sabit if koşulu (always true)
+        /*if (true) {
+            OceanOutput("Bu her zaman çalışır");
+        } else {
+            OceanOutput("Bu asla çalışmaz");
+        }*/
+        
+        // Test 2: Sabit if koşulu (always false)
+        /*if (false) {
+            OceanOutput("Bu asla çalışmaz");
+        }*/
+        
+        // Test 3: Constant folding
+        variable x = 5 + 10;
+        OceanOutput(x);
+        
+        variable y = 3 * 4 + 2;
+        OceanOutput(y);
+        
+        // Test 4: Final değişken
+        value pi = 3;
+        OceanOutput(pi);
+    }
+}

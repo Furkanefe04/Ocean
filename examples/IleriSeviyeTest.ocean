@@ -1,0 +1,42 @@
+package com.resources;
+
+public class IleriSeviyeTest {
+    main(){
+        variable start = System.nanoTime();
+        for(variable sayi from 0 to 1000000 with increasing 1){
+            denemeClass dc = new denemeClass();
+            dc.add();
+            if(sayi % 3 == 0) dc.subtract();
+            if(sayi % 5 == 0) dc.changeStatus();
+        }
+        variable end = System.nanoTime();
+        variable diff = (end - start)/(1000000000.0);
+        OceanOutput("süre : " + diff);
+
+        if (denemeClass.count == 666666 && denemeClass.status == false) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}
+
+public class denemeClass {
+    public static variable status = false;
+    public static int count = 0;
+
+    void function add(){
+        count++;
+    }
+    void function subtract(){
+        count--;
+    }
+    void function changeStatus(){
+        if (status == false){
+            status = true;
+        }
+        else{
+            status = false;
+        }
+    }
+}

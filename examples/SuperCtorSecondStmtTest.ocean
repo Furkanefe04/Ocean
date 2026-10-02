@@ -1,0 +1,26 @@
+package com.resources;
+
+class Parent {
+    int x;
+    function Parent() {
+        x = 10;
+    }
+    function Parent(int a) {
+        x = a;
+    }
+}
+
+class Child extends Parent {
+    int myField;
+    function Child() {
+        myField = 50; // ILLEGAL: early this access before super
+        super(20);
+    }
+}
+
+class SuperCtorSecondStmtTest {
+    main() {
+        variable c = new Child();
+        OceanOutput("Child created!");
+    }
+}

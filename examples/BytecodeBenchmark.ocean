@@ -1,0 +1,17 @@
+package com.resources;
+    class BytecodeBenchmark {
+    main() {
+        long start = System.currentTimeMillis();
+        long count = 0;
+        while (System.currentTimeMillis() - start < 1000) {
+            OceanOutput("Deneme metin");
+            count = count + 1;
+        }
+        OceanOutput(count);
+        if (count > 0) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

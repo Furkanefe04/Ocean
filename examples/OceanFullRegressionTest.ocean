@@ -1,0 +1,135 @@
+package com.resources;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.lang.Thread;
+import java.lang.Runnable;
+
+// --- Veri Modelleri (Kalıtım Testi) ---
+class RegressionPerson {
+    variable name = "";
+    variable age = 0;
+
+    void function greet() {
+        OceanOutput("Merhaba, benim adim " + name);
+    }
+}
+
+class RegressionStudent extends RegressionPerson {
+    variable studentId = 0;
+
+    void function study() {
+        OceanOutput(name + " (" + studentId + ") ders calisiyor...");
+    }
+}
+
+class RegressionAnimal {
+    variable age = 0;
+    
+    void function sound() {
+        OceanOutput("Animal makes a sound.");
+    }
+}
+
+class RegressionDog extends RegressionAnimal implements Runnable {
+    variable breed = "";
+    
+    void function sound() {
+        super.sound();
+        OceanOutput("Dog barks!");
+    }
+    
+    void function run() {
+        OceanOutput("Dog is running in a separate thread!");
+    }
+}
+
+// --- Ana Test Sinifi ---
+class OceanFullRegressionTest {
+    
+    main() {
+        OceanOutput("=============================================");
+        OceanOutput("   OCEAN COMPILER FULL REGRESSION TEST       ");
+        OceanOutput("=============================================");
+
+        bool r1 = testEscapeCharacters();
+        bool r2 = testOOPInheritance();
+        bool r3 = testJavaInterop();
+        bool r4 = testBigDecimalArithmetic();
+        
+        if (r1 && r2 && r3 && r4) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+
+    static bool function testEscapeCharacters() {
+        OceanOutput("\n>>> 1. KACIS KARAKTERLERI TESTI");
+        OceanOutput("Satir 1\nSatir 2");
+        OceanOutput("Tab\tBosluk");
+        OceanOutput("Tirnak: \" | Ters Slas: \\");
+        OceanOutput("OK.");
+        return true;
+    }
+
+    static bool function testOOPInheritance() {
+        OceanOutput("\n>>> 2. OOP & KALITIM TESTI");
+        
+        variable s = new RegressionStudent();
+        s.name = "Ali";
+        s.studentId = 12345;
+        s.greet();
+        s.study();
+
+        variable d = new RegressionDog();
+        d.breed = "Golden";
+        d.sound();
+        
+        // Interface test (Runnable)
+        variable t = new Thread(d);
+        t.start();
+        
+        OceanOutput("OK.");
+        return "Ali".equals(s.name) && s.studentId == 12345 && "Golden".equals(d.breed);
+    }
+
+    static bool function testJavaInterop() {
+        OceanOutput("\n>>> 3. JAVA STANDART KUTUPHANE (INTEROP) TESTI");
+        
+        variable list = new ArrayList();
+        list.add(99);
+        list.add(11);
+        list.add(55);
+        
+        OceanOutput("Liste (Ham): " + list.toString());
+        Collections.sort(list);
+        OceanOutput("Liste (Sirali): " + list.toString());
+        
+        OceanOutput("OK.");
+        return "[11, 55, 99]".equals(list.toString());
+    }
+
+    static bool function testBigDecimalArithmetic() {
+        OceanOutput("\n>>> 4. BIGDECIMAL HASSAS ARITMETIK TESTI");
+        
+        variable a = new BigDecimal("10.00");
+        variable b = new BigDecimal("3.00");
+        
+        OceanOutput("A: " + a.toString() + " | B: " + b.toString());
+        
+        variable sum = a.add(b);
+        variable diff = a.subtract(b);
+        variable prod = a.multiply(b);
+        variable quot = a.divide(b, 4, RoundingMode.HALF_UP);
+        
+        OceanOutput("Toplam: " + sum.toString());
+        OceanOutput("Fark: " + diff.toString());
+        OceanOutput("Carpim: " + prod.toString());
+        OceanOutput("Bolum (Scale=4): " + quot.toString());
+        
+        OceanOutput("OK.");
+        return "13.00".equals(sum.toString()) && "7.00".equals(diff.toString()) && "30.0000".equals(prod.toString()) && "3.3333".equals(quot.toString());
+    }
+}

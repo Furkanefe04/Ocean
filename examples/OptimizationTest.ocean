@@ -1,0 +1,22 @@
+package com.resources;
+    class OptimizationTest {
+    static main() {
+        int x = 10 + 20 * 2; // Should become 50
+        bool b = (10 < 20) && (5 == 5); // Should become true
+        
+        if (false) {
+            OceanOutput("This is unreachable");
+        } else {
+            OceanOutput("Result: " + x);
+        }
+        
+        if (x == 50 && b) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+        
+        return;
+        OceanOutput("This is also unreachable after return");
+    }
+}

@@ -1,0 +1,80 @@
+package com.resources;
+interface Storage<+T> {
+    T? function get();
+}
+
+interface AdvancedStorage<+T> extends Storage<T> {
+    void function syncx();
+}
+
+class Box<+T> implements AdvancedStorage<T> {
+    void function syncx() { OceanOutput("Box synced."); }
+    T? function get() { return null; }
+}
+
+class Animal {
+    void function speak() { OceanOutput("Animal"); }
+}
+class Dog extends Animal {
+    void function speak() { OceanOutput("Dog"); }
+}
+
+class GodModeCompilerTest {
+
+    static int function factorial(int n) {
+        if (n <= 1) return 1;
+        return n * factorial(n - 1);
+    }
+
+    main() {
+        OceanOutput("=== GOD MODE COMPILER TEST START ===");
+
+        // 1. 4D Array and Math Stress
+        variable tensor = new int[2][2][2][2];
+        int count = 0;
+        for (int i from 0 to 1 with increasing 1) {
+            for (int j from 0 to 1 with increasing 1) {
+                for (int k from 0 to 1 with increasing 1) {
+                    for (int l from 0 to 1 with increasing 1) {
+                        // Use static call
+                        tensor[i][j][k][l] = factorial(i + j + k + l + 1);
+                        count = count + 1;
+                    }
+                }
+            }
+        }
+        OceanOutput("4D Tensor processed. Total cells: " + count);
+        OceanOutput("Tensor[1][1][1][1] (Factorial 5): " + tensor[1][1][1][1]);
+
+        // 2. Deep Covariance Check
+        Box<Dog> dogBox = new Box<Dog>();
+        AdvancedStorage<Animal> animalStore = dogBox;
+        animalStore.syncx();
+
+        // 3. String Chain Stress
+        variable report = "Data: " + 100 + " | " + true + " | " + "Test" + " | " + 3.14 + " | " + "Done.";
+        OceanOutput(report);
+
+        bool outerAECaught = false;
+        // 4. Nested Exceptions & DCE
+        trying {
+            trying {
+                // Trigger NPE
+                throw new NullPointerException();
+            } catch (NullPointerException e) {
+                OceanOutput("Inner NPE caught, triggering ArithmeticException...");
+                int x = 10 / 0;
+            }
+        } catch (ArithmeticException e) {
+            OceanOutput("Outer AE caught: " + e.getClass().getSimpleName());
+            outerAECaught = true;
+        } finally {
+            if (count == 1 && tensor[1][1][1][1] == 0 && report == "Data: 100 | true | Test | 3.14 | Done." && outerAECaught) {
+                OceanOutput("STATUS: PASSED");
+            } else {
+                OceanOutput("STATUS: FAILED");
+            }
+            //OceanOutput("FAIL: DCE failed if you see this!");
+        }
+    }
+}

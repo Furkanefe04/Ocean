@@ -1,0 +1,24 @@
+package com.resources;
+import java.lang.System;
+import java.lang.Math;
+
+class MathBench {
+    static main() {
+        int limit = 100000000;
+        long start = System.currentTimeMillis();
+        
+        double res = 0.0;
+        for (int i from 0 to 99999999 with increasing 1) {
+            double d = i;
+            res = res + Math.sin(d) * Math.cos(d) + Math.sqrt(d);
+        }
+        
+        long end = System.currentTimeMillis();
+        OceanOutput("OCEAN Math Res: " + res + ", Time: " + (end - start) + " ms");
+        if (Math.abs(res - 666666651666.5509) < 1.0) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

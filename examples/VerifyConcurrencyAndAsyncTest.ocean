@@ -1,0 +1,75 @@
+package ocean.test;
+
+import java.lang.AssertionError;
+import java.lang.Thread;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+class ThreadWorker implements java.lang.Runnable {
+    int workerId;
+    AtomicInteger counter;
+    AtomicBoolean failureDetected;
+
+    function ThreadWorker(int workerId, AtomicInteger counter, AtomicBoolean failureDetected) {
+        this.workerId = workerId;
+        this.counter = counter;
+        this.failureDetected = failureDetected;
+    }
+
+    public void function run() {
+        trying {
+            for (int i from 0 to 50 with increasing 1) {
+                int val = this.counter.incrementAndGet();
+                verify val > 0 : "Counter invariant violated: " + val;
+            }
+        } catch (AssertionError e) {
+            this.failureDetected.set(true);
+        }
+    }
+}
+
+class VerifyConcurrencyAndAsyncTest {
+
+    static main() {
+        OceanOutput("=== Running VerifyConcurrencyAndAsyncTest ===");
+        trying {
+
+        AtomicInteger sharedCounter = new AtomicInteger(0);
+        AtomicBoolean failureFlag = new AtomicBoolean(false);
+
+        Thread t1 = new Thread(new ThreadWorker(1, sharedCounter, failureFlag));
+        Thread t2 = new Thread(new ThreadWorker(2, sharedCounter, failureFlag));
+        Thread t3 = new Thread(new ThreadWorker(3, sharedCounter, failureFlag));
+
+        t1.start();
+        t2.start();
+        t3.start();
+
+        t1.join();
+        t2.join();
+        t3.join();
+
+        verify !failureFlag.get() : "Concurrent worker threads encountered assertion failures!";
+        verify sharedCounter.get() == 150 : "Expected shared counter to reach 150, got: " + sharedCounter.get();
+
+        AtomicBoolean deliberateFailCaught = new AtomicBoolean(false);
+        Thread failThread = new Thread(() -> {
+            trying {
+                int bad = -5;
+                verify bad >= 0 : "Deliberate negative failure";
+            } catch (AssertionError ex) {
+                deliberateFailCaught.set(true);
+            }
+        });
+        failThread.start();
+        failThread.join();
+
+        verify deliberateFailCaught.get() : "Deliberate async thread assertion failure was not caught!";
+
+        OceanOutput("STATUS: PASSED");
+        } catch (java.lang.Exception e) {
+            OceanOutput("Unexpected exception: " + e.getMessage());
+            verify false : "Exception occurred in main: " + e.getMessage();
+        }
+    }
+}

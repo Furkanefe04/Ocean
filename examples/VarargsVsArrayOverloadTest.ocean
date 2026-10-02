@@ -1,0 +1,53 @@
+package Test;
+
+public class VarargsTester {
+    public int function compute(int[] items) {
+        int sum = 0;
+        for (int x in items) {
+            sum += x;
+        }
+        return sum;
+    }
+
+    public String function concat(String sep, String... parts) {
+        StringBuilder sb = new StringBuilder();
+        int idx = 0;
+        for (String p in parts) {
+            if (idx > 0) {
+                sb.append(sep);
+            }
+            sb.append(p);
+            idx++;
+        }
+        return sb.toString();
+    }
+
+    public String function tag(String label) {
+        return "single:" + label;
+    }
+
+    public String function tag(String... labels) {
+        return "varargs:" + labels.length;
+    }
+}
+
+public class VarargsVsArrayOverloadTest {
+    public static main(String[] args) {
+        VarargsTester t = new VarargsTester();
+
+        // 1. Array parameter requires explicit array
+        int[] data = [10, 20, 30, 40];
+        verify t.compute(data) == 100;
+
+        // 2. Varargs parameters accept variable arguments and empty varargs
+        verify t.concat("-", "alpha", "beta", "gamma").equals("alpha-beta-gamma");
+        verify t.concat(":").equals("");
+
+        // 3. Exact single overload is preferred over varargs (Rule: non-varargs more specific)
+        verify t.tag("hello").equals("single:hello");
+        verify t.tag("hello", "world").equals("varargs:2");
+        verify t.tag().equals("varargs:0");
+
+        System.out.println("VarargsVsArrayOverloadTest passed successfully!");
+    }
+}

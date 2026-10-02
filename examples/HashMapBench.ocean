@@ -1,0 +1,80 @@
+package com.resources;
+import java.lang.System;
+class HashNode {
+    int key;
+    int valuex;
+    HashNode next;
+}
+
+class ManualHashMap {
+    HashNode[] buckets;
+    int capacity;
+
+    static ManualHashMap function create(int cap) {
+        ManualHashMap m = new ManualHashMap();
+        m.capacity = cap;
+        m.buckets = new HashNode[cap];
+        return m;
+    }
+
+    void function put(int key, int valuex) {
+        int h = key % capacity;
+        if (h < 0) { h = -h; }
+        
+        HashNode[] b = buckets;
+        HashNode curr = b[h];
+        while (curr != null) {
+            if (curr.key == key) {
+                curr.valuex = valuex;
+                return;
+            }
+            curr = curr.next;
+        }
+        
+        HashNode newNode = new HashNode();
+        newNode.key = key;
+        newNode.valuex = valuex;
+        newNode.next = b[h];
+        b[h] = newNode;
+    }
+
+    int function get(int key) {
+        int h = key % capacity;
+        if (h < 0) { h = -h; }
+        
+        HashNode[] b = buckets;
+        HashNode curr = b[h];
+        while (curr != null) {
+            if (curr.key == key) {
+                return curr.valuex;
+            }
+            curr = curr.next;
+        }
+        return -1;
+    }
+}
+
+class HashMapBench {
+    main() {
+        int targetSize = 5000000;
+        long start = System.currentTimeMillis();
+        
+        ManualHashMap map = ManualHashMap.create(targetSize);
+        for (int i from 0 to 4999999 with increasing 1) {
+            map.put(i, i * 2);
+        }
+        
+        long sum = 0;
+        for (int i from 0 to 4999999 with increasing 1) {
+            sum = sum + map.get(i);
+        }
+        
+        long end = System.currentTimeMillis();
+        OceanOutput("OCEAN HashMap Sum: " + sum + ", Time: " + (end - start) + " ms");
+        if (sum == 24999985000002) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

@@ -1,0 +1,155 @@
+package com.dependencytest;
+
+// Bu test iki ana şeyi doğrular:
+// 1. Cache Hardening: Hatalı derleme sonrası compiler_cache.dat kirlenmez
+// 2. Dependency Tracking: Bağımlılık kaydının doğru çalıştığı doğrulanır
+
+// Bağımlılık hiyerarşisi:
+//   DependencyTrackingTest -> Engine -> BaseComponent
+//   DependencyTrackingTest -> Logger (interface) -> LogFormatter (interface)
+
+public interface LogFormatter {
+    public String function format(String msg);
+}
+
+public interface Logger extends LogFormatter {
+    public void function log(String message);
+    public int function getLogCount();
+}
+
+public class BaseComponent {
+    public String name;
+    public int version;
+
+    public function BaseComponent(String name, int version) {
+        this.name = name;
+        this.version = version;
+    }
+
+    public String function identify() {
+        return name + " v" + version;
+    }
+}
+
+public class Engine extends BaseComponent {
+    public int rpm;
+
+    public function Engine(String name, int ver, int rpm) {
+        super(name, ver);
+        this.rpm = rpm;
+    }
+
+    public int function computePower() {
+        return rpm / 100;
+    }
+}
+
+public class ConsoleLogger implements Logger {
+    public int count;
+
+    public function ConsoleLogger() {
+        count = 0;
+    }
+
+    public String function format(String msg) {
+        return "[LOG] " + msg;
+    }
+
+    public void function log(String message) {
+        OceanOutput(format(message));
+        count = count + 1;
+    }
+
+    public int function getLogCount() {
+        return count;
+    }
+}
+
+public class DependencyTrackingTest {
+    static main() {
+        OceanOutput("==============================================");
+        OceanOutput("=== DEPENDENCY TRACKING INTEGRATION TEST  ===");
+        OceanOutput("==============================================");
+
+        bool test1 = false;
+        bool test2 = false;
+        bool test3 = false;
+        bool test4 = false;
+
+        // TEST 1: BaseComponent → Engine inheritance chain
+        trying {
+            Engine engine = new Engine("OceanV8", 3, 6000);
+            String id = engine.identify();
+            int power = engine.computePower();
+
+            OceanOutput("[1] Engine ID: " + id);
+            OceanOutput("[1] Engine Power: " + power + " units");
+
+            if (id.equals("OceanV8 v3") && power == 60) {
+                test1 = true;
+            }
+        } catch (Exception e) {
+            OceanOutput("[1] FAIL: " + e.getMessage());
+        }
+
+        // TEST 2: Logger interface chain (Logger extends LogFormatter)
+        trying {
+            Logger logger = new ConsoleLogger();
+            logger.log("System initialized");
+            logger.log("Engine started");
+
+            int count = logger.getLogCount();
+            String formatted = logger.format("Direct format test");
+
+            OceanOutput("[2] Log Count: " + count);
+            OceanOutput("[2] Formatted: " + formatted);
+
+            if (count == 2 && formatted.equals("[LOG] Direct format test")) {
+                test2 = true;
+            }
+        } catch (Exception e) {
+            OceanOutput("[2] FAIL: " + e.getMessage());
+        }
+
+        // TEST 3: Cross-dependency — Engine used inside Logger handler
+        trying {
+            Engine eng = new Engine("TurboEngine", 2, 9000);
+            ConsoleLogger log = new ConsoleLogger();
+            log.log("Engine: " + eng.identify() + " power=" + eng.computePower());
+
+            if (log.getLogCount() == 1 && eng.computePower() == 90) {
+                test3 = true;
+            }
+            OceanOutput("[3] Cross-dep check: " + test3);
+        } catch (Exception e) {
+            OceanOutput("[3] FAIL: " + e.getMessage());
+        }
+
+        // TEST 4: Reflection - verify dependency class hierarchy visibility
+        trying {
+            Engine eng = new Engine("RefEngine", 1, 3000);
+            variable clazz = eng.getClass();
+            variable superClazz = clazz.getSuperclass();
+
+            bool isBaseComponent = superClazz.getSimpleName().equals("BaseComponent");
+            OceanOutput("[4] Engine superclass: " + superClazz.getSimpleName());
+            OceanOutput("[4] isBaseComponent: " + isBaseComponent);
+
+            if (isBaseComponent) {
+                test4 = true;
+            }
+        } catch (Exception e) {
+            OceanOutput("[4] FAIL: " + e.getMessage());
+        }
+
+        // SUMMARY
+        OceanOutput("----------------------------------------------");
+        if (test1 && test2 && test3 && test4) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+            OceanOutput("Details -> T1=" + test1 + " T2=" + test2 + " T3=" + test3 + " T4=" + test4);
+        }
+        OceanOutput("==============================================");
+    }
+}

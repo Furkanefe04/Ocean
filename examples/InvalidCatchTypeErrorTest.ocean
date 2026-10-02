@@ -1,0 +1,11 @@
+package com.resources;
+
+class InvalidCatchTypeErrorTest {
+    main() {
+        trying {
+            int x = 10;
+        } catch (String s) {
+            OceanOutput(s);
+        }
+    }
+}

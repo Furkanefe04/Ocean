@@ -1,0 +1,137 @@
+package ocean.test;
+
+import java.lang.AssertionError;
+import java.util.ArrayList;
+
+class ComplexAccount {
+    String id;
+    int balance;
+    ArrayList<Integer> transactions;
+
+    function ComplexAccount(String? id, int initialBalance) {
+        verify id != null : "Account ID cannot be null";
+        verify initialBalance >= 0 : "Initial balance must be non-negative: " + initialBalance;
+
+        this.id = id??"";
+        this.balance = initialBalance;
+        this.transactions = new ArrayList<Integer>();
+        this.transactions.add(initialBalance);
+    }
+
+    void function deposit(int amount) {
+        verify amount > 0 : "Deposit amount must be positive, got: " + amount;
+        int oldBalance = this.balance;
+        this.balance += amount;
+        this.transactions.add(amount);
+        verify this.balance == oldBalance + amount : "Postcondition failed for deposit";
+    }
+
+    void function withdraw(int amount) {
+        verify amount > 0 : "Withdrawal amount must be positive";
+        verify this.balance >= amount : "Insufficient funds: balance=" + this.balance + ", requested=" + amount;
+        int oldBalance = this.balance;
+        this.balance -= amount;
+        this.transactions.add(-amount);
+        verify this.balance == oldBalance - amount : "Postcondition failed for withdraw";
+    }
+
+    int function getBalance() {
+        return this.balance;
+    }
+}
+
+class VerifyStatementStressTest {
+
+    static int function fibonacci(int n) {
+        verify n >= 0 : "Fibonacci index must be non-negative: " + n;
+        if (n <= 1) {
+            return n;
+        }
+        int prev = 0;
+        int curr = 1;
+        for (int i from 2 to n with increasing 1) {
+            int next = prev + curr;
+            verify next >= curr : "Fibonacci overflow check failed at step " + i;
+            prev = curr;
+            curr = next;
+        }
+        return curr;
+    }
+
+    static main() {
+        OceanOutput("=== Running VerifyStatementStressTest ===");
+
+        // 1. Basic Invariants & Arithmetic assertions
+        int a = 100;
+        int b = 25;
+        verify a > b;
+        verify a / b == 4 : "Division invariant failed";
+        verify a % b == 0;
+
+        // 2. Object Lifecycle & State Invariant testing
+        ComplexAccount acc = new ComplexAccount("ACC-001", 1000);
+        acc.deposit(500);
+        verify acc.getBalance() == 1500 : "Unexpected balance: " + acc.getBalance();
+        acc.withdraw(300);
+        verify acc.getBalance() == 1200 : "Unexpected balance: " + acc.getBalance();
+
+        // 3. Negative assertion catching via trying-catch (AssertionError)
+        bool caughtNullAccount = false;
+        trying {
+            ComplexAccount badAcc = new ComplexAccount(null, 100);
+        } catch (AssertionError e) {
+            caughtNullAccount = true;
+            verify e.getMessage().contains("Account ID cannot be null") : "Incorrect error message on null ID";
+        }
+        verify caughtNullAccount : "Expected AssertionError was not thrown for null account ID";
+
+        bool caughtNegativeDeposit = false;
+        trying {
+            acc.deposit(-50);
+        } catch (AssertionError e) {
+            caughtNegativeDeposit = true;
+            verify e.getMessage().contains("Deposit amount must be positive") : "Incorrect deposit error message";
+        }
+        verify caughtNegativeDeposit : "Expected AssertionError was not thrown for negative deposit";
+
+        bool caughtOverdraw = false;
+        trying {
+            acc.withdraw(99999);
+        } catch (AssertionError e) {
+            caughtOverdraw = true;
+            verify e.getMessage().contains("Insufficient funds") : "Incorrect overdraw error message";
+        }
+        verify caughtOverdraw : "Expected AssertionError was not thrown for overdraw";
+
+        // 4. Algorithmic and Loop-Level Invariant Assertions
+        int fib10 = fibonacci(11);
+        verify fib10 == 55 : "Fibonacci(10) expected 55, got " + fib10;
+
+        int sum = 0;
+        for (int i from 1 to 11 with increasing 1) {
+            sum += i;
+            verify sum == (i * (i + 1)) / 2 : "Gauss sum formula invariant violated";
+        }
+        verify sum == 55;
+
+        // 5. Contextual keyword test (verify as variable and method names)
+        String verify = "contextual_keyword_string";
+        verify = verify + "_ok";
+        verify verify.startsWith("contextual") : "Contextual string verification failed";
+
+        // 6. Higher-order verification logic
+        int testVal = 42;
+        verify testVal > 0 : "Value must be strictly positive: " + testVal;
+
+        bool negativeCatch = false;
+        trying {
+            int badVal = -99;
+            verify badVal > 0 : "Value must be positive";
+        } catch (AssertionError e) {
+            negativeCatch = true;
+        }
+        verify negativeCatch : "Assertion failure was not caught!";
+
+        OceanOutput("STATUS: PASSED");
+    }
+}

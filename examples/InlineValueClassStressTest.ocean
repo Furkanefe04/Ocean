@@ -1,0 +1,85 @@
+package com.resources;
+
+import java.util.Objects;
+
+@Inline
+class UserId {
+    public int id;
+    function UserId(int id) {
+        this.id = id;
+    }
+}
+
+@Inline
+class Price {
+    public double amount;
+    function Price(double amount) {
+        this.amount = amount;
+    }
+}
+
+@Inline
+class Email {
+    public String address;
+    function Email(String address) {
+        this.address = address;
+    }
+}
+
+class InlineValueClassStressTest {
+
+    static double function applyTax(Price price, double taxRate) {
+        return price.amount * (1.0 + taxRate);
+    }
+
+    static String function formatUser(UserId user, Email email) {
+        return "User#" + user.id + "<" + email.address + ">";
+    }
+
+    static main() {
+        OceanOutput("=== INLINE VALUE CLASS STRESS TEST START ===");
+        long start = System.nanoTime();
+
+        // 1. Instantiation of Multiple @Inline Value Classes
+        UserId u1 = new UserId(1001);
+        UserId u2 = new UserId(1002);
+        Price p1 = new Price(250.50);
+        Email e1 = new Email("user1001@ocean.org");
+
+        // 2. Passing @Inline instances to static methods
+        double totalPrice = applyTax(p1, 0.20);
+        String userInfo = formatUser(u1, e1);
+
+        // 3. High-Frequency Loop with 50 Milyon @Inline Value Instantiations
+        int loopCount = 50000000; // 50 Milyon Iteration
+        double sumPrice = 0.0;
+        int sumIds = 0;
+        int i = 0;
+
+        while (i < loopCount) {
+            UserId currentId = new UserId(i);
+            Price currentPrice = new Price((double) (i % 100));
+
+            sumIds = sumIds + currentId.id;
+            sumPrice = sumPrice + currentPrice.amount;
+
+            i = i + 1;
+        }
+
+        long durationMs = (System.nanoTime() - start) / 1000000;
+        OceanOutput("Duration (@Inline): " + durationMs + " ms");
+        OceanOutput("User Info: " + userInfo);
+        OceanOutput("Total Price with Tax: " + totalPrice);
+        OceanOutput("Sum IDs: " + sumIds);
+        OceanOutput("Sum Price: " + sumPrice);
+
+        if (u1.id == 1001 && u2.id == 1002 && p1.amount == 250.50 &&
+            totalPrice > 300.5 && totalPrice < 300.7 &&
+            userInfo.equals("User#1001<user1001@ocean.org>") &&
+            sumIds != 0 && sumPrice > 0.0) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

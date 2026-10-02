@@ -1,0 +1,85 @@
+package com.resources;
+
+class LibrariesVerificationTest {
+    static main() {
+        OceanOutput("=== CORE LIBRARIES VERIFICATION ===");
+
+        // 1. OceanJson Verification
+        OceanOutput("--- OceanJson Test ---");
+        variable originalMap = {
+            "name": "Ocean Language",
+            "version": 1,
+            "isActive": true,
+            "tags": ["compiler", "stdlib", "jvm"]
+        };
+        
+        String jsonStr = OceanJson.stringify(originalMap);
+        OceanOutput("Stringified JSON: " + jsonStr);
+        
+        variable parsedVal = OceanJson.parse(jsonStr);
+        OceanOutput("Parsed type is Map: " + (parsedVal instanceof java.util.Map));
+        
+        variable parsedMap = (OceanMap) parsedVal;
+        OceanOutput("Parsed name: " + parsedMap.get("name"));
+        OceanOutput("Parsed version: " + parsedMap.get("version"));
+        OceanOutput("Parsed isActive: " + parsedMap.get("isActive"));
+        
+        variable parsedTags = (OceanList) parsedMap.get("tags");
+        OceanOutput("Parsed tags size: " + parsedTags.size());
+        OceanOutput("Parsed tags first item: " + parsedTags[0]);
+
+        // 2. OceanRegex Verification
+        OceanOutput("--- OceanRegex Test ---");
+        bool isMatch = OceanRegex.matches("hello [a-z]+", "hello world");
+        OceanOutput("Regex matches 'hello world': " + isMatch);
+        
+        variable matches = OceanRegex.findAll("\\b\\w{4}\\b", "this is a test code");
+        OceanOutput("Found 4-letter words:");
+        for (String word in matches) {
+            OceanOutput(" - " + word);
+        }
+
+        // 3. OceanDate & OceanTime Verification
+        OceanOutput("--- OceanDate & OceanTime Test ---");
+        String currentDateTime = OceanDate.now();
+        OceanOutput("Current Datetime: " + currentDateTime);
+        
+        String formattedDate = OceanDate.format("yyyy-MM-dd");
+        OceanOutput("Formatted Date: " + formattedDate);
+        
+        String currentTime = OceanTime.now();
+        OceanOutput("Current Time: " + currentTime);
+
+        // 4. OceanHttp Verification
+        OceanOutput("--- OceanHttp Test ---");
+        trying {
+            // Using status 200 check which returns an empty body but guarantees a successful request
+            String httpRes = OceanHttp.get("https://httpbin.org/status/200");
+            OceanOutput("HTTP GET status check successful. Response body length: " + httpRes.length());
+        } catch (Exception e) {
+            OceanOutput("HTTP request skipped/failed (expected if offline): " + e.getMessage());
+        }
+
+        bool jsonOk = "Ocean Language".equals(parsedMap.get("name")) && 
+                      (("" + parsedMap.get("version")).equals("1") || ("" + parsedMap.get("version")).equals("1.0")) && 
+                      ("" + parsedMap.get("isActive")).equals("true") && 
+                      parsedTags.size() == 3 &&
+                      "compiler".equals(parsedTags[0]);
+
+        variable matchCount = 0;
+        for (String word in matches) {
+            matchCount++;
+        }
+        bool regexOk = isMatch && (matchCount == 3);
+        
+        bool dateOk = currentDateTime != null && currentDateTime.length() > 0 && 
+                      formattedDate != null && formattedDate.length() > 0 && 
+                      currentTime != null && currentTime.length() > 0;
+
+        if (jsonOk && regexOk && dateOk) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

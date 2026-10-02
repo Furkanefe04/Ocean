@@ -1,0 +1,367 @@
+﻿package com.resources;
+
+// =========================================================================
+// 1. INTERFACE VE ENUM HİYERARŞİSİ
+// =========================================================================
+
+interface IOmniItem {
+    int function getId();
+    String function getTag();
+    double function getValue();
+}
+
+interface ISecureOmniItem extends IOmniItem {
+    String function getSecurityToken();
+}
+
+enum OmniPriority {
+    LOW(10, "Dusuk"),
+    MEDIUM(20, "Orta"),
+    HIGH(30, "Yuksek"),
+    CRITICAL(40, "Kritik");
+
+    int level;
+    String label;
+
+    function OmniPriority(int pLevel, String pLabel) {
+        level = pLevel;
+        label = pLabel;
+    }
+
+    int function getLevel() { return level; }
+    String function getLabel() { return label; }
+}
+
+// =========================================================================
+// 2. DATA CLASS MODELLERİ (Equals, HashCode, Copy)
+// =========================================================================
+
+data class OmniPayload(int id, String tag, double valuex) implements IOmniItem {
+    @Override
+    int function getId() { return id; }
+    @Override
+    String function getTag() { return tag; }
+    @Override
+    double function getValue() { return valuex; }
+}
+
+data class SecureOmniPayload(int id, String tag, double valuex, String securityToken) implements ISecureOmniItem {
+    @Override
+    int function getId() { return id; }
+    @Override
+    String function getTag() { return tag; }
+    @Override
+    double function getValue() { return valuex; }
+    @Override
+    String function getSecurityToken() { return securityToken; }
+}
+
+// =========================================================================
+// 3. ERİŞİM BELİRLEYİCİLERİ & ENKAPSÜLASYON
+// =========================================================================
+
+class OmniVault {
+    private String secretSalt;
+    private int operationCounter;
+    protected String vaultZone;
+
+    public function OmniVault(String salt, String zone) {
+        secretSalt = salt;
+        vaultZone = zone;
+        operationCounter = 0;
+    }
+
+    private String function generateHashInternal(int round) {
+        return $"HASH_{secretSalt}_R{round}_{operationCounter}";
+    }
+
+    public String function sealTransaction(int round, String data) {
+        operationCounter = operationCounter + 1;
+        String h = generateHashInternal(round);
+        return $"[SEALED: {data} | {h}]";
+    }
+
+    public int function getCount() { return operationCounter; }
+    public String function getZone() { return vaultZone; }
+}
+
+// =========================================================================
+// 4. EXTENSION METHODS (Genişletme Metotları)
+// =========================================================================
+
+class OmniExtensions {
+    public String SecureOmniPayload.function formatAudit(int round) {
+        return $"[AUDIT_R{round}: id={this.getId()}, tag={this.getTag()}, token={this.getSecurityToken()}]";
+    }
+
+    public int OmniPriority.function calculateScore(int roundMultiplier) {
+        return this.getLevel() * roundMultiplier;
+    }
+}
+
+// =========================================================================
+// 5. SAM INTERFACE VE VARYANS SINIFLARI (+T Kovaryans, -T Kontravaryans)
+// =========================================================================
+
+interface IOmniTransformer<InType, OutType> {
+    OutType function transform(InType input);
+}
+
+class OmniProducer<+T> {
+    private T item;
+
+    public function OmniProducer(T pItem) {
+        item = pItem;
+    }
+
+    public T function emit() {
+        return item;
+    }
+}
+
+class OmniConsumer<-T> {
+    private int consumedCount = 0;
+    private String lastTag = "NONE";
+
+    public function OmniConsumer() { }
+
+    public void function accept(T pItem) {
+        consumedCount++;
+        if (pItem instanceof IOmniItem it) {
+            lastTag = it.getTag();
+        }
+    }
+
+    public int function getConsumedCount() { return consumedCount; }
+    public String function getLastTag() { return lastTag; }
+}
+
+class OmniBivariantPipe<-In, +Out> {
+    private Out constantOutput;
+
+    public function OmniBivariantPipe(Out output) {
+        constantOutput = output;
+    }
+
+    public Out function process(In input) {
+        return constantOutput;
+    }
+}
+
+// =========================================================================
+// 6. ASENKRON MOTOR VE ANA STRESS TESTİ
+// =========================================================================
+
+class OmniFiftyRoundLanguageStressTest {
+
+    public static OmniPriority function resolvePriority(int round) {
+        int rem = round % 4;
+        if (rem == 1) {
+            return OmniPriority.LOW;
+        }
+        if (rem == 2) {
+            return OmniPriority.MEDIUM;
+        }
+        if (rem == 3) {
+            return OmniPriority.HIGH;
+        }
+        return OmniPriority.CRITICAL;
+    }
+
+    public static String function mapPriorityToTag(OmniPriority prio) {
+        return switch (prio) {
+            case OmniPriority.LOW -> "TIER_LOW"
+            case OmniPriority.MEDIUM -> "TIER_MED"
+            case OmniPriority.HIGH -> "TIER_HIGH"
+            case OmniPriority.CRITICAL -> "TIER_CRITICAL"
+            default -> "TIER_UNKNOWN"
+        };
+    }
+
+    public static async String function asyncComputeTag(int round, String baseTag) {
+        String p = "ASYNC_";
+        String r = "_R";
+        return p + baseTag + r + round;
+    }
+
+    public static void function runFiftyRoundStressSuite() {
+        OceanOutput("=================================================");
+        OceanOutput("   OMNI 50-ROUND COMPREHENSIVE LANGUAGE STRESS   ");
+        OceanOutput("=================================================");
+
+        int totalRoundsPassed = 0;
+        int totalSubChecksPassed = 0;
+
+        OmniVault globalVault = new OmniVault("SALT_ROOT_99", "ZONE_OMEGA");
+        OmniConsumer<IOmniItem> globalSink = new OmniConsumer<IOmniItem>();
+
+        int round = 1;
+        while (round <= 50) {
+            int roundChecks = 0;
+
+            // -------------------------------------------------------------
+            // [KONTROL 1] Erişim Belirleyicileri & Kapsülleme
+            // -------------------------------------------------------------
+            String sealedData = globalVault.sealTransaction(round, $"TX_DATA_{round}");
+            if (globalVault.getCount() == round && sealedData.contains($"HASH_SALT_ROOT_99_R{round}_{round}")) {
+                roundChecks = roundChecks + 1;
+            }
+
+            // -------------------------------------------------------------
+            // [KONTROL 2] Data Class Eşitlik, HashCode ve Copy
+            // -------------------------------------------------------------
+            SecureOmniPayload pOriginal = new SecureOmniPayload(round, $"TAG_{round}", 10.5 * round, $"TOKEN_{round}");
+            SecureOmniPayload pCopy = pOriginal.copy();
+            SecureOmniPayload pManual = new SecureOmniPayload(round, $"TAG_{round}", 10.5 * round, $"TOKEN_{round}");
+
+            if (pOriginal.equals(pCopy) && pOriginal.equals(pManual) && pOriginal.hashCode() == pManual.hashCode()) {
+                roundChecks = roundChecks + 1;
+            }
+
+            // -------------------------------------------------------------
+            // [KONTROL 3] Extension Methodlar ve Enum Entegrasyonu
+            // -------------------------------------------------------------
+            String auditText = pOriginal.formatAudit(round);
+            OmniPriority prio = resolvePriority(round);
+
+            int score = prio.calculateScore(round);
+            if (auditText.contains($"AUDIT_R{round}") && score == (prio.getLevel() * round)) {
+                roundChecks = roundChecks + 1;
+            }
+
+            // -------------------------------------------------------------
+            // [KONTROL 4] Switch Expression Eşleme
+            // -------------------------------------------------------------
+            String tierStr = mapPriorityToTag(prio);
+            bool tierOk = (prio == OmniPriority.LOW && tierStr == "TIER_LOW") ||
+                          (prio == OmniPriority.MEDIUM && tierStr == "TIER_MED") ||
+                          (prio == OmniPriority.HIGH && tierStr == "TIER_HIGH") ||
+                          (prio == OmniPriority.CRITICAL && tierStr == "TIER_CRITICAL");
+            if (tierOk) {
+                roundChecks = roundChecks + 1;
+            }
+
+            // -------------------------------------------------------------
+            // [KONTROL 5] Kovaryant Üretici Zinciri (+T)
+            // -------------------------------------------------------------
+            OmniProducer<SecureOmniPayload> secureProd = new OmniProducer<SecureOmniPayload>(pOriginal);
+            OmniProducer<ISecureOmniItem> isecureProd = secureProd; // Covariant
+            OmniProducer<IOmniItem> baseProd = isecureProd;         // Covariant
+
+            IOmniItem emittedItem = baseProd.emit();
+            if (emittedItem.getId() == round && emittedItem.getTag() == $"TAG_{round}") {
+                roundChecks = roundChecks + 1;
+            }
+
+            // -------------------------------------------------------------
+            // [KONTROL 6] Kontravaryant Tüketici Zinciri (-T)
+            // -------------------------------------------------------------
+            OmniConsumer<ISecureOmniItem> secureSink = globalSink;        // Contravariant
+            OmniConsumer<SecureOmniPayload> concreteSink = secureSink;    // Contravariant
+
+            concreteSink.accept(pOriginal);
+            if (globalSink.getConsumedCount() == round && globalSink.getLastTag() == $"TAG_{round}") {
+                roundChecks = roundChecks + 1;
+            }
+
+            // -------------------------------------------------------------
+            // [KONTROL 7] SAM Lambda Dönüşümü
+            // -------------------------------------------------------------
+            IOmniTransformer<SecureOmniPayload, String> mapper = (SecureOmniPayload item) -> {
+                return $"TRANSFORMED_{item.getTag()}_{item.getSecurityToken()}";
+            };
+            String mapResult = mapper.transform(pOriginal);
+            if (mapResult == $"TRANSFORMED_TAG_{round}_TOKEN_{round}") {
+                roundChecks = roundChecks + 1;
+            }
+
+            // -------------------------------------------------------------
+            // [KONTROL 8] İki Yönlü Varyans Boru Hattı (-In, +Out)
+            // -------------------------------------------------------------
+            OmniBivariantPipe<IOmniItem, SecureOmniPayload> concretePipe = new OmniBivariantPipe<IOmniItem, SecureOmniPayload>(pOriginal);
+            OmniBivariantPipe<ISecureOmniItem, IOmniItem> polyPipe = concretePipe; // Contravariant In, Covariant Out
+
+            IOmniItem pipeOut = polyPipe.process(pOriginal);
+            if (pipeOut.getId() == round) {
+                roundChecks = roundChecks + 1;
+            }
+
+            // -------------------------------------------------------------
+            // [KONTROL 9] Null Güvenliği, Safe Call (?.) ve Elvis (??)
+            // -------------------------------------------------------------
+            SecureOmniPayload? optItem = null;
+            if (round % 2 == 0) {
+                optItem = pOriginal;
+            }
+
+            String resolvedTag = optItem?.getTag() ?? $"FALLBACK_TAG_{round}";
+            double resolvedVal = optItem?.getValue() ?? -999.0;
+
+            bool nullOk = false;
+            if (round % 2 == 0) {
+                if (resolvedTag == $"TAG_{round}" && resolvedVal == (10.5 * round)) {
+                    nullOk = true;
+                }
+            } else {
+                if (resolvedTag == $"FALLBACK_TAG_{round}" && resolvedVal == -999.0) {
+                    nullOk = true;
+                }
+            }
+
+            if (nullOk) {
+                roundChecks = roundChecks + 1;
+            }
+
+            // -------------------------------------------------------------
+            // [KONTROL 10] Asenkron (async CompletableFuture) ve İstisna (trying/catch)
+            // -------------------------------------------------------------
+            variable futureTag = asyncComputeTag(round, pOriginal.getTag());
+            String asyncTag = (String) futureTag.join();
+
+            bool exceptionFlowOk = false;
+            trying {
+                if (round % 10 == 0) {
+                    throw new RuntimeException($"ROUND_MILESTONE_{round}");
+                }
+                exceptionFlowOk = true;
+            } catch (RuntimeException e) {
+                if (e.getMessage() == $"ROUND_MILESTONE_{round}") {
+                    exceptionFlowOk = true;
+                }
+            }
+
+            if (asyncTag == $"ASYNC_TAG_{round}_R{round}" && exceptionFlowOk) {
+                roundChecks = roundChecks + 1;
+            }
+
+            // -------------------------------------------------------------
+            // Tur Değerlendirmesi
+            // -------------------------------------------------------------
+            totalSubChecksPassed = totalSubChecksPassed + roundChecks;
+            if (roundChecks == 10) {
+                totalRoundsPassed = totalRoundsPassed + 1;
+                if (round % 10 == 0 || round == 1 || round == 50) {
+                    OceanOutput($"[TUR {round}/50] 10/10 Kontrol Tamamlandi -> GECERLI");
+                }
+            } else {
+                OceanOutput($"[TUR {round}/50] BASARISIZ! Gecen kontrol: {roundChecks}/10");
+            }
+
+            round = round + 1;
+        }
+
+        OceanOutput("-------------------------------------------------");
+        OceanOutput($"Toplam Gecen Tur: {totalRoundsPassed} / 50");
+        OceanOutput($"Toplam Dogrulanan Alt Kontrol: {totalSubChecksPassed} / 500");
+
+        if (totalRoundsPassed == 50 && totalSubChecksPassed == 500) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+
+    static main() {
+        runFiftyRoundStressSuite();
+    }
+}

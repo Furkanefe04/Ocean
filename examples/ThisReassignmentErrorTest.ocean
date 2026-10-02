@@ -1,0 +1,15 @@
+package com.resources;
+
+class ThisReassignmentErrorTest {
+    void function test() {
+        this = new ThisReassignmentErrorTest();
+    }
+
+    static void function thisDenemesi(){
+        OceanOutput(this);
+    }
+
+    static main() {
+        OceanOutput("Test");
+    }
+}

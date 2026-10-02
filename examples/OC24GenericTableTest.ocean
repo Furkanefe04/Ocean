@@ -1,0 +1,91 @@
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+class CustomContainer<T> {
+    T value;
+    
+    function CustomContainer(T v) {
+        value = v;
+    }
+    
+    // Generic method returning T
+    T function get() {
+        return value;
+    }
+    
+    // Overloaded method returning String (NOT T)
+    String function get(String suffix) {
+        return "value_" + suffix;
+    }
+}
+
+class OC24GenericTableTest {
+    public static void function main(String[] args) {
+        // 1. User generic class with overloaded get()
+        CustomContainer<int> container = new CustomContainer<int>(42);
+        
+        // get() should return int
+        int val = container.get();
+        if (val != 42) {
+            OceanOutput("FAILED: container.get() != 42");
+            System.exit(1);
+        }
+        
+        // get(String) should return String (OC-24: previously misidentified as T/int)
+        String strVal = container.get("test");
+        int strLen = strVal.length();
+        if (!strVal.equals("value_test") || strLen != 10) {
+            OceanOutput("FAILED: strVal not matching value_test");
+            System.exit(1);
+        }
+
+        // 2. Standard JDK List<String>
+        List<String> list = new ArrayList<String>();
+        list.add("first");
+        list.add("second");
+        
+        // List.get(int) -> String
+        String item = list.get(0);
+        int itemLen = item.length();
+        if (itemLen != 5) {
+            OceanOutput("FAILED: itemLen != 5");
+            System.exit(1);
+        }
+        
+        // List.remove(int) -> String
+        String removed = list.remove(0);
+        if (!removed.equals("first")) {
+            OceanOutput("FAILED: removed != first");
+            System.exit(1);
+        }
+
+        // List.remove(Object) -> boolean
+        bool removedBool = list.remove("second");
+        if (!removedBool) {
+            OceanOutput("FAILED: removedBool != true");
+            System.exit(1);
+        }
+
+        // 3. Standard JDK Map<String, int>
+        Map<String, int> map = new HashMap<String, int>();
+        map.put("one", 1);
+        map.put("two", 2);
+        
+        int mapVal = map.get("one");
+        if (mapVal != 1) {
+            OceanOutput("FAILED: mapVal != 1");
+            System.exit(1);
+        }
+        
+        int removedMapVal = map.remove("one");
+        if (removedMapVal != 1) {
+            OceanOutput("FAILED: removedMapVal != 1");
+            System.exit(1);
+        }
+
+        OceanOutput("OC-24 Generic Table Test: PASSED");
+        OceanOutput("STATUS: PASSED");
+    }
+}

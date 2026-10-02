@@ -1,0 +1,272 @@
+package com.stress;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Date;
+import java.math.BigDecimal;
+import java.util.concurrent.atomic.AtomicInteger;
+
+interface A {
+    String function who();
+}
+
+interface B {
+    String function who();
+}
+
+class Base {
+
+    int x;
+
+    function Base() {
+        this(50);// artık çalışıyor
+        //Base(50);//Düzgün çalışıyor ancak 2. derlemede
+    }
+
+    function Base(int x) {
+        this.x = x;
+    }
+
+    int function getX() {
+        return x;
+    }
+}
+
+class Derived extends Base implements A,B{
+
+    static int counter = 0;
+
+    static {
+        counter = 100;
+    }
+
+    function Derived() {
+        super(50);
+    }
+
+    @Override
+    String function who() {
+        return "Derived";
+    }
+
+    Date function getDate() {
+        return new Date();
+    }
+}
+
+class Box<T> {
+    T val;
+
+    function Box(T v) {
+        val = v;
+    }
+
+    T function get() {
+        return val;
+    }
+}
+
+class RecursiveMath {
+
+    static int function factorial(int n) {
+        if(n <= 1) {
+            return 1;
+        }
+        return n * factorial(n - 1);
+    }
+}
+
+class SharedCounter {
+
+    sync int count = 0;
+
+    sync void function inc() {
+        count++;
+    }
+}
+
+class OceanExtremeCompilerTest {
+    main() {
+        OceanOutput("===== EXTREME TEST START =====");
+
+        //-----------------------------------
+        // 1 Operator precedence hell
+        //-----------------------------------
+
+        variable x = 2 + 3 * 4 << 2 & 31 ^ 8 | 1;
+        OceanOutput(x);
+
+        //-----------------------------------
+        // 2 Deep expression nesting
+        //-----------------------------------
+
+        variable y = (((((((((((10 + 20) * 3) - 5) / 5) + 100) * 2) - 50) << 1) / 2) + 999));
+
+        OceanOutput(y);
+
+        //-----------------------------------
+        // 3 Recursive function
+        //-----------------------------------
+
+        variable fact = RecursiveMath.factorial(10);
+        OceanOutput(fact);
+
+        //-----------------------------------
+        // 4 Generics nesting
+        //-----------------------------------
+
+        variable nested = new Box< Box< Box< Integer > > >(new Box < Box < Integer > > (new Box< Integer >(999)));
+
+
+        //-----------------------------------
+        // 5 BigDecimal promotion chain
+        //-----------------------------------
+
+        variable bd = 1000000000000000000000 * 999999999999999999999 + 888888888888888888888;
+
+        variable xyz = 5 + 5L + 5.5f + 5.2 + new BigDecimal("10");
+
+        OceanOutput(bd);
+        OceanOutput(xyz);
+        //-----------------------------------
+        // 6 Lambda closure capture
+        //-----------------------------------
+
+        variable local = 50;
+
+        variable r = (Runnable) () -> {
+            OceanOutput(local);
+        };
+
+        r();
+
+        //-----------------------------------
+        // 7 Null coalescing
+        //-----------------------------------
+
+        String? s = null;
+        String xy = s ?? "fallback";
+
+        OceanOutput(xy);
+
+        //-----------------------------------
+        // 8 Massive threading
+        //-----------------------------------
+
+        variable counter = new SharedCounter();
+
+        variable t1 = new Thread((Runnable) () -> {
+            for(int i from 0 to 5000 with increasing 1) {
+                counter.inc();
+            }
+        });
+
+        variable t2 = new Thread((Runnable) () -> {
+            for(int i from 0 to 5000 with increasing 1) {
+                counter.inc();
+            }
+        });
+
+        t1.start();
+        t2.start();
+        trying{
+            t1.join();
+            t2.join();
+        } catch(InterruptedException e){
+            OceanOutput("hata yakalandı" + e.getMessage());
+        }
+
+        OceanOutput(counter.count);
+
+        //-----------------------------------
+        // 10 Switch expression nesting
+        //-----------------------------------
+
+        variable sw = switch(5) {
+        case 5 -> switch(10) {
+        case 10 -> "nested_ok"
+        default -> "fail"
+        }
+
+        default -> "outer_fail"
+        };
+
+        OceanOutput(sw);
+
+        //-----------------------------------
+        // 11 Inheritance + constructor chain
+        //-----------------------------------
+
+        Derived d = new Derived();
+
+        OceanOutput(d.getX());
+        OceanOutput(d.who());
+        OceanOutput(Derived.counter);
+        //-----------------------------------
+        // 12 Array/List/Map nesting
+        //-----------------------------------
+
+        variable complex = [{ "a": [1,2,3] ,"b": [4,5,6] }];
+        OceanOutput(complex);
+        variable datas = complex.get(0);
+        ArrayList arrList = datas.get("a");
+        OceanOutput(datas.get("a"));
+        OceanOutput(complex.get(0).get("a").get(2));
+        //-----------------------------------
+        // 13 Cast precedence
+        //-----------------------------------
+
+        double q = 5.7;
+        int casted = (int) q + 10 * 2;
+
+        OceanOutput(casted);
+
+        //-----------------------------------
+        // 14 Exception propagation
+        //-----------------------------------
+
+        trying {
+
+            trying {
+                throw new RuntimeException("test");
+            }
+
+            catch(RuntimeException e) {
+                throw e;
+            }
+
+        }
+
+        catch(Exception e) {
+            OceanOutput("caught");
+        }
+
+        //-----------------------------------
+        // 15 Parser ambiguity
+        //-----------------------------------
+
+        variable z =
+        ((int)((double)((long)
+        ((5 + 5) * (3 + 7)))));
+
+        OceanOutput(z);
+
+        //-----------------------------------
+        // Final verification
+        //-----------------------------------
+
+        if(
+        fact == 3628800 &&
+        counter.count == 10000 &&
+        sw.equals("nested_ok") &&
+        d.getX()==50&&d.who().equals("Derived")&&
+        casted == 25 &&
+        z == 100
+        ) {
+            OceanOutput("STATUS PASSED");
+        }
+        else {
+            OceanOutput("STATUS FAILED");
+        }
+    }
+}

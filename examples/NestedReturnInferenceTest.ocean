@@ -1,0 +1,43 @@
+package com.resources;
+
+class NestedReturnInferenceTest {
+    static int function inferInt(int a) {
+        if (a > 10) {
+            return 1;
+        } else {
+            return 2;
+        }
+    }
+
+    static String function inferString(int a) {
+        if (a > 10) {
+            if (a > 20) {
+                return "Large " + a;
+            }
+            return "Medium";
+        }
+        return "Small";
+    }
+
+    static String function inferTernary(int val) {
+        return val > 0 ? "Positive" : "Non-Positive";
+    }
+
+    static bool function inferLogical(int val) {
+        return val > 10 && val < 20;
+    }
+
+    static main() {
+        int val = inferInt(15);
+        String str = inferString(25);
+        String tern = inferTernary(5);
+        bool log = inferLogical(15);
+        
+        bool ok = (val == 1) && (str.equals("Large 25")) && (tern.equals("Positive")) && log;
+        if (ok) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

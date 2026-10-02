@@ -1,0 +1,817 @@
+package compiler.advanced;
+
+import java.util.List;
+import java.util.Map;
+import java.util.ArrayList;
+import java.util.concurrent.CompletableFuture;
+
+
+// ================================================================
+// TEST INFRASTRUCTURE
+// ================================================================
+
+public class OceanAdvancedCompilerTest {
+
+    static int passed = 0;
+    static int failed = 0;
+
+    static void function check(bool condition, String name) {
+        if (condition) {
+            passed++;
+            OceanOutput($"[PASS] {name}");
+        } else {
+            failed++;
+            OceanOutput($"[FAIL] {name}");
+        }
+    }
+
+    static void function checkInt(int actual, int expected, String name) {
+        check(actual == expected, name);
+    }
+
+    static void function checkLong(long actual, long expected, String name) {
+        check(actual == expected, name);
+    }
+
+    static void function checkDouble(double actual, double expected, String name) {
+        check(actual == expected, name);
+    }
+
+    static void function checkString(String actual, String expected, String name) {
+        check(actual == expected, name);
+    }
+
+    static void function checkBool(bool actual, bool expected, String name) {
+        check(actual == expected, name);
+    }
+
+
+    // ============================================================
+    // MAIN
+    // ============================================================
+
+    static main() {
+
+        OceanOutput("========================================");
+        OceanOutput(" OCEAN ADVANCED COMPILER TEST");
+        OceanOutput("========================================");
+
+
+        // ========================================================
+        // 1. LITERAL TYPES
+        // ========================================================
+
+        byte byteValue = 127;
+        short shortValue = 32000;
+        int intValue = 123456;
+        long longValue = 9000000000L;
+        float floatValue = 3.5F;
+        double doubleValue = 9.25D;
+        char charValue = 'O';
+        bool boolValue = true;
+
+        checkInt(byteValue, 127, "byte literal");
+        checkInt(shortValue, 32000, "short literal");
+        checkInt(intValue, 123456, "int literal");
+        checkLong(longValue, 9000000000L, "long literal");
+        checkDouble(doubleValue, 9.25D, "double literal");
+        checkBool(boolValue, true, "bool literal");
+
+
+        // ========================================================
+        // 2. VALUE / VARIABLE / FINAL MIX
+        // ========================================================
+
+        variable mutableValue = 10;
+        value immutableValue = 20;
+        final int explicitFinal = 30;
+
+        mutableValue += immutableValue;
+        mutableValue += explicitFinal;
+
+        checkInt(mutableValue, 60, "variable + value + final");
+
+
+        // ========================================================
+        // 3. STRING ESCAPING + MULTILINE STRING
+        // ========================================================
+
+        String escaped = "Ocean\nCompiler\tTest";
+
+        String multiline = """
+Ocean
+Compiler
+Test
+""";
+
+        check(escaped.length() > 0, "escaped string literal");
+
+        check(multiline.length() > 0, "multiline string literal");
+
+
+        // ========================================================
+        // 4. STRING INTERPOLATION + EXPRESSION
+        // ========================================================
+
+        variable x = 7;
+        variable y = 8;
+
+        String expressionString = $"Result={x + y}, Product={x * y}";
+
+        checkString(expressionString, "Result=15, Product=56", "interpolation with expressions");
+
+
+        // ========================================================
+        // 5. COMPLEX OPERATOR PRECEDENCE
+        // ========================================================
+
+        int precedence = ((10 + 20) * 3) - ((40 / 5) % 3) + (2 << 3);
+
+        checkInt(precedence, 104, "complex arithmetic precedence");
+
+
+        // ========================================================
+        // 6. BITWISE COMBINATION
+        // ========================================================
+
+        int bits = 0;
+
+        bits = bits | 1;
+        bits = bits | 4;
+        bits = bits | 16;
+
+        checkInt(bits, 21, "bitwise accumulation");
+
+        bits = bits & 20;
+
+        checkInt(bits, 20, "bitwise mask");
+
+
+        // ========================================================
+        // 7. NESTED BOOLEAN EXPRESSION
+        // ========================================================
+
+        bool logic = ((10 > 5) && (20 < 30)) && (!(10 == 20) || (5 != 5));
+
+        checkBool(logic, true, "nested boolean expression");
+
+
+        // ========================================================
+        // 8. NULLABLE PRIMITIVE
+        // ========================================================
+
+        int? nullableNumber = null;
+
+        int safeNumber = nullableNumber ?? 999;
+
+        checkInt(safeNumber, 999, "nullable primitive + coalescing");
+
+
+        // ========================================================
+        // 9. NULLABLE OBJECT + SAFE CALL
+        // ========================================================
+
+        String? nullableText = null;
+
+        int? nullableLength = nullableText?.length();
+
+        check(nullableLength == null, "nullable safe-call");
+
+
+        // ========================================================
+        // 10. ARRAY + SLICE
+        // ========================================================
+
+        int[] values = {10, 20, 30, 40, 50, 60};
+
+        int[] middle = values[2..5];
+
+        checkInt(middle.length, 4, "array slicing");
+
+        checkInt(middle[0], 30, "slice element 0");
+
+        checkInt(middle[2], 50, "slice element 2");
+
+
+        // ========================================================
+        // 11. LIST + SLICE
+        // ========================================================
+
+        List<String> names = ["A", "B", "C", "D", "E"];
+
+        List<String> nameSlice = names[1..4];
+
+        checkInt(nameSlice.size(), 4, "List slicing");
+
+        checkString(nameSlice.get(1), "C", "List slice middle element");
+
+
+        // ========================================================
+        // 12. SET LITERAL
+        // ========================================================
+
+        variable uniqueValues = #{"A", "B", "A", "C"};
+
+        checkInt(uniqueValues.size(), 3, "Set literal + uniqueness");
+
+
+        // ========================================================
+        // 13. MAP LITERAL
+        // ========================================================
+
+        Map<String, int> scores = {"math": 90, "physics": 80, "compiler": 100};
+
+        checkInt(scores.get("compiler"), 100, "Map literal lookup");
+
+
+        // ========================================================
+        // 14. LABELED NESTED LOOPS
+        // ========================================================
+
+        variable outerResult = 0;
+
+        outerLoop: for (int i from 1 to 5 with increasing 1) {
+            innerLoop: for (int j from 1 to 5 with increasing 1) {
+                if (i * j == 12) {
+                    stop outerLoop;
+                }
+
+                if (j == 2) {
+                    skip innerLoop;
+                }
+
+                outerResult++;
+            }
+        }
+
+        check(outerResult > 0, "labeled nested loops");
+
+
+        // ========================================================
+        // 15. FOR-IN WITH INFERRED VARIABLE
+        // ========================================================
+
+        variable total = 0;
+
+        for (variable number in values) {
+            total += number;
+        }
+
+        checkInt(total, 210, "for-in inferred variable");
+
+
+        // ========================================================
+        // 16. SWITCH STATEMENT
+        // ========================================================
+
+        variable switchText = "";
+        int switchInput = 3;
+
+        switch (switchInput) {
+
+            case 1:
+                switchText = "ONE";
+                stop;
+
+            case 2:
+            case 3:
+                switchText = "TWO_THREE";
+                stop;
+
+            default:
+                switchText = "OTHER";
+        }
+
+        checkString(switchText, "TWO_THREE", "switch statement fall-through");
+
+
+        // ========================================================
+        // 17. SWITCH EXPRESSION
+        // ========================================================
+
+        variable switchValue =
+            switch (switchInput) {
+                case 1 -> "ONE"
+                case 2 -> "TWO"
+                case 3 -> "THREE"
+                default -> "OTHER"
+            };
+
+        checkString(switchValue, "THREE", "switch expression");
+
+
+        // ========================================================
+        // 18. SWITCH EXPRESSION BLOCK + RESULT
+        // ========================================================
+
+        variable switchBlock =
+            switch (switchInput) {
+                case 3 -> {
+                    variable prefix = "VALUE";
+                    result $"FOUND_{prefix}";
+                }
+                default -> "NOT_FOUND"
+            };
+
+        checkString(switchBlock, "FOUND_VALUE", "switch block result");
+
+
+        // ========================================================
+        // 19. DEFAULT PARAMETERS
+        // ========================================================
+
+        ParameterTest parameterTest = new ParameterTest();
+
+        String defaultResult = parameterTest.combine();
+
+        checkString(defaultResult, "localhost:8080:true", "default parameters");
+
+
+        // ========================================================
+        // 20. NAMED ARGUMENTS
+        // ========================================================
+
+        String namedResult = parameterTest.combine(port = 9090, url = "127.0.0.1", ssl = false);
+
+        checkString(namedResult, "127.0.0.1:9090:false", "named arguments");
+
+
+        // ========================================================
+        // 21. VARARGS
+        // ========================================================
+
+        // varargs dönüşümünde problem var
+        int varargResult = parameterTest.sum(10, 20, 30, 40);
+
+        checkInt(varargResult, 100, "varargs");
+
+
+        // ========================================================
+        // 22. GENERIC CLASS
+        // ========================================================
+
+        GenericBox<String> stringBox = new GenericBox<String>("Ocean");
+
+        checkString(stringBox.get(), "Ocean", "generic class String");
+
+        GenericBox<int> intBox = new GenericBox<int>(404);
+
+        checkInt(intBox.get(), 404, "generic class primitive");
+
+
+        // ========================================================
+        // 23. UPPER BOUND
+        // ========================================================
+
+        NumericBox<Integer> numericBox = new NumericBox<Integer>(42);
+
+        checkInt(numericBox.getInt(), 42, "generic upper bound");
+
+
+        // ========================================================
+        // 24. COVARIANCE
+        // ========================================================
+
+        Producer<String> stringProducer = new Producer<String>("Ocean");
+
+        checkString(stringProducer.produce(), "Ocean", "covariant producer");
+
+
+        // ========================================================
+        // 25. CONTRAVARIANCE
+        // ========================================================
+
+        Consumer<String> stringConsumer = new Consumer<String>();
+
+        stringConsumer.consume("Ocean");
+
+        check(true, "contravariant consumer declaration");
+
+
+        // ========================================================
+        // 26. DATA CLASS
+        // ========================================================
+
+        User user = new User(42, "Furkan");
+
+        checkInt(user.id, 42, "data class field");
+
+        checkString(user.name, "Furkan", "data class String field");
+
+        User copied = user.copy();
+
+        check(copied.equals(user), "data class copy/equals");
+
+
+        // ========================================================
+        // 27. SEALED CLASS HIERARCHY
+        // ========================================================
+
+        Circle circle = new Circle(5.0);
+
+        Rectangle rectangle = new Rectangle(4.0, 6.0);
+
+        checkDouble(circle.area(), 78.53975, "sealed subclass circle");
+
+        checkDouble(rectangle.area(), 24.0, "sealed subclass rectangle");
+
+
+        // ========================================================
+        // 28. INTERFACE DEFAULT METHOD
+        // ========================================================
+
+        Service service = new ServiceImpl();
+
+        checkString(service.name(), "SERVICE", "interface implementation");
+
+        checkString(service.status(), "RUNNING", "interface default method");
+
+
+        // ========================================================
+        // 29. ENUM WITH PARAMETERS
+        // ========================================================
+
+        Level level =
+            Level.HIGH;
+
+        checkInt(
+            level.getCode(),
+            30,
+            "parameterized enum"
+        );
+
+        checkString(level.getLabel(), "High", "enum String field");
+
+
+        // ========================================================
+        // 30. ANNOTATION
+        // ========================================================
+
+        AnnotatedClass annotationTarget = new AnnotatedClass();
+
+        check(annotationTarget != null, "annotation-decorated class");
+
+
+        // ========================================================
+        // 31. EXTENSION METHOD
+        // ========================================================
+
+        int extensionNumber = 9;
+
+        int squared = extensionNumber.square();
+
+        checkInt(squared, 81, "primitive extension method");
+
+
+        // ========================================================
+        // 32. STRING EXTENSION
+        // ========================================================
+
+        String source = "Ocean";
+
+        String greeting = source.greet();
+
+        checkString(greeting, "Hello Ocean", "String extension method");
+
+
+        // ========================================================
+        // 33. EXCEPTION HANDLING
+        // ========================================================
+
+        variable exceptionCaught = false;
+        variable finallyExecuted = false;
+
+        trying {
+            throw new IllegalArgumentException("TEST");
+        } catch (IllegalArgumentException e) {
+            exceptionCaught = true;
+        } finally {
+            finallyExecuted = true;
+        }
+
+        checkBool(exceptionCaught, true, "exception catch");
+
+        checkBool(finallyExecuted, true, "finally execution");
+
+
+        // ========================================================
+        // 34. MULTI-CATCH
+        // ========================================================
+
+        variable multiCatchExecuted = false;
+
+        trying {
+            throw new NullPointerException("NULL");
+        } catch (IllegalArgumentException | NullPointerException e) {
+            multiCatchExecuted = true;
+        }
+
+        checkBool(multiCatchExecuted, true, "multi-catch");
+
+
+        // ========================================================
+        // 35. SYNCHRONIZED METHOD
+        // ========================================================
+
+        Counter counter = new Counter();
+
+        counter.incrementSync();
+        counter.incrementSync();
+        counter.incrementSync();
+
+        checkInt(counter.get(), 3, "sync method");
+
+
+        // ========================================================
+        // 36. LOCK BLOCK
+        // ========================================================
+
+        counter.incrementLocked();
+        counter.incrementLocked();
+
+        checkInt(counter.get(), 5, "lock block");
+
+
+        // ========================================================
+        // 37. ASYNC METHOD
+        // ========================================================
+
+        CompletableFuture<String> future = AsyncService.fetch("compiler");
+
+        String asyncValue = future.join();
+
+        checkString(asyncValue, "DATA_compiler", "async/await");
+
+
+        // ========================================================
+        // FINAL RESULT
+        // ========================================================
+
+        OceanOutput("");
+        OceanOutput("========================================");
+        OceanOutput($"PASSED CHECKS: {passed}");
+        OceanOutput($"FAILED CHECKS: {failed}");
+        OceanOutput("========================================");
+
+        if (failed == 0) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}
+
+
+// ====================================================================
+// SUPPORT TYPES
+// ====================================================================
+
+
+// --------------------------------------------------------------------
+// DEFAULT PARAMETERS + NAMED ARGUMENTS + VARARGS
+// --------------------------------------------------------------------
+
+public class ParameterTest {
+
+    public String function combine(String url = "localhost", int port = 8080, bool ssl = true) {
+        return $"{url}:{port}:{ssl}";
+    }
+
+    public int function sum(int... numbers) {
+        int total = 0;
+
+        for (int number in numbers) {
+            total += number;
+        }
+
+        return total;
+    }
+}
+
+
+// --------------------------------------------------------------------
+// GENERIC CLASS
+// --------------------------------------------------------------------
+
+public class GenericBox<T> {
+
+    private T val;
+
+    public function GenericBox(T val) {
+        this.val = val;
+    }
+
+    public T function get() {
+        return val;
+    }
+}
+
+
+// --------------------------------------------------------------------
+// UPPER BOUND
+// --------------------------------------------------------------------
+
+public class NumericBox<T <: Number> {
+
+    private T val;
+
+    public function NumericBox(T val) {
+        this.val = val;
+    }
+
+    public int function getInt() {
+        return val.intValue();
+    }
+}
+
+
+// --------------------------------------------------------------------
+// COVARIANCE
+// --------------------------------------------------------------------
+
+public class Producer<+T> {
+
+    private T val;
+
+    public function Producer(T val) {
+        this.val = val;
+    }
+
+    public T function produce() {
+        return val;
+    }
+}
+
+
+// --------------------------------------------------------------------
+// CONTRAVARIANCE
+// --------------------------------------------------------------------
+
+public class Consumer<-T> {
+    public void function consume(T value) {
+        OceanOutput($"Consumed: {value}");
+    }
+}
+
+
+// --------------------------------------------------------------------
+// DATA CLASS
+// --------------------------------------------------------------------
+
+public data class User(int id, String name);
+
+
+// --------------------------------------------------------------------
+// SEALED HIERARCHY
+// --------------------------------------------------------------------
+
+public abstract sealed class Shape restricts Circle, Rectangle {
+    public abstract double function area();
+}
+
+
+public non-sealed class Circle extends Shape {
+
+    private variable radius;
+
+    function Circle(double radius){
+        this.radius = radius;
+    }
+
+    public double function area() {
+        return 3.14159 * radius * radius;
+    }
+}
+
+
+public final class Rectangle extends Shape {
+    private double width,height;
+
+    function Rectangle(double width, double height){
+        this.width = width;
+        this.height = height;
+    }
+
+    public double function area() {
+        return width * height;
+    }
+}
+
+
+// --------------------------------------------------------------------
+// INTERFACE
+// --------------------------------------------------------------------
+
+public interface Service {
+
+    String function name();
+
+    String function status() {
+        return "RUNNING";
+    }
+}
+
+
+public class ServiceImpl implements Service {
+
+    public String function name() {
+        return "SERVICE";
+    }
+}
+
+
+// --------------------------------------------------------------------
+// ENUM
+// --------------------------------------------------------------------
+
+public enum Level {
+
+    LOW(10, "Low"),
+    MEDIUM(20, "Medium"),
+    HIGH(30, "High");
+
+    private int code;
+    private String label;
+
+    function Level(int code, String label) {
+        this.code = code;
+        this.label = label;
+    }
+
+    public int function getCode() {
+        return this.code;
+    }
+
+    public String function getLabel() {
+        return this.label;
+    }
+}
+
+
+// --------------------------------------------------------------------
+// ANNOTATION
+// --------------------------------------------------------------------
+
+public annotation CompileMarker {
+    String name() default "Ocean";
+    int version() default 1;
+}
+
+
+@CompileMarker(name = "AdvancedTest", version = 3)
+public class AnnotatedClass {
+
+}
+
+
+// --------------------------------------------------------------------
+// EXTENSION METHODS
+// --------------------------------------------------------------------
+
+public class Extensions {
+
+    public int int.function square() {
+        return this * this;
+    }
+
+    public String String.function greet() {
+        return $"Hello {this}";
+    }
+}
+
+
+// --------------------------------------------------------------------
+// SYNCHRONIZATION
+// --------------------------------------------------------------------
+
+public class Counter {
+
+    private int val = 0;
+
+    private Object monitor = new Object();
+
+    public sync void function incrementSync() {
+        this.val++;
+    }
+
+    public void function incrementLocked() {
+        lock (this.monitor) {
+            this.val++;
+        }
+    }
+
+    public int function get() {
+        return this.val;
+    }
+}
+
+
+// --------------------------------------------------------------------
+// ASYNC
+// --------------------------------------------------------------------
+
+public class AsyncService {
+    public static async String function fetch(String name) {
+        return $"DATA_{name}";
+    }
+}

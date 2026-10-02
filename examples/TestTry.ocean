@@ -1,0 +1,18 @@
+package com.resources;
+    class TestTry {
+    main() {
+        bool caught = false;
+        trying {
+            throw new Exception("Test");
+        } catch (Exception e) {
+            if (e.getMessage().equals("Test")) {
+                caught = true;
+            }
+        }
+        if (caught) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

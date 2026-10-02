@@ -1,0 +1,49 @@
+package com.resources;
+
+class DefaultParamService {
+    public static String function formatLog(String msg, String prefix = "[INFO]", int code = 200) {
+        return prefix + " " + msg + " (" + code + ")";
+    }
+
+    public static String function formatUser(String name, String role = "MEMBER", int priority = 1) {
+        return role + ":" + name + ":" + priority;
+    }
+}
+
+class DefaultAndNamedParamsTest {
+    static main() {
+        OceanOutput("=== DEFAULT & NAMED PARAMETERS TEST ===");
+
+        // 1. Omit trailing parameters (use defaults)
+        String r1 = DefaultParamService.formatLog("System booted");
+        OceanOutput("r1: " + r1);
+
+        // 2. Override default with positional parameter
+        String r2 = DefaultParamService.formatLog("Database connected", "[SYS]");
+        OceanOutput("r2: " + r2);
+
+        // 3. Named parameter out-of-order
+        String r3 = DefaultParamService.formatUser("Alice", priority = 99, role = "ADMIN");
+        OceanOutput("r3: " + r3);
+
+        // 4. Mix default parameters and named overrides
+        String r4 = DefaultParamService.formatUser("Bob", priority = 5);
+        OceanOutput("r4: " + r4);
+
+        bool p1 = r1.equals("[INFO] System booted (200)");
+        bool p2 = r2.equals("[SYS] Database connected (200)");
+        bool p3 = r3.equals("ADMIN:Alice:99");
+        bool p4 = r4.equals("MEMBER:Bob:5");
+
+        OceanOutput("P1 Trailing Defaults: " + p1);
+        OceanOutput("P2 Override Positional: " + p2);
+        OceanOutput("P3 Named Arguments Out-Of-Order: " + p3);
+        OceanOutput("P4 Mixed Defaults & Named: " + p4);
+
+        if (p1 && p2 && p3 && p4) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

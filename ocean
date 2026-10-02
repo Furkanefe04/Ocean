@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# Ocean Programming Language Compiler Launcher (Linux / macOS)
+# ==============================================================================
+
+set -e
+
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do
+  DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"
+done
+SCRIPT_DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
+
+OCEAN_JAR=""
+
+if [ -n "$OCEAN_HOME" ]; then
+  if [ -f "$OCEAN_HOME/lib/Ocean-all.jar" ]; then
+    OCEAN_JAR="$OCEAN_HOME/lib/Ocean-all.jar"
+  elif [ -f "$OCEAN_HOME/build/libs/Ocean-all.jar" ]; then
+    OCEAN_JAR="$OCEAN_HOME/build/libs/Ocean-all.jar"
+  elif [ -f "$OCEAN_HOME/Ocean-all.jar" ]; then
+    OCEAN_JAR="$OCEAN_HOME/Ocean-all.jar"
+  fi
+fi
+
+if [ -z "$OCEAN_JAR" ]; then
+  CANDIDATES=(
+    "$SCRIPT_DIR/../lib/Ocean-all.jar"
+    "$SCRIPT_DIR/lib/Ocean-all.jar"
+    "$SCRIPT_DIR/build/libs/Ocean-all.jar"
+    "$SCRIPT_DIR/Ocean-all.jar"
+  )
+  for c in "${CANDIDATES[@]}"; do
+    if [ -f "$c" ]; then
+      OCEAN_JAR="$c"
+      break
+    fi
+  done
+fi
+
+if [ -z "$OCEAN_JAR" ]; then
+  if [ -f "$SCRIPT_DIR/gradlew" ]; then
+    echo "[INFO] Ocean-all.jar not found. Building compiler with Gradle..."
+    (cd "$SCRIPT_DIR" && ./gradlew shadowJar -q)
+    if [ -f "$SCRIPT_DIR/build/libs/Ocean-all.jar" ]; then
+      OCEAN_JAR="$SCRIPT_DIR/build/libs/Ocean-all.jar"
+    fi
+  elif [ -f "$SCRIPT_DIR/../gradlew" ]; then
+    echo "[INFO] Ocean-all.jar not found. Building compiler with Gradle..."
+    (cd "$SCRIPT_DIR/.." && ./gradlew shadowJar -q)
+    if [ -f "$SCRIPT_DIR/../build/libs/Ocean-all.jar" ]; then
+      OCEAN_JAR="$SCRIPT_DIR/../build/libs/Ocean-all.jar"
+    fi
+  fi
+fi
+
+if [ -z "$OCEAN_JAR" ]; then
+  echo "Error: Ocean-all.jar could not be found." >&2
+  echo "Please build the project with './gradlew shadowJar' or set OCEAN_HOME." >&2
+  exit 1
+fi
+
+if ! command -v java >/dev/null 2>&1; then
+  echo "Error: Java runtime not found in PATH." >&2
+  echo "Please install Java 17 or higher and ensure 'java' is accessible." >&2
+  exit 1
+fi
+
+QUIET="true"
+if [ -n "$OCEAN_DEBUG" ]; then
+  QUIET="false"
+fi
+
+exec java -Docean.home="$SCRIPT_DIR" -Dfile.encoding=UTF-8 -Dquiet="$QUIET" -cp "$OCEAN_JAR" ocean.compiler.OceanRunnerV3 "$@"

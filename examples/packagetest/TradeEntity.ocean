@@ -1,0 +1,26 @@
+package com.trading.core;
+
+public interface Printable {
+    void function printDetails();
+}
+
+public class TradeEntity implements Printable {
+    public String id;
+    public double timestamp;
+
+    public void function printDetails() {
+        OceanOutput("Entity ID: " + id + " | TS: " + timestamp);
+    }
+}
+
+public class Pair<A, B> {
+    public A first;
+    public B second;
+
+    public static <X, Y> Pair<X, Y> function create(X f, Y s) {
+        Pair<X, Y> p = new Pair<X, Y>();
+        p.first = f;
+        p.second = s;
+        return p;
+    }
+}

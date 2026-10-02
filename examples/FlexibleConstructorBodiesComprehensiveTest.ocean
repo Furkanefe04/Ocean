@@ -1,0 +1,107 @@
+package com.resources;
+
+import java.util.ArrayList;
+import java.util.List;
+
+// 1. Üst Sınıf & super() öncesi doğrulama / ön hesaplama testi
+class Shape {
+    String name;
+    int perimeter;
+    int area;
+
+    function Shape(String name, int perimeter, int area) {
+        this.name = name;
+        this.perimeter = perimeter;
+        this.area = area;
+    }
+}
+
+class Rectangle extends Shape {
+    int width;
+    int height;
+
+    function Rectangle(int width, int height) {
+        if (width <= 0 || height <= 0) {
+            throw new IllegalArgumentException("Width and height must be positive!");
+        }
+
+        int p = 2 * (width + height);
+        int a = width * height;
+
+        // super() çağrısından önce yerel hesaplama ve doğrulama
+        super("Rectangle", p, a);
+
+        // super() sonrasında alt sınıf alanlarını başlatma
+        this.width = width;
+        this.height = height;
+    }
+}
+
+// 2. this() delegasyonundan önce veri ön hazırlığı testi
+class ConfigEntry {
+    String key;
+    String val;
+    int priority;
+
+    function ConfigEntry(String key, String val, int priority) {
+        this.key = key;
+        this.val = val;
+        this.priority = priority;
+    }
+
+    function ConfigEntry(String rawLine) {
+        String clean = rawLine.trim();
+        int defaultPriority = 100;
+        // this() çağrısından önce hazırlık
+        this(clean, "DEFAULT_VALUE", defaultPriority);
+    }
+}
+
+// 3. super() öncesinde döngü ve liste işleme testi
+class Aggregator {
+    int totalElements;
+    function Aggregator(int count) {
+        totalElements = count;
+    }
+}
+
+class FastListAggregator extends Aggregator {
+    int sum;
+
+    function FastListAggregator(int[] numbers) {
+        int tempSum = 0;
+        for (int i from 0 to numbers.length with increasing 1) {
+            tempSum = tempSum + numbers[i];
+        }
+
+        super(numbers.length);
+        sum = tempSum;
+    }
+}
+
+public class FlexibleConstructorBodiesComprehensiveTest {
+    static main() {
+        OceanOutput("=== FLEXIBLE CONSTRUCTOR BODIES COMPREHENSIVE TEST ===");
+
+        // Test 1: super() öncesi doğrulama ve hesaplama
+        Rectangle rect = new Rectangle(15, 20);
+        OceanOutput("Rectangle area: " + rect.area);
+        OceanOutput("Rectangle perimeter: " + rect.perimeter);
+        OceanOutput("Rectangle dimensions: " + rect.width + "x" + rect.height);
+
+        // Test 2: this() öncesi ön hazırlık
+        ConfigEntry entry = new ConfigEntry("  database.url   ");
+        OceanOutput("Config: " + entry.key + " -> " + entry.val + " (P:" + entry.priority + ")");
+
+        // Test 3: super() öncesi döngü ve hesaplama
+        int[] items = [5, 15, 25, 35, 45];
+        FastListAggregator agg = new FastListAggregator(items);
+        OceanOutput("Aggregator total: " + agg.totalElements + ", sum: " + agg.sum);
+
+        if (rect.area == 300 && rect.perimeter == 70 && entry.key.equals("database.url") && agg.sum == 125) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

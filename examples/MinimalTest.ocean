@@ -1,0 +1,16 @@
+package com.resources;
+class MinimalTest {
+    function MinimalTest() {
+        OceanOutput("Minimal Test Constructor");
+    }
+
+    static main() {
+        MinimalTest m = new MinimalTest();
+        OceanOutput("Minimal Test Main");
+        if (m != null) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

@@ -1,0 +1,18 @@
+package com.resources;
+
+class OceanBench11ReusedBuilder {
+    static main() {
+        int n = 5000000;
+        long start = System.nanoTime();
+        long totalLength = 0L;
+        StrBuilder builder = new StrBuilder();
+        for (int i from 0 to n - 1 with increasing 1) {
+            builder.append("Furkan").append(100);
+            String s = builder.toString();
+            totalLength = totalLength + s.length();
+            builder.clear();
+        }
+        long end = System.nanoTime();
+        OceanOutput("total_len=" + totalLength + " | time_ms=" + ((end - start) / 1000000));
+    }
+}

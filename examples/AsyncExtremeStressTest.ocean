@@ -1,0 +1,53 @@
+package com.asynctest;
+
+import java.util.concurrent.CompletableFuture;
+
+public interface AsyncProcessor<T> {
+    public async T function processAsync(T input);
+}
+
+public class StringProcessor implements AsyncProcessor<String> {
+    public async String function processAsync(String input) {
+        return input + "_processed";
+    }
+}
+
+// Extension methods class
+public class AsyncExtensions {
+    // Ocean Extension Method Syntax: ReceiverClass.function methodName(...)
+    public static async String CompletableFuture<String>.function awaitWithPrefix(String prefix) {
+        String val = await this;
+        return prefix + val;
+    }
+}
+
+public class AsyncExtremeStressTest {
+
+    public static async void function run() {
+        AsyncProcessor<String> processor = new StringProcessor();
+        
+        // 1. Call generic async method on interface
+        variable fut1 = processor.processAsync("ocean");
+        
+        // 2. Call async extension method on the future!
+        variable fut2 = fut1.awaitWithPrefix("RESULT: ");
+        
+        String res = await fut2;
+        OceanOutput("Final string: " + res);
+        
+        if (res.equals("RESULT: ocean_processed")) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+
+    static main() {
+        OceanOutput("==============================================");
+        OceanOutput("===          ASYNC EXTREME STRESS TEST     ===");
+        OceanOutput("==============================================");
+        variable f = run();
+        f.join();
+        OceanOutput("==============================================");
+    }
+}

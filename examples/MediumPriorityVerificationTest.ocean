@@ -1,0 +1,28 @@
+package com.resources;
+
+import com.packagea.ConflictClass;
+import com.packagea.ConflictClassA;
+import com.packageb.ConflictClassB;
+
+class MediumPriorityVerificationTest {
+    main() {
+        OceanOutput("=== MEDIUM PRIORITY VERIFICATION TEST START ===");
+
+        // Dependency references to ensure they are compiled:
+        ConflictClassA? dummyA = null;
+        ConflictClassB? dummyB = null;
+
+        // 1. Verify SF1 explicit import bypasses resolveClassName ambiguity
+        ConflictClass obj = new ConflictClass();
+        obj.doA();
+
+        // 2. Verify M10 classpath output directory works locally
+        // The fact that this compiles and runs locally shows that .ocean/bin output directory works.
+
+        if (obj != null && obj.getClass().getSimpleName().equals("ConflictClass")) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

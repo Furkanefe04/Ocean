@@ -1,0 +1,48 @@
+package com.resources;
+    @Deprecated
+class AnnotatedClass {
+    @Deprecated
+    public void function test() {
+        OceanOutput("Annotated method called");
+    }
+}
+
+class AdvFeatureTest {
+    static main() {
+        String a = "Hello";
+        String b = "World";
+        int c = 123;
+        // Test optimization and mixed types
+        String res = a + " " + b + " " + c + "!";
+        OceanOutput(res);
+        
+        // Test overloading robustness
+        OverloadTest o = new OverloadTest();
+        String r1 = o.process(10);
+        String r2 = o.process(10.5);
+        String r3 = o.process("text");
+        
+        if (res == "Hello World 123!" && r1 == "Int: 10" && r2 == "Double: 10.5" && r3 == "String: text") {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}
+
+class OverloadTest {
+    public String function process(int i) {
+        OceanOutput("Int: " + i);
+        return "Int: " + i;
+    }
+    
+    public String function process(double d) {
+        OceanOutput("Double: " + d);
+        return "Double: " + d;
+    }
+    
+    public String function process(String s) {
+        OceanOutput("String: " + s);
+        return "String: " + s;
+    }
+}

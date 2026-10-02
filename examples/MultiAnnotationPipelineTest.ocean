@@ -1,0 +1,104 @@
+package com.annotationtest;
+
+import java.lang.Class;
+import java.lang.Integer;
+import java.lang.reflect.Method;
+import java.lang.annotation.Annotation;
+import Test.Data;
+import com.resources.DataClassDenemesi;
+
+// AOP Custom Annotations
+public annotation Transaction {
+    int timeout() default 30;
+    bool readOnly() default false;
+}
+
+public annotation Cacheable {
+    String key();
+}
+
+public annotation LogExecution {
+    String level() default "INFO";
+}
+
+public class MultiAnnotationPipelineTest {
+
+    @Transaction(timeout = 120, readOnly = true)
+    @Cacheable(key = "user_find_by_id")
+    @LogExecution(level = "VERBOSE")
+    public void function findUserById(int id) {
+        OceanOutput("Finding user: " + id);
+    }
+
+    @LogExecution(level = "WARNING")
+    public void function deleteUser(int id) {
+        OceanOutput("Deleting user: " + id);
+    }
+
+    static main() {
+        OceanOutput("=== MULTI ANNOTATION PIPELINE TEST START ===");
+
+        bool findUserPipelineOk = false;
+        bool deleteUserPipelineOk = false;
+
+        trying {
+            MultiAnnotationPipelineTest service = new MultiAnnotationPipelineTest();
+            variable clazz = service.getClass();
+            variable loader = clazz.getClassLoader();
+
+            variable txAnnoClass = loader.loadClass("com.annotationtest.Transaction");
+            variable cacheAnnoClass = loader.loadClass("com.annotationtest.Cacheable");
+            variable logAnnoClass = loader.loadClass("com.annotationtest.LogExecution");
+
+            // 1. Inspect findUserById method annotations
+            Method findMethod = clazz.getMethod("findUserById", Integer.TYPE);
+            Transaction txAnno = (Transaction) findMethod.getAnnotation(txAnnoClass);
+            Cacheable cacheAnno = (Cacheable) findMethod.getAnnotation(cacheAnnoClass);
+            LogExecution logAnno1 = (LogExecution) findMethod.getAnnotation(logAnnoClass);
+
+            if (txAnno != null && cacheAnno != null && logAnno1 != null) {
+                OceanOutput("TX Timeout: " + txAnno.timeout() + ", ReadOnly: " + txAnno.readOnly());
+                OceanOutput("Cache Key: " + cacheAnno.key());
+                OceanOutput("Log Level: " + logAnno1.level());
+
+                if (txAnno.timeout() == 120 && txAnno.readOnly() && cacheAnno.key().equals("user_find_by_id") && logAnno1.level().equals("VERBOSE")) {
+                    findUserPipelineOk = true;
+                }
+                else {
+                    OceanOutput(txAnno.timeout());
+                    OceanOutput(txAnno.readOnly());
+                    OceanOutput(cacheAnno.key());
+                    OceanOutput(logAnno1.level());
+                }
+            }
+
+            // 2. Inspect deleteUser method annotations
+            Method deleteMethod = clazz.getMethod("deleteUser", Integer.TYPE);
+            Transaction txAnno2 = (Transaction) deleteMethod.getAnnotation(txAnnoClass);
+            LogExecution logAnno2 = (LogExecution) deleteMethod.getAnnotation(logAnnoClass);
+
+            if (txAnno2 == null && logAnno2 != null) {
+                OceanOutput("Delete Method Has No TX (as expected)");
+                OceanOutput("Delete Log Level: " + logAnno2.level());
+
+                if (logAnno2.level().equals("WARNING")) {
+                    deleteUserPipelineOk = true;
+                }
+                else {
+                    OceanOutput(logAnno2.level());
+                }
+            }
+
+        } catch (Exception e) {
+            OceanOutput("Pipeline Exception: " + e.getMessage());
+        }
+
+        if (findUserPipelineOk && deleteUserPipelineOk) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+
+        OceanOutput("=== MULTI ANNOTATION PIPELINE TEST COMPLETED ===");
+    }
+}

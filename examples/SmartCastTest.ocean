@@ -1,0 +1,25 @@
+package com.resources;
+
+class SmartCastAnimal {
+}
+
+class SmartCastDog extends SmartCastAnimal {
+    int barkCount;
+    function SmartCastDog(int barkCount) {
+        this.barkCount = barkCount;
+    }
+}
+
+class SmartCastTest {
+    main() {
+        variable a = (Object) new SmartCastDog(5);
+        if (a instanceof SmartCastDog) {
+            variable bark = a.barkCount; //cast gerektiriyor
+            if (bark == 5) {
+                OceanOutput("STATUS: PASSED");
+                return;
+            }
+        }
+        OceanOutput("STATUS: FAILED");
+    }
+}

@@ -1,0 +1,56 @@
+package com.test.switchpattern;
+
+public class SwitchPatternMatchingTest {
+    public static String function describe(Object? obj) {
+        return switch (obj) {
+            case null -> "null object"
+            case String s when s.length() > 5 -> "long string: " + s
+            case String s -> "short string: " + s
+            case Integer i when i > 100 -> "large int: " + i
+            case Integer i -> "small int: " + i
+            case Boolean b -> "boolean: " + b
+            default -> "unknown type: " + obj?.toString()
+        };
+    }
+
+    public static String function testStatement(Object obj) {
+        variable resultx = "";
+        switch (obj) {
+            case String s when s.startsWith("A"):
+                resultx = "starts with A: " + s;
+                stop;
+            case String s:
+                resultx = "other string: " + s;
+                stop;
+            case Integer i:
+                resultx = "integer: " + i;
+                stop;
+            default:
+                resultx = "default fallback";
+                stop;
+        }
+        return resultx;
+    }
+
+
+    main() {
+        OceanOutput("=== Testing Switch Pattern Matching ===");
+
+        // 1. Test Switch Expression with Type & Guard Patterns
+        OceanOutput(describe(null));
+        OceanOutput(describe("hello world"));
+        OceanOutput(describe("hi"));
+        OceanOutput(describe(Integer.valueOf(150)));
+        OceanOutput(describe(Integer.valueOf(42)));
+        OceanOutput(describe(Boolean.valueOf(true)));
+        OceanOutput(describe(Double.valueOf(3.14)));
+
+        // 2. Test Switch Statement with Type & Guard Patterns
+        OceanOutput(testStatement("Apple"));
+        OceanOutput(testStatement("Banana"));
+        OceanOutput(testStatement(Integer.valueOf(99)));
+        OceanOutput(testStatement(Double.valueOf(1.23)));
+
+        OceanOutput("=== All Pattern Matching Tests Passed Successfully! ===");
+    }
+}

@@ -1,0 +1,11 @@
+package com.resources;
+
+class MemberTypeMismatchTest {
+    int valuex;
+
+    main() {
+        variable obj = new MemberTypeMismatchTest();
+        obj.valuex = "hello"; // Invalid: String to int field
+        OceanOutput("Assigned hello to int field!");
+    }
+}

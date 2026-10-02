@@ -1,0 +1,20 @@
+package com.resources;
+
+class OceanBench4SumLoop {
+    static main() {
+        int warmup = 5;
+        for (int w from 0 to warmup - 1 with increasing 1) {
+            long s = 0L;
+            for (int i from 1 to 1000000 with increasing 1) {
+                s = s + i;
+            }
+        }
+        long start = System.nanoTime();
+        long sum = 0L;
+        for (int i from 1 to 1000000000 with increasing 1) {
+            sum = sum + i;
+        }
+        long end = System.nanoTime();
+        OceanOutput("sum(1B)=" + sum + " | time_ms=" + ((end - start) / 1000000));
+    }
+}

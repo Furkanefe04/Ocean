@@ -1,0 +1,113 @@
+package com.resources;
+
+class PrimitiveFullTest {
+    static main() {
+        int passed = 0;
+
+        // 1. Byte test
+        byte b = 100;
+        b++;
+        b--;
+        b = (byte) (b + 10);
+        if (b == 110) {
+            passed = passed + 1;
+            OceanOutput("BYTE TEST PASSED: b == 110");
+        } else {
+            OceanOutput("BYTE TEST FAILED: " + b);
+        }
+
+        // 2. Short test
+        short s = 30000;
+        s++;
+        s--;
+        s = (short) (s + 1000);
+        if (s == 31000) {
+            passed = passed + 1;
+            OceanOutput("SHORT TEST PASSED: s == 31000");
+        } else {
+            OceanOutput("SHORT TEST FAILED: " + s);
+        }
+
+        // 3. Int test
+        int i = 2000000;
+        i++;
+        i--;
+        i = i * 2;
+        if (i == 4000000) {
+            passed = passed + 1;
+            OceanOutput("INT TEST PASSED: i == 4000000");
+        } else {
+            OceanOutput("INT TEST FAILED: " + i);
+        }
+
+        // 4. Long test
+        long l = 5000000000L;
+        l++;
+        l--;
+        l = l + 1000000000L;
+        if (l == 6000000000L) {
+            passed = passed + 1;
+            OceanOutput("LONG TEST PASSED: l == 6000000000L");
+        } else {
+            OceanOutput("LONG TEST FAILED: " + l);
+        }
+
+        // 5. Float test
+        float f = 2.5f;
+        f++;
+        f--;
+        f = f * 2.0f;
+        if (f == 5.0f) {
+            passed = passed + 1;
+            OceanOutput("FLOAT TEST PASSED: f == 5.0f");
+        } else {
+            OceanOutput("FLOAT TEST FAILED: " + f);
+        }
+
+        // 6. Double test
+        double d = 10.5;
+        d++;
+        d--;
+        d = d / 2.0;
+        if (d == 5.25) {
+            passed = passed + 1;
+            OceanOutput("DOUBLE TEST PASSED: d == 5.25");
+        } else {
+            OceanOutput("DOUBLE TEST FAILED: " + d);
+        }
+
+        // 7. Char test
+        char c = 'A';
+        c++;
+        if (c == 'B') {
+            if (c == 66) {
+                passed = passed + 1;
+                OceanOutput("CHAR TEST PASSED: c == 'B'");
+            }
+            else {
+                OceanOutput("CHAR TEST FAILED: " + c);
+            }
+
+        } else {
+            OceanOutput("CHAR TEST FAILED: " + c);
+        }
+
+
+        // 8. Boolean test
+        bool boolVal = true;
+        if (boolVal && !false) {
+            passed = passed + 1;
+            OceanOutput("BOOLEAN TEST PASSED: boolVal == true");
+        } else {
+            OceanOutput("BOOLEAN TEST FAILED");
+        }
+
+        OceanOutput("----------------------------------------");
+        if (passed == 8) {
+            OceanOutput("ALL 8 PRIMITIVE TESTS PASSED!");
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

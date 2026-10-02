@@ -1,0 +1,95 @@
+package com.resources;
+
+public class NonStaticInnerClassThis0Test {
+
+    public int outerCounter = 100;
+    public String outerMessage = "Initial";
+    public int[] outerArray = {10, 20, 30};
+
+    public int function getOuterBonus(int mult) {
+        return outerCounter * mult;
+    }
+
+    public class Level1Inner {
+        public int inner1Val = 50;
+
+        public void function mutateOuter() {
+            outerCounter = outerCounter + 250;
+            outerMessage = "ModifiedByInner1";
+            outerArray[1] = 99;
+        }
+
+        public int function computeTotal() {
+            int bonus = getOuterBonus(2);
+            return outerCounter + inner1Val + bonus + outerArray[1];
+        }
+
+        public class Level2Inner {
+            public int inner2Val = 5;
+
+            public int function computeDeep() {
+                // Accessing Level1Inner instance field (inner1Val) and Outer instance field (outerCounter)
+                outerCounter = outerCounter + 50;
+                inner1Val = inner1Val + 10;
+                return outerCounter + inner1Val + inner2Val + getOuterBonus(1);
+            }
+        }
+
+        public Level2Inner function createLevel2() {
+            return new Level2Inner();
+        }
+    }
+
+    public Level1Inner function createLevel1() {
+        return new Level1Inner();
+    }
+
+    public void function runAllTests() {
+        Level1Inner l1 = createLevel1();
+        l1.mutateOuter();
+
+        if (outerCounter != 350) {
+            OceanOutput("FAILED: outerCounter after mutateOuter, expected 350 but got " + outerCounter);
+            return;
+        }
+        if (!outerMessage.equals("ModifiedByInner1")) {
+            OceanOutput("FAILED: outerMessage after mutateOuter, expected ModifiedByInner1 but got " + outerMessage);
+            return;
+        }
+        if (outerArray[1] != 99) {
+            OceanOutput("FAILED: outerArray[1], expected 99 but got " + outerArray[1]);
+            return;
+        }
+
+        int total1 = l1.computeTotal();
+        // outerCounter (350) + inner1Val (50) + bonus (350 * 2 = 700) + outerArray[1] (99) = 1199
+        if (total1 != 1199) {
+            OceanOutput("FAILED: total1 expected 1199 but got " + total1);
+            return;
+        }
+
+        Level1Inner.Level2Inner l2 = l1.createLevel2();
+        int deepTotal = l2.computeDeep();
+        // outerCounter becomes 350 + 50 = 400
+        // inner1Val becomes 50 + 10 = 60
+        // inner2Val = 5
+        // getOuterBonus(1) = 400 * 1 = 400
+        // sum = 400 + 60 + 5 + 400 = 865
+        if (deepTotal != 865) {
+            OceanOutput("FAILED: deepTotal expected 865 but got " + deepTotal);
+            return;
+        }
+
+        if (outerCounter != 400) {
+            OceanOutput("FAILED: outerCounter after deep, expected 400 but got " + outerCounter);
+            return;
+        }
+
+        OceanOutput("STATUS: PASSED");
+    }
+
+    public static void function main(String[] args) {
+        NonStaticInnerClassThis0Test test = new NonStaticInnerClassThis0Test();
+        test.runAllTests();
+    }
+}

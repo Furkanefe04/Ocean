@@ -1,0 +1,7 @@
+package com.resources;
+
+abstract final class IncompatibleModifiersTest {
+    main() {
+        OceanOutput("Should fail at compile time!");
+    }
+}

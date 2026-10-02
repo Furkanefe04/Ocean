@@ -1,0 +1,11 @@
+import java.math.BigDecimal;
+
+class BigDecimalVerifyTest {
+    main(){
+        variable i = 100_000;
+        variable l = 9_999_999_999;
+        variable bd = 10+50+99+99999999999999999999999999999999999999999999;
+        if (i instanceof int && l instanceof long && bd instanceof BigDecimal) OceanOutput("STATUS: PASSED");
+        else OceanOutput("STATUS: FAILED");
+    }
+}

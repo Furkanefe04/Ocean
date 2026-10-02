@@ -1,0 +1,55 @@
+﻿package com.resources;
+
+data class Point(int x, int y);
+data class Box(Point p, String label);
+
+class UnnamedPatternsAndVariablesTest {
+    public static String function inspect(Object obj) {
+        return switch (obj) {
+            case Box(Point(int x, _), "red") -> "Red box x=" + x
+            case Point(int x, _) when x > 50 -> "High X Point: " + x
+            case Point(_, int y) when y == 0 -> "Point on X-axis"
+            case Point(_, _) -> "Some Point"
+            case String _ -> "Some String"
+            case _ -> "Something else"
+        };
+    }
+
+    public static int function safeParse(String str) {
+        trying {
+            return Integer.parseInt(str);
+        } catch (NumberFormatException _) {
+            return -1;
+        }
+    }
+
+    public static void function main(String[] args) {
+        OceanOutput("=== UNNAMED PATTERNS & VARIABLES TEST ===");
+
+        // 1. Multiple Unnamed Local Variables in the same scope
+        int _ = 10;
+        String _ = "hello";
+        variable _ = true;
+        OceanOutput("1. Unnamed locals successfully declared without conflict");
+
+        // 2. Unnamed Patterns in Switch Expression
+        OceanOutput("2. Switch pattern with _: " + inspect(new Box(new Point(42, 99), "red")));
+        OceanOutput("3. Switch pattern with _: " + inspect(new Point(80, 5)));
+        OceanOutput("4. Switch pattern with _: " + inspect(new Point(20, 0)));
+        OceanOutput("5. Switch pattern with _: " + inspect(new Point(20, 20)));
+        OceanOutput("6. Switch wildcard _: " + inspect(9999));
+
+        // 3. Unnamed Catch
+        OceanOutput("7. Safe parse '100': " + safeParse("100"));
+        OceanOutput("8. Safe parse 'abc': " + safeParse("abc"));
+
+        // 4. Unnamed For Loop
+        variable sum = 0;
+        for (variable _ from 0 to 5 with increasing 1) {
+            sum += 10;
+        }
+        OceanOutput("9. For loop sum: " + sum);
+
+        OceanOutput("=== ALL UNNAMED TESTS PASSED ===");
+    }
+}

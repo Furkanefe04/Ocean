@@ -1,0 +1,89 @@
+package test;
+
+public class HierarchyA {
+    public String function name() { return "A"; }
+}
+
+public class HierarchyB extends HierarchyA {
+    public String function name() { return "B"; }
+}
+
+public class HierarchyC extends HierarchyB {
+    public String function name() { return "C"; }
+}
+
+public class OverloadDispatcher {
+    public String function process(HierarchyA a) {
+        return "process(A)";
+    }
+
+    public String function process(HierarchyB b) {
+        return "process(B)";
+    }
+
+    public String function numeric(long val) {
+        return "numeric(long)";
+    }
+
+    public String function numeric(Integer val) {
+        return "numeric(Integer)";
+    }
+
+    public String function numeric(int val) {
+        return "numeric(int)";
+    }
+
+    public String function format(Object? o) {
+        return "format(Object)";
+    }
+
+    public String function format(String? s) {
+        return "format(String)";
+    }
+
+    public String function multi(int a, long b) {
+        return "multi(int, long)";
+    }
+
+    public String function multi(long a, int b) {
+        return "multi(long, int)";
+    }
+
+    public String function multi(int a, int b) {
+        return "multi(int, int)";
+    }
+}
+
+public class MethodOverloadStressTest {
+    main(String[] args) {
+        OverloadDispatcher d = new OverloadDispatcher();
+
+        // 1. Reference subtyping hierarchy (most specific subtype)
+        HierarchyC c = new HierarchyC();
+        HierarchyB b = new HierarchyB();
+        HierarchyA a = new HierarchyA();
+
+        verify d.process(c).equals("process(B)");
+        verify d.process(b).equals("process(B)");
+        verify d.process(a).equals("process(A)");
+
+        // 2. Exact primitive match vs widening vs boxing
+        int iVal = 100;
+        short sVal = 5;
+        Integer boxedVal = Integer.valueOf(50);
+
+        verify d.numeric(iVal).equals("numeric(int)");
+        verify d.numeric(sVal).equals("numeric(int)"); // short widens to int (Phase 1)
+        verify d.numeric(boxedVal).equals("numeric(Integer)");
+
+        // 3. Null argument selects most specific subtype
+        verify d.format(null).equals("format(String)");
+
+        // 4. Multi-parameter primitive overload
+        verify d.multi(1, 2).equals("multi(int, int)");
+        verify d.multi(1, 2L).equals("multi(int, long)");
+        verify d.multi(1L, 2).equals("multi(long, int)");
+
+        System.out.println("MethodOverloadStressTest passed successfully!");
+    }
+}

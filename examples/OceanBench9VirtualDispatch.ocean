@@ -1,0 +1,39 @@
+package com.resources;
+
+interface Computable9 {
+    long function compute(int n);
+}
+
+class Alpha9 implements Computable9 {
+    long function compute(int n) { return n * 2L; }
+}
+
+class Beta9 implements Computable9 {
+    long function compute(int n) { return n * 3L + 1L; }
+}
+
+class Gamma9 implements Computable9 {
+    long function compute(int n) { return (long)n * n; }
+}
+
+class Delta9 implements Computable9 {
+    long function compute(int n) { return (n + 1L) * 2L; }
+}
+
+class OceanBench9VirtualDispatch {
+    static main() {
+        int n = 10000000;
+        Computable9[] cs = new Computable9[4];
+        cs[0] = new Alpha9();
+        cs[1] = new Beta9();
+        cs[2] = new Gamma9();
+        cs[3] = new Delta9();
+        long start = System.nanoTime();
+        long sum = 0L;
+        for (int i from 0 to n - 1 with increasing 1) {
+            sum = sum + cs[i % 4].compute(i);
+        }
+        long end = System.nanoTime();
+        OceanOutput("sum=" + sum + " | time_ms=" + ((end - start) / 1000000));
+    }
+}

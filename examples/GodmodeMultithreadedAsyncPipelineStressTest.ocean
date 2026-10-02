@@ -1,0 +1,105 @@
+package com.resources;
+
+import java.util.Comparator;
+
+@FunctionalInterface
+public interface AsyncTransformer<IN, OUT> {
+    public OUT function process(IN input);
+}
+
+public interface PipelineProcessor<T, R> {
+    public String function getPipelineId();
+    public OceanList<R> function executePipeline(OceanList<T> inputs, AsyncTransformer<T, R> transformer);
+}
+
+public abstract class AbstractPipeline<T, R> implements PipelineProcessor<T, R> {
+    private String pipelineId;
+
+    public function AbstractPipeline(String id) {
+        pipelineId = id;
+    }
+
+    @Override
+    public String function getPipelineId() {
+        return pipelineId;
+    }
+}
+
+public class GodmodeMultithreadedAsyncPipelineStressTest extends AbstractPipeline<String, String> {
+
+    public function GodmodeMultithreadedAsyncPipelineStressTest() {
+        super("GODMODE_ASYNC_PIPELINE_STRESS_V1");
+    }
+
+    @Override
+    public OceanList<String> function executePipeline(OceanList<String> inputs, AsyncTransformer<String, String> transformer) {
+        variable results = [];
+        for (int i from 0 to inputs.size() with increasing 1) {
+            String val = (String) inputs.get(i);
+            String transformed = transformer.process(val);
+            results.add(transformed);
+        }
+        return results;
+    }
+
+    public static String function processSafely(String? item) {
+        trying {
+            if (item == null) {
+                throw new Exception("Null item invalid");
+            }
+            return "PROCESSED_" + item.toUpperCase();
+        } catch (Exception e) {
+            return "FALLBACK_ERROR";
+        }
+    }
+
+    main() {
+        OceanOutput("=== GODMODE MULTITHREADED ASYNC PIPELINE STRESS TEST START ===");
+
+        GodmodeMultithreadedAsyncPipelineStressTest pipeline = new GodmodeMultithreadedAsyncPipelineStressTest();
+        OceanOutput("Pipeline ID: " + pipeline.getPipelineId());
+
+        variable dataset = ["alpha", "beta", "gamma", "delta", "epsilon"];
+
+        // 1. Test Custom AsyncTransformer SAM Implementation
+        AsyncTransformer<String, String> transformer = new AsyncTransformer<String, String>() {
+            @Override
+            public String function process(String input) {
+                return GodmodeMultithreadedAsyncPipelineStressTest.processSafely(input);
+            }
+        };
+
+        variable processedList = pipeline.executePipeline(dataset, transformer);
+        OceanOutput("Processed list size: " + processedList.size() + ", first: " + processedList.get(0));
+
+        // 2. Exception Safety Test
+        String fallbackRes = GodmodeMultithreadedAsyncPipelineStressTest.processSafely(null);
+        OceanOutput("Exception fallback: " + fallbackRes);
+
+        // 3. Primitive List & Sorting Stress Test
+        variable scores = [98, 45, 12, 87, 63, 100, 2];
+        scores.shuffle();
+        scores.sort(new Comparator<Integer>() {
+            @Override
+            public int function compare(Integer o1, Integer o2) {
+                return o1.compareTo(o2);
+            }
+        });
+
+        int minScore = (int) scores.get(0);
+        int maxScore = (int) scores.get(6);
+        OceanOutput("Sorted Scores -> Min: " + minScore + ", Max: " + maxScore);
+
+        // 4. Final Assertions
+        bool a1 = pipeline.getPipelineId().equals("GODMODE_ASYNC_PIPELINE_STRESS_V1");
+        bool a2 = processedList.size() == 5 && processedList.get(0).equals("PROCESSED_ALPHA");
+        bool a3 = fallbackRes.equals("FALLBACK_ERROR");
+        bool a4 = minScore == 2 && maxScore == 100;
+
+        if (a1 && a2 && a3 && a4) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

@@ -1,0 +1,41 @@
+package com.resources;
+import java.util.Date;
+import java.io.File;
+import java.util.HashMap;
+import java.util.ArrayList;
+
+class JavaInteropTest {
+    Date function getCurrentDate() {
+        return new Date();
+    }
+
+    File function getFile(String path) {
+        return new File(path);
+    }
+
+    main() {
+        variable test = new JavaInteropTest();
+        
+        variable date = test.getCurrentDate();
+        Output("Current Date: " + date.toString());
+        
+        variable file = test.getFile("interop_test.txt");
+        Output("File path: " + file.getAbsolutePath());
+        
+        variable map = new HashMap();
+        map.put("key", "Interop Success!");
+        Output("Map value: " + map.get("key"));
+        
+        // Test ArrayList as well
+        variable list = new ArrayList();
+        list.add("First");
+        list.add("Second");
+
+        variable path = file.getAbsolutePath();
+        if (date != null && path.endsWith("interop_test.txt") && map.get("key") == "Interop Success!" && list.size() == 2 && list.get(0) == "First") {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

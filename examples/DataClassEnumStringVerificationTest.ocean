@@ -1,0 +1,73 @@
+package com.resources;
+
+data class Point(int x, int y) {
+    // fields x, y and copy(), copy(int x, int y) generated automatically
+}
+
+enum CustomPlanet {
+    MERCURY(3.303, 2439.7),
+    VENUS(4.869, 6051.8);
+
+    variable mass;
+    variable radius;
+
+    function CustomPlanet(double mass, double radius) {
+        this.mass = mass;
+        this.radius = radius;
+    }
+
+    double function getMass() {
+        return mass;
+    }
+
+    double function getRadius() {
+        return radius;
+    }
+}
+
+class DataClassEnumStringVerificationTest {
+    main() {
+        OceanOutput("=== VERIFICATION TEST ===");
+
+        // 1. String equality verification
+        String a = "hello";
+        String b = a + "";
+        if (b == "hello") {
+            OceanOutput("String Equality: SUCCESS");
+        } else {
+            OceanOutput("String Equality: FAILURE");
+        }
+
+        // 2. Data Class copy verification
+        Point p1 = new Point(10, 20);
+        Point p2 = p1.copy();
+        Point p3 = p1.copy(30, 40);
+
+        OceanOutput("Point 1: " + p1.toString()); // Expected: Point(x=10, y=20)
+        OceanOutput("Point 2 (copy): " + p2.toString()); // Expected: Point(x=10, y=20)
+        OceanOutput("Point 3 (copy override): " + p3.toString()); // Expected: Point(x=30, y=40)
+
+        if (p1.equals(p2)) {
+            OceanOutput("Point copy equals: SUCCESS");
+        } else {
+            OceanOutput("Point copy equals: FAILURE");
+        }
+
+        // 3. Enum value/method verification
+        CustomPlanet m = CustomPlanet.MERCURY;
+        CustomPlanet v = CustomPlanet.VENUS;
+        
+        OceanOutput("Mercury Mass: " + m.getMass());
+        OceanOutput("Venus Radius: " + v.getRadius());
+
+        bool stringOk = (b == "hello");
+        bool pointOk = p1.toString().equals("Point(x=10, y=20)") && p2.toString().equals("Point(x=10, y=20)") && p3.toString().equals("Point(x=30, y=40)") && p1.equals(p2);
+        bool enumOk = (m.getMass() == 3.303) && (v.getRadius() == 6051.8) && m.name().equals("MERCURY") && m.ordinal() == 0;
+
+        if (stringOk && pointOk && enumOk) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

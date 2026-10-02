@@ -1,0 +1,11 @@
+package com.resources;
+
+class UntypedValueWithoutInitializerErrorTest {
+    void function test() {
+        value uninitializedLocal;
+    }
+
+    static main() {
+        OceanOutput("Test");
+    }
+}

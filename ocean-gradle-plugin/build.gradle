@@ -1,0 +1,30 @@
+plugins {
+    id 'java-gradle-plugin'
+    id 'java'
+}
+
+group = 'ocean'
+version = '1.0.0'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation project(':')
+    implementation gradleApi()
+}
+
+gradlePlugin {
+    plugins {
+        oceanPlugin {
+            id = 'ocean.compiler'
+            implementationClass = 'ocean.gradle.OceanPlugin'
+        }
+    }
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}

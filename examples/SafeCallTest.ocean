@@ -1,0 +1,37 @@
+package com.resources;
+
+class SafeCallTest {
+    static void function main() {
+        OceanList list = new OceanList();
+        list.add("Hello");
+        
+        // Safe call on existing object
+        Object? len = list?.size();
+        OceanOutput("Size: ");
+        OceanOutput(len);
+        OceanOutput("\n");
+        
+        // Safe call on null object
+        OceanList? nullList = null;
+        Object? nullLen = nullList?.size();
+        OceanOutput("Null Size (should be null): ");
+        OceanOutput(nullLen);
+        OceanOutput("\n");
+        
+        // Safe call on field
+        Object? item = list?.get(0);
+        OceanOutput("Item: ");
+        OceanOutput(item);
+        OceanOutput("\n");
+        
+        bool s1 = (len != null) && len.toString().equals("1");
+        bool s2 = (nullLen == null);
+        bool s3 = (item != null) && item.toString().equals("Hello");
+
+        if (s1 && s2 && s3) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

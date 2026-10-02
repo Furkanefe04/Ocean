@@ -1,0 +1,743 @@
+================================================================================
+              OCEAN PROGRAMLAMA DİLİ - EKSİKSİZ SÖZDİZİMİ (SYNTAX) KILAVUZU
+================================================================================
+Proje genel bakışı, kurulum, hızlı başlangıç ve derleyici mimarisi için:
+Bkz. README.md (Proje Kök Dizini)
+
+Bu kılavuz, Ocean.g4 gramer dosyasındaki tüm kuralları, anahtar kelimeleri, veri
+tiplerini, operatörleri, dil ve çalışma zamanı (runtime) özelliklerini en basitten
+en ileri seviyeye kadar tek bir metin altında eksiksiz bir normatif referans
+olarak sunmaktadır.
+
+--------------------------------------------------------------------------------
+1. PAKET VE İÇE AKTARMA (PACKAGE & IMPORTS)
+--------------------------------------------------------------------------------
+// Paket bildirimi (Dosyanın ilk ifadesi)
+package com.sirket.proje.modul;
+
+// Sınıf veya paket içe aktarma (Java ve Ocean sınıfları)
+import java.util.List;
+import java.util.Map;
+import java.util.*;
+import ocean.stdlib.OceanIntList;
+import ocean.stdlib.Task;
+
+// Statik içe aktarma
+import static java.lang.Math.PI;
+import static java.lang.Math.*;
+
+
+--------------------------------------------------------------------------------
+2. DEĞİŞKEN TANIMLAMA & ATAMA (VARIABLES & ASSIGNMENTS)
+--------------------------------------------------------------------------------
+Ocean'da değişken ve sabit tanımlamaları açık tip veya tip çıkarımı (type inference)
+ile yapılabilir:
+
++--------------------+----------------+------------------+---------------------+
+| Sözdizimi          | Tip Belirteci  | Yeniden Atanma   | Açıklama            |
++--------------------+----------------+------------------+---------------------+
+| int sayi = 42;     | Açık (Explicit)| Evet (Mutable)   | Standart değişken   |
+| variable x = 10;   | Tip Çıkarımlı  | Evet (Mutable)   | Yerel değişken      |
+| value y = 3.14;    | Tip Çıkarımlı  | Hayır (Immutable)| Değiştirilemez sabit|
+| final int z = 100; | Açık (Explicit)| Hayır (Immutable)| Açık tipli sabit    |
++--------------------+----------------+------------------+---------------------+
+
+// 1. Açık Tipli Değişkenler
+int sayi = 42;
+String metin = "Ocean";
+bool aktif = true;
+
+// 2. Tip Çıkarımlı Değiştirilebilir Değişken (variable)
+variable sayac = 10;        // Tipi int olarak çıkarılır, yeniden atanabilir
+sayac = 20;                 // Geçerli
+
+// 3. Tip Çıkarımlı Değiştirilemez Değer (value)
+value piSayisi = 3.14159;   // Tipi double olarak çıkarılır
+// piSayisi = 3.14;         // DERLEME HATASI: 'value' ile tanımlanan değerler yeniden atanamaz
+
+// 4. Açık Tipli Değiştirilemez Sabit (final)
+final int PORT = 8080;
+// PORT = 9090;             // DERLEME HATASI: 'final' alan yeniden atanamaz
+
+// 5. İlk Değersiz Tanımlama (Definite Assignment kurallarına tabidir)
+int toplam;
+String sonuc;
+// OceanOutput(toplam);     // DERLEME HATASI: Değişken ilk değer atanmadan okunamaz
+
+// 6. Bileşik Atamalar (Compound Assignments)
+sayi += 5;
+sayi -= 2;
+sayi *= 3;
+sayi /= 2;
+sayi %= 4;
+
+// 7. Artırma / Azaltma (Prefix & Postfix)
+sayi++;
+sayi--;
+++sayi;
+--sayi;
+
+
+--------------------------------------------------------------------------------
+3. VERİ TİPLERİ, LİTERALLER VE NULL GÜVENLİĞİ
+--------------------------------------------------------------------------------
+// İlkel ve Standart Tipler
+bool flag = true;             // true veya false (JVM boolean)
+byte b = 127;                 // 8-bit tamsayı
+short s = 32000;              // 16-bit tamsayı
+int i = 100;                  // 32-bit tamsayı
+long l = 10000000000L;        // 64-bit tamsayı (L son eki ile)
+float f = 3.14F;              // 32-bit kayan nokta (F son eki ile)
+double d = 3.1415926535D;     // 64-bit kayan nokta
+char c = 'A';                 // 16-bit Unicode karakter
+String str = "Ocean Dili";    // UTF-16 karakter dizisi
+
+// -----------------------------------------------------------------------------
+// Null Güvenliği (Compile-Time Null Safety)
+// -----------------------------------------------------------------------------
+// Ocean'da tipler varsayılan olarak NON-NULL'dur. Bir değişkenin null alabilmesi
+// için tipinin sonuna '?' eklenmelidir:
+String nonNullStr = "Merhaba";
+// nonNullStr = null;         // DERLEME HATASI: Non-null tipe null atanamaz
+
+String? optStr = null;        // Geçerli: Nullable tip
+int? opsiyonelSayi = null;
+
+// Nullable -> Non-Nullable Doğrudan Atama Engeli:
+String a = "Güvenli";
+String? b = null;
+// a = b;                     // DERLEME HATASI: Nullable tip doğrudan non-null tipe atanamaz!
+
+// Güvenli Açma (Safe Unwrapping): Elvis Operatörü (??)
+a = b ?? "Varsayılan";        // Geçerli: b null ise "Varsayılan" kullanılır
+
+// Güvenli Çağrı Operatörü (Safe Navigation: ?.)
+int? uzunluk = b?.length();   // b null ise metot çağrılmaz, sonuç null döner
+// int hata = b.length();     // DERLEME HATASI: Nullable referans üzerinde doğrudan metot çağrılamaz
+
+// -----------------------------------------------------------------------------
+// Dize Literalleri ve İnterpolasyon
+// -----------------------------------------------------------------------------
+String duzMetin = "Klasik Dize\nİkinci Satır";
+String cokSatirli = """
+    Bu bir çok satırlı
+    metin bloğudur.
+    """;
+
+// Dize İçi Değişken Ekleme (String Interpolation: $"...")
+variable ad = "Furkan";
+variable yas = 25;
+String info = $"Kullanıcı: {ad}, Gelecek Yıl Yaşı: {yas + 1}";
+
+// -----------------------------------------------------------------------------
+// Koleksiyon ve Dizi Literalleri
+// -----------------------------------------------------------------------------
+// 1. Kutulamasız Yüksek Performanslı İlkel Koleksiyonlar (ocean.stdlib)
+OceanIntList sayilar = [10, 20, 30, 40, 50];            // Sıfır boxing maliyeti (int[])
+OceanDoubleList oranlar = [1.5, 2.7, 3.14];
+
+// 2. Özel Ocean Koleksiyonları
+OceanList<String> liste = ["elma", "armut", "muz"];     // OceanList literali [...]
+OceanSet<String> kume = #{ "elma", "armut", "muz" };    // OceanSet literali #{...}
+OceanMap<String, int> sozluk = { "A": 100, "B": 200 };  // OceanMap literali {...}
+
+// 3. Ham JVM Dizisi
+int[] dizi = { 10, 20, 30, 40 };                        // Standart dizi literali
+
+// 4. Dizi ve Liste Dilimleme (Range Slicing: [start..end])
+// KURAL: Dilimleme operatörü [start..end] HER İKİ SINIRI DA İÇERİR (INCLUSIVE).
+int[] parca = dizi[1..3];                               // { 20, 30, 40 } (1, 2 ve 3. indeksler)
+OceanIntList listeParca = sayilar[0..2];                 // [10, 20, 30]
+
+
+--------------------------------------------------------------------------------
+4. GİRDİ VE ÇIKTI (I/O) İŞLEMLERİ
+--------------------------------------------------------------------------------
+// Ekrana Yazdırma
+OceanOutput("Sisteme hoşgeldiniz!");
+OceanOutput($"Değer: {sayi}");
+OceanOutput(); // Boş satır yazdırır
+
+// Konsoldan Girdi Alma (OceanInput() nesnesi üzerinden)
+String isim = OceanInput().nextLine();
+int yasGirdisi = OceanInput().nextInt();
+double oran = OceanInput().nextDouble();
+bool onay = OceanInput().nextBoolean();
+
+
+--------------------------------------------------------------------------------
+5. OPERATÖRLER VE İFADELER
+--------------------------------------------------------------------------------
+// Aritmetik İfadeler
+int hesap = (10 + 5) * 2 - (8 / 4) % 3;
+
+// Mantıksal ve İlişkisel İfadeler
+bool test = (hesap > 5) && (hesap <= 50) || !(hesap == 20) && (hesap != 0);
+
+// Bit Düzeyinde İşlemler (Bitwise & Shift)
+int bitAnd = hesap & 15;
+int bitOr  = hesap | 16;
+int bitXor = hesap ^ 255;
+int bitNot = ~hesap;
+int shl    = hesap << 2;
+int shr    = hesap >> 2;
+int ushr   = hesap >>> 2;
+
+// Üçlü Koşul Operatörü (Ternary Operator)
+String durumMesaji = (hesap >= 18) ? "Reşit" : "Reşit Değil";
+
+// Tip Dönüşümü (Cast)
+double kesirli = 3.99;
+int tam = (int) kesirli;
+
+// Tip Kontrolü ve Örüntü Eşleme (Pattern Matching instanceof)
+Object nesne = "Ocean Dili";
+if (nesne instanceof String s) {
+    OceanOutput($"Metin uzunluğu: {s.length()}");
+}
+
+// Sözleşme Doğrulama (Verify Statement)
+verify hesap >= 0 : "Hesap negatif olamaz!";
+
+
+--------------------------------------------------------------------------------
+6. AKIŞ KONTROL YAPILARI (CONTROL FLOW)
+--------------------------------------------------------------------------------
+// 1. if - else if - else
+if (sayi > 100) {
+    OceanOutput("Çok büyük");
+} else if (sayi > 50) {
+    OceanOutput("Orta");
+} else {
+    OceanOutput("Küçük");
+}
+
+// 2. Gelişmiş For Döngüsü (from ... to ... with increasing/decreasing)
+// KURAL: 'to' sınırı HARİÇTİR (EXCLUSIVE). 'i from 1 to 10' döngüsü i < 10 iken çalışır (1..9).
+for (int k from 1 to 10 with increasing 1) {
+    OceanOutput($"Artan K: {k}"); // 1'den 9'a kadar yazar
+}
+
+for (variable j from 100 to 0 with decreasing 10) {
+    OceanOutput($"Azalan J: {j}"); // 100'den 10'a kadar yazar (0 hariç)
+}
+
+// 3. For-In (Foreach) Döngüsü
+for (String oge in liste) {
+    OceanOutput($"Öğe: {oge}");
+}
+
+// 4. While ve Do-While Döngüleri
+while (sayac > 0) {
+    sayac--;
+}
+
+do {
+    sayac++;
+} while (sayac < 10);
+
+// 5. Atlama İfadeleri (stop = break, skip = continue)
+while (true) {
+    if (sayac == 5) {
+        skip; // döngü adımını atlar (continue)
+    }
+    if (sayac > 20) {
+        stop; // döngüyü sonlandırır (break)
+    }
+    sayac++;
+}
+
+// 6. Etiketli Döngüler (Labeled Loops)
+anaDongu: for (int a from 1 to 5 with increasing 1) {
+    icDongu: for (int b from 1 to 5 with increasing 1) {
+        if (a * b == 6) {
+            stop anaDongu; // Dış döngüyü tamamen kırar
+        }
+        if (b == 2) {
+            skip icDongu;  // İç döngünün bir sonraki adımına geçer
+        }
+    }
+}
+
+
+--------------------------------------------------------------------------------
+7. SWITCH DEYİMİ (STATEMENT) VE SWITCH İFADESİ (EXPRESSION)
+--------------------------------------------------------------------------------
+// 1. Switch Deyimi (Statement: İki noktalı veya oklu sözdizimi)
+switch (sayi) {
+    case 1:
+        OceanOutput("Bir");
+        stop;
+    case 2:
+    case 3:
+        OceanOutput("İki veya Üç");
+        stop;
+    case 4 -> OceanOutput("Dört");
+    default -> OceanOutput("Diğer Sayı");
+}
+
+// 2. Switch İfadesi (Expression: Değer Döndüren Yapı)
+// NOT: Tek satırlı oklu dallarda satır sonu noktalı virgül KULLANILMAZ.
+// Tüm switch ifadesinin atandığı satırın sonuna ';' konur.
+variable sonucMetni = switch (sayi) {
+    case 10 -> "Düşük"
+    case 20 -> "Orta"
+    case 30 -> "Yüksek"
+    default -> "Bilinmeyen"
+};
+
+// 3. Bloklu Switch İfadesi: 'result' Anahtar Kelimesi
+// Çok satırlı mantık içeren dallarda süslü parantez kullanılır ve değer 'result' ile dönülür:
+variable detayliSonuc = switch (sayi) {
+    case 10 -> "Düşük"
+    case 40 -> {
+        variable detay = "Kritik Seviye";
+        result $"Uyarı: {detay}"; // Değer switch ifadesine aktarılır
+    }
+    default -> "Bilinmeyen"
+};
+
+
+--------------------------------------------------------------------------------
+8. SINIFLAR, KURUCULAR VE DATA CLASS'LAR
+--------------------------------------------------------------------------------
+Ocean'da sınıflar standart nesne yönelimli model ile tanımlanır.
+
+Metot ve Kurucu Sözdizimi:
++------------------------------------+------------------------------------------+
+| Sözdizimi                          | Anlamı                                   |
++------------------------------------+------------------------------------------+
+| public function SinifAdi(...)      | Kurucu Metot (Constructor - dönüş tipi yok)|
+| public void function metotAdi(...) | Void dönüşlü metot                       |
+| public String function metotAdi()  | Tip dönüşlü metot                        |
+| public static int function topla() | Statik metot                             |
+| public sync void function guncelle()| Senkronize (monitor lock) metot          |
+| public async String function oku() | Asenkron metot (CompletableFuture döner) |
++------------------------------------+------------------------------------------+
+
+// 1. Standart Sınıf, Kapsülleme ve Kalıtım
+public class Kisi {
+    private String isim;
+    protected int yas;
+
+    // Kurucu Metot (Constructor: Sınıf adıyla aynıdır, dönüş tipi yazılmaz)
+    public function Kisi(String pIsim, int pYas) {
+        this.isim = pIsim;
+        this.yas = pYas;
+    }
+
+    // Kurucu Zincirleme (this çağrısı)
+    public function Kisi(String pIsim) {
+        this(pIsim, 0);
+    }
+
+    public String function getIsim() { return this.isim; }
+    public int function getYas() { return this.yas; }
+}
+
+// 2. Alt Sınıf (Subclass) ve Üst Kurucu Çağrısı (super)
+// NOT: Normal sınıflarda primary constructor (sınıf adının yanında parantez) KULLANILMAZ.
+// Constructor gövdesinde super(...) çağrısı yapılır:
+public class Calisan extends Kisi {
+    private double maas;
+
+    public function Calisan(String name, int age, double maas) {
+        super(name, age);
+        this.maas = maas;
+    }
+
+    public double function getMaas() {
+        return this.maas;
+    }
+}
+
+// 3. Nesne Oluşturma (Object Instantiation: new)
+Kisi k = new Kisi("Furkan", 25);
+Calisan c = new Calisan("Ahmet", 30, 75000.0);
+
+// 4. Data Class (Veri Taşıyıcı Sınıf)
+// Primary constructor sözdizimi YALNIZCA 'data class' yapılarına özgüdür.
+// Derleyici otomatik olarak getter, setter, equals, hashCode, toString ve copy() üretir:
+public data class Urun(int id, String baslik, double fiyat);
+
+// Data Class Kullanımı:
+Urun u1 = new Urun(101, "Laptop", 45000.0);
+Urun u2 = u1.copy(fiyat = 42000.0); // İmmutable kopyalama
+OceanOutput(u1.toString());         // Urun(id=101, baslik=Laptop, fiyat=45000.0)
+
+// 5. Mühürlü Sınıflar (Sealed Classes & Restricts)
+// Alt sınıf izinleri 'restricts' listesiyle kesin olarak sınırlandırılır:
+public sealed class Sekil restricts Daire, Dikdortgen {
+    public abstract double function alanHesapla();
+}
+
+public non-sealed class Daire extends Sekil {
+    private double r;
+    public function Daire(double yaricap) {
+        this.r = yaricap;
+    }
+    @Override
+    public double function alanHesapla() {
+        return 3.14159 * this.r * this.r;
+    }
+}
+
+public final class Dikdortgen extends Sekil {
+    private double genislik;
+    private double yukseklik;
+    public function Dikdortgen(double a, double b) {
+        this.genislik = a;
+        this.yukseklik = b;
+    }
+    @Override
+    public double function alanHesapla() {
+        return this.genislik * this.yukseklik;
+    }
+}
+
+
+--------------------------------------------------------------------------------
+9. ARAYÜZLER (INTERFACES), ENUMLAR VE NOTASYONLAR (ANNOTATIONS)
+--------------------------------------------------------------------------------
+// 1. Arayüz Tanımı (Gövdesiz ve Default Metotlar)
+public interface IServis {
+    void function baslat();
+    
+    // Varsayılan gövdeli metot (Default Method)
+    void function log(String mesaj) {
+        OceanOutput($"[LOG]: {mesaj}");
+    }
+}
+
+// Mühürlü Arayüz (Sealed Interface)
+public sealed interface IDugum restricts YaprakDugum, DalDugum {
+    int function deger();
+}
+
+// 2. Enum Tanımı (Basit ve Parametreli)
+public enum Seviye {
+    DUSUK(10, "Low"),
+    ORTA(20, "Medium"),
+    YUKSEK(30, "High");
+
+    private int kod;
+    private String etiket;
+
+    function Seviye(int pKod, String pEtiket) {
+        this.kod = pKod;
+        this.etiket = pEtiket;
+    }
+
+    public int function getKod() { return this.kod; }
+    public String function getEtiket() { return this.etiket; }
+}
+
+// 3. Notasyon Tanımlama (Annotations)
+// Ocean'da özel annotation bildirimi 'annotation' anahtar kelimesi ile yapılır:
+public annotation Tablo {
+    String isim() default "tablo";
+    int versiyon() default 1;
+}
+
+// Not: @Override ve @Deprecated gibi standart Java annotation'ları
+// derleyici tarafından doğrudan tanınır ve bytecode'a aktarılır.
+@Tablo(isim = "kullanicilar", versiyon = 2)
+public class KullaniciEntity {
+    @Override
+    public String function toString() {
+        return "Kullanici";
+    }
+}
+
+
+--------------------------------------------------------------------------------
+10. İLERİ DÜZEY GENERICS, VARYANS (+T, -T) VE SINIRLAR (<:, >:)
+--------------------------------------------------------------------------------
+Ocean, JVM üzerinde tam Generic Signature üreten güçlü bir generic tip sistemine sahiptir.
+
+// 1. Standart Generic Sınıf
+public class Depo<T> {
+    private T icerik;
+    public function Depo(T veri) { this.icerik = veri; }
+    public T function al() { return this.icerik; }
+}
+
+// 2. Üst Sınır (Upper Bound <: veya extends)
+public class SayisalKutu<T <: Number> {
+    public double function doubleDeger(T val) {
+        return val.doubleValue();
+    }
+}
+
+// 3. Alt Sınır (Lower Bound >:)
+// T tipi Integer veya Integer'ın üst sınıflarından (Number, Object) biri olabilir:
+public class AltSinirDeposu<T >: Integer> {
+    private T deger;
+    public function AltSinirDeposu(T d) { this.deger = d; }
+    public T function getDeger() { return this.deger; }
+}
+
+// 4. Kovaryans (+T / Üretici / Out / Covariant)
+// SADECE dönüş pozisyonlarında (return type) yer alabilir.
+// NOT: Kurucu metot (<init>) parametreleri nesne ilk değerleme bağlamı olduğu için
+// kovaryans kontrolünden muaftır:
+public class Uretici<+T> {
+    private T oge;
+    public function Uretici(T pOge) { this.oge = pOge; } // Kurucu parametresi geçerli
+    public T function uret() { return this.oge; }        // Dönüş pozisyonu geçerli
+    // public void function tuket(T x); // DERLEME HATASI: +T metot parametresinde kullanılamaz!
+}
+
+// 5. Kontravaryans (-T / Tüketici / In / Contravariant)
+// SADECE metot parametre pozisyonlarında yer alabilir:
+public class Tuketici<-T> {
+    public void function tuket(T oge) {
+        OceanOutput($"Tüketildi: {oge}");
+    }
+    // public T function uret(); // DERLEME HATASI: -T dönüş tipinde kullanılamaz!
+}
+
+// 6. Çift Yönlü Varyans Boru Hattı (-Giris, +Cikis)
+public class DonusturucuBoru<-InType, +OutType <: CharSequence> {
+    private OutType sabitCikis;
+    public function DonusturucuBoru(OutType cikis) {
+        this.sabitCikis = cikis;
+    }
+    public OutType function calistir(InType girdi) {
+        return this.sabitCikis;
+    }
+}
+
+
+--------------------------------------------------------------------------------
+11. GENİŞLETME METOTLARI (EXTENSION METHODS)
+--------------------------------------------------------------------------------
+Var olan sınıflara veya ilkel tiplere, kaynak kodlarını değiştirmeden dışarıdan
+metot eklemeyi sağlar.
+Kurallar:
+- Çağrıldığı nesne 'this' anahtar kelimesi ile temsil edilir.
+- Statik olarak çözümlenir (static dispatch).
+- Private alanlara doğrudan erişemez, public üyelere erişir.
+
+public class MetotGenisletmeleri {
+    // String sınıfına .selamla() metodu ekleme
+    public String String.function selamla() {
+        return $"Merhaba, {this}!";
+    }
+
+    // int ilkel tipine .kare() metodu ekleme
+    public int int.function kare() {
+        return this * this;
+    }
+}
+
+// Kullanım:
+// "Ocean".selamla();  -> "Merhaba, Ocean!"
+// 5.kare();           -> 25
+
+
+--------------------------------------------------------------------------------
+12. METOT PARAMETRE ÇEŞİTLERİ (DEFAULT, NAMED, VARARGS, THROWS)
+--------------------------------------------------------------------------------
+public class MetotKurallari {
+    // 1. Varsayılan Parametreler (Default Parameters)
+    public void function baglantiKur(String url = "localhost", int port = 8080, bool ssl = true) {
+        OceanOutput($"Bağlanılıyor: {url}:{port} (SSL={ssl})");
+    }
+
+    // 2. Varargs (Değişken Argüman Sayısı)
+    public int function toplaHepsi(int... sayilar) {
+        int t = 0;
+        for (int s in sayilar) t += s;
+        return t;
+    }
+
+    // 3. İstisna Bildirimi (Throws List)
+    public void function dosyaOku(String yol) throws IOException, FileNotFoundException {
+        // Dosya okuma işlemleri
+    }
+}
+
+// İsimlendirilmiş Parametrelerle Çağrı (Named Arguments):
+// nesne.baglantiKur(port = 9090, url = "192.168.1.1");
+
+
+--------------------------------------------------------------------------------
+13. FONKSİYONEL PROGRAMLAMA: LAMBDALAR VE METOT REFERANSLARI
+--------------------------------------------------------------------------------
+public interface FonksiyonelIslem<T, R> {
+    R function isle(T girdi);
+}
+
+public class LambdaRehberi {
+    public static void function calistir() {
+        // 1. Kısa İfadeli Lambda
+        FonksiyonelIslem<int, int> ikiKati = (x) -> x * 2;
+
+        // 2. Tipli Parametreli ve Bloklu Lambda
+        FonksiyonelIslem<String, int> uzunlukBul = (String str) -> {
+            int len = str.length();
+            return len;
+        };
+
+        // 3. Metot Referansı (Method Reference)
+        FonksiyonelIslem<String, String> donustur = String::toUpperCase;
+        
+        // 4. Kurucu Referansı (Constructor Reference)
+        Supplier<ArrayList<String>> listeUretici = ArrayList::new;
+    }
+}
+
+
+--------------------------------------------------------------------------------
+14. İSTİSNA YÖNETİMİ VE KAYNAK YÖNETİMİ (`trying`)
+--------------------------------------------------------------------------------
+public class IstisnaRehberi {
+    public static void function test() {
+        // 1. trying - catch - finally (Çoklu Catch Desteği: Type1 | Type2)
+        trying {
+            if (true) throw new IllegalArgumentException("Hatalı parametre");
+        } catch (IllegalArgumentException | NullPointerException e) {
+            OceanOutput($"Yakalama: {e.getMessage()}");
+        } finally {
+            OceanOutput("Kaynak temizliği.");
+        }
+
+        // 2. Try-With-Resources (Otomatik Kaynak Kapatma)
+        trying (FileInputStream fis = new FileInputStream("dosya.txt")) {
+            fis.read();
+        } catch (IOException e) {
+            OceanOutput("G/Ç Hatası");
+        }
+    }
+}
+
+
+--------------------------------------------------------------------------------
+15. EŞZAMANLILIK VE KİLİTLEME (CONCURRENCY & SYNCHRONIZATION)
+--------------------------------------------------------------------------------
+public class SenkronizasyonRehberi {
+    private int sayac = 0;
+    private Object kilitNesnesi = new Object();
+
+    // 1. sync Anahtar Kelimesi ile Metot Düzeyinde Kilitleme
+    public sync void function artirSync() {
+        this.sayac++;
+    }
+
+    // 2. lock(monitor) Blok İfadesi
+    public void function artirLockBlogu() {
+        lock (this.kilitNesnesi) {
+            this.sayac++;
+        }
+    }
+}
+
+
+--------------------------------------------------------------------------------
+16. ASENKRON PROGRAMLAMA VE SANAL THREAD'LER (ASYNC / AWAIT / TASK)
+--------------------------------------------------------------------------------
+Ocean, Java Project Loom Sanal Thread'leri (Virtual Threads) üzerinde çalışan
+yerel asenkron programlama desteği sunar.
+
+Kurallar:
+- 'async' olarak tanımlanan her metot, JVM seviyesinde otomatik olarak
+  'java.util.concurrent.CompletableFuture<T>' döndürür.
+- 'await' ifadesi yalnızca 'async' fonksiyonlar içerisinde kullanılabilir.
+- 'Task' yardımcı sınıfı (`ocean.stdlib.Task`) Project Loom sanal thread'lerini
+  yönetir: Task.sleep, Task.all, Task.race, Task.isVirtual.
+
+import java.util.concurrent.CompletableFuture;
+import ocean.stdlib.Task;
+
+public class AsenkronRehberi {
+    // 1. Asenkron Metot (CompletableFuture<String> üretir)
+    public static async String function uzakVeriCek(String endpoint) {
+        Task.sleep(100); // Sanal thread üzerinde bloklamayan bekleme
+        return $"VERI_{endpoint}";
+    }
+
+    // 2. Asenkron Akış ve Await
+    public static async void function akisiCalistir() {
+        CompletableFuture<String> f1 = uzakVeriCek("users");
+        CompletableFuture<String> f2 = uzakVeriCek("orders");
+
+        // Birden fazla asenkron görevi paralel bekleme:
+        await Task.all(f1, f2);
+
+        String u = await f1;
+        String o = await f2;
+        OceanOutput($"Sonuç: {u}, {o}");
+    }
+}
+
+
+--------------------------------------------------------------------------------
+17. JAVA İLE DOĞRUDAN BİRLİKTE ÇALIŞMA (JAVA INTEROPERABILITY)
+--------------------------------------------------------------------------------
+Ocean, JVM üzerinde çalıştığından tüm Java standart kütüphanesi ve üçüncü parti
+Java kütüphaneleriyle sıfır maliyetle doğrudan çalışır:
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.io.File;
+
+class JavaInteropOrnegi {
+    main() {
+        // Java sınıflarını doğrudan kullanma
+        ArrayList<String> javaListesi = new ArrayList<String>();
+        javaListesi.add("Ocean");
+        javaListesi.add("Java 21");
+
+        for (String oge in javaListesi) {
+            OceanOutput($"Java Listesi Öğesi: {oge}");
+        }
+
+        // Java Dosya API'si
+        File dosya = new File("build.gradle");
+        OceanOutput($"Dosya Mevcut mu: {dosya.exists()} (Boyut: {dosya.length()} bayt)");
+    }
+}
+
+
+--------------------------------------------------------------------------------
+18. PROGRAM GİRİŞ NOKTASI (`main` METODU)
+--------------------------------------------------------------------------------
+Ocean'da ana metot farklı esnekliklerde tanımlanabilir. Derleyici arka planda
+her durumda standart JVM `public static void main(String[] args)` metodunu üretir.
+
+ÖNEMLİ KURAL:
+'main' metodu asenkron (async) olamaz. 'main' içinde async metotlar çağrıldığında,
+JVM'in görevler bitmeden sonlanmasını önlemek için döndürülen CompletableFuture
+üzerinde '.join()' çağrılmalıdır.
+
+class Program {
+    // 1. En Sade ve İdiyomatik Giriş Noktası (Önerilen)
+    main() {
+        OceanOutput("Ocean Programı Başlatıldı!");
+    }
+
+    // 2. Asenkron İşlem Bekleyen Main Örneği (.join kuralı)
+    /*
+    main() {
+        AsenkronRehberi.akisiCalistir().join(); // Görevler bitene kadar bekler
+    }
+    */
+
+    // 3. Komut Satırı Argümanlı Main
+    /*
+    main(String[] args) {
+        for (String arg in args) {
+            OceanOutput($"Argüman: {arg}");
+        }
+    }
+    */
+
+    // 4. Açıkça 'static' Bildirilen Main
+    /*
+    static main() {
+        OceanOutput("Statik main");
+    }
+    */
+}
+================================================================================

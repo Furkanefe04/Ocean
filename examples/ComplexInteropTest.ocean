@@ -1,0 +1,39 @@
+package com.resources;
+class ComplexInteropTest {
+        main()
+        {
+            HelperClass.main();
+            variable user = "Furkan";
+            variable a = 10;
+            variable b = 20;
+
+            OceanOutput("--- Complex Interop Test Start ---");
+
+            // Nested interpolation with method call
+            variable msg = $"User: {user}, Sum: {a + b}, Greet: { HelperClass.greet(user) }";
+            OceanOutput(msg);
+
+            // Conditional interpolation
+            variable status = $"Status: { (a + b > 25 ? "High" : "Low") }";
+            OceanOutput(status);
+
+            // Brace escaping in complex string
+            variable json = $"JSON: {{ \"user\": \"{user}\", \"data\": {a * b} }}";
+            OceanOutput(json);
+
+            // Complex expression in interpolation
+            OceanOutput("Complex Math: " + (a * 2 + b / 2) * 5);
+
+            OceanOutput("--- Running CryptoExchangeSim ---");
+            CryptoExchangeSim.runSim(10);
+
+            if (msg.equals("User: Furkan, Sum: 30, Greet: Greetings, Furkan!") &&
+                status.equals("Status: High") &&
+                json.equals("JSON: { \"user\": \"Furkan\", \"data\": 200 }") &&
+                (a * 2 + b / 2) * 5 == 150) {
+                OceanOutput("STATUS: PASSED");
+            } else {
+                OceanOutput("STATUS: FAILED");
+            }
+        }
+    }

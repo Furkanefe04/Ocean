@@ -1,0 +1,40 @@
+package com.resources;
+
+class MultilineStringVerificationTest {
+    static main() {
+        OceanOutput("=== MULTI-LINE STRING VERIFICATION TEST ===");
+
+        // 1. Basic Multi-line String
+        String json = """{
+"name": "Ocean",
+"version": "1.0",
+"status": "awesome"
+}""";
+        
+        OceanOutput("JSON Text:");
+        OceanOutput(json);
+        OceanOutput("Length: " + OceanString.length(json));
+
+        // 2. Multi-line String with escapes
+        String textWithEscapes = """Line 1\twith tab
+Line 2\nLine 3""";
+        
+        OceanOutput("Escaped Text:");
+        OceanOutput(textWithEscapes);
+
+        // 3. Concatenation
+        String concat = "Concatenated: " + """first line
+second line""";
+        OceanOutput(concat);
+
+        bool isJsonOk = OceanString.length(json) == 58;
+        bool isEscapesOk = textWithEscapes != null && textWithEscapes.contains("\t") && textWithEscapes.contains("\n");
+        bool isConcatOk = concat != null && concat.startsWith("Concatenated: first line");
+
+        if (isJsonOk && isEscapesOk && isConcatOk) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

@@ -1,0 +1,20 @@
+class MethodParamIncDeclTest {
+    main(){
+        int val = 10;
+        bool check1 = 10 == deneme(val++) && 11 == val;
+        bool check2 = 12 == deneme(++val) && 12 == val;
+        bool check3 = 12 == deneme(val--) && 11 == val;
+        bool check4 = 10 == deneme(--val) && 10 == val;
+        bool check = check1 && check2 && check3 && check4;
+        if (check) {
+            OceanOutput("STATUS: PASSED");
+        }
+        else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+    public static int function deneme(int val) {
+        return val;
+    }
+}
+

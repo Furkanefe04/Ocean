@@ -1,0 +1,46 @@
+
+class OceanPrimitiveBenchmark {
+
+    public static void function main(String[] args) {
+        int N = 10000000;
+        int ROUNDS = 5;
+
+        OceanOutput("=== Ocean OceanIntList Benchmark (N=" + N + ", Rounds=" + ROUNDS + ") ===");
+
+        long totalInitStart = System.nanoTime();
+        OceanIntList list = new OceanIntList(N);
+        for (int i from 0 to N with increasing 1) {
+            list.add(i % 1000);
+        }
+        long initTimeMs = (System.nanoTime() - totalInitStart) / 1000000;
+        OceanOutput("List Initialization Time: " + initTimeMs + " ms");
+
+        long totalSum = 0;
+        long totalExecStart = System.nanoTime();
+
+        for (int r from 0 to ROUNDS with increasing 1) {
+            long roundStart = System.nanoTime();
+
+            // 1. Indexed updates
+            for (int i from 0 to N with increasing 1) {
+                int updated = (list[i] * 3 + 7) % 10000;
+                list[i] = updated;
+            }
+
+            // 2. Foreach iteration sum
+            long sum = 0;
+            for (int val in list) {
+                sum = sum + val;
+            }
+            totalSum = totalSum + sum;
+
+            long roundTimeMs = (System.nanoTime() - roundStart) / 1000000;
+            OceanOutput("  Round " + (r + 1) + ": " + roundTimeMs + " ms (Checksum: " + sum + ")");
+        }
+
+        long totalExecTimeMs = (System.nanoTime() - totalExecStart) / 1000000;
+        OceanOutput("----------------------------------------------");
+        OceanOutput("Total Execution Time: " + totalExecTimeMs + " ms (Avg: " + (totalExecTimeMs / ROUNDS) + " ms/round)");
+        OceanOutput("Final Checksum: " + totalSum);
+    }
+}

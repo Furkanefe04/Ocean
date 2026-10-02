@@ -1,0 +1,81 @@
+package com.resources;
+
+
+class OceanSetAndFileVerificationTest {
+    static main() {
+        OceanOutput("=== OCEAN SET AND FILE VERIFICATION TEST ===");
+
+        // 1. OceanSet Verification
+        OceanSet<String> set = new OceanSet();
+        set.add("apple");
+        set.add("banana");
+        set.add("apple"); // duplicate, should be ignored
+
+        OceanOutput("Set size: " + set.size()); // Expected: 2
+        OceanOutput("Set contains apple: " + set.contains("apple")); // Expected: true
+        OceanOutput("Set contains orange: " + set.contains("orange")); // Expected: false
+
+        set.remove("apple");
+        OceanOutput("Set size after remove: " + set.size()); // Expected: 1
+        OceanOutput("Set contains apple after remove: " + set.contains("apple")); // Expected: false
+
+        // 2. OceanFile Verification
+        String testFile = "temp_verification_test.txt";
+        String copyFile = "temp_verification_test_copy.txt";
+        String movedFile = "temp_verification_test_moved.txt";
+
+        // clean up first if any left-over
+        if (OceanFile.exists(testFile)) { OceanFile.delete(testFile); }
+        if (OceanFile.exists(copyFile)) { OceanFile.delete(copyFile); }
+        if (OceanFile.exists(movedFile)) { OceanFile.delete(movedFile); }
+
+        // 2.1 writeLines & exists
+        OceanList<String> lines = new OceanList();
+        lines.add("line1");
+        lines.add("line2");
+        OceanFile.writeLines(testFile, lines);
+
+        OceanOutput("File exists: " + OceanFile.exists(testFile)); // Expected: true
+        OceanOutput("File size: " + OceanFile.size(testFile)); // Expected > 0
+
+        // 2.2 readLines
+        OceanList<String> readLines = OceanFile.readLines(testFile);
+        OceanOutput("Line 1 read: " + readLines.get(0)); // Expected: line1
+        OceanOutput("Line 2 read: " + readLines.get(1)); // Expected: line2
+
+        // 2.3 append
+        OceanFile.append(testFile, "line3\n");
+        OceanOutput("File size after append: " + OceanFile.size(testFile)); // Expected to increase
+
+        // 2.4 copy & move
+        OceanFile.copy(testFile, copyFile);
+        OceanOutput("Copy exists: " + OceanFile.exists(copyFile)); // Expected: true
+
+        OceanFile.move(copyFile, movedFile);
+        bool copyExistsAfterMove = OceanFile.exists(copyFile);
+        bool movedFileExists = OceanFile.exists(movedFile);
+        OceanOutput("Copy exists after move: " + copyExistsAfterMove); // Expected: false
+        OceanOutput("Moved file exists: " + movedFileExists); // Expected: true
+
+        // 2.5 isDirectory & listFiles
+        OceanOutput("Is resources dir: " + OceanFile.isDirectory("examples")); // Expected: true
+        OceanList<String> files = OceanFile.listFiles("examples");
+        OceanOutput("Resources list size: " + files.size()); // Expected > 0
+
+        // Clean up
+        OceanFile.delete(testFile);
+        OceanFile.delete(movedFile);
+
+        bool s1 = (set.size() == 1) && (!set.contains("apple"));
+        bool s2 = !OceanFile.exists(testFile) && !OceanFile.exists(movedFile);
+        bool s3 = readLines.get(0).equals("line1") && readLines.get(1).equals("line2");
+        bool s4 = files.size() > 0;
+        bool s5 = (!copyExistsAfterMove) && movedFileExists;
+
+        if (s1 && s2 && s3 && s4 && s5) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

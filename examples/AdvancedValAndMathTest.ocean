@@ -1,0 +1,41 @@
+package com.resources;
+
+class AdvancedValAndMathTest {
+    static double dField = 2.5;
+
+    static main() {
+        // 1. Boolean output ve string interpolation testi
+        bool bTrue = true;
+        bool bFalse = false;
+        
+        OceanOutput(bTrue);
+        OceanOutput(bFalse);
+        
+        OceanOutput("Interpolated true: " + bTrue);
+        OceanOutput("Interpolated false: " + bFalse);
+
+        // 2. Value kullanımı (okuma serbest olmalı)
+        value x = 42;
+        OceanOutput("Value x: " + x);
+
+        // 3. Double yerel değişken ve static field increment/decrement testleri
+        double dLocal = 10.5;
+        dLocal++;
+        OceanOutput("dLocal post-inc: " + dLocal); // 11.5
+        
+        --dLocal;
+        OceanOutput("dLocal pre-dec: " + dLocal); // 10.5
+
+        dField++;
+        OceanOutput("dField post-inc: " + dField); // 3.5
+
+        --dField;
+        OceanOutput("dField pre-dec: " + dField); // 2.5
+
+        if (bTrue == true && bFalse == false && x == 42 && dLocal == 10.5 && dField == 2.5) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

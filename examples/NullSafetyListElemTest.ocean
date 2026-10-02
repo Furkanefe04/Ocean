@@ -1,0 +1,21 @@
+class NullSafetyListElemTest {
+    main(){
+        OceanList<String?>? nullSafety = new OceanList<>();
+        nullSafety?.add("deneme");
+        nullSafety?.add(deneme());
+        variable? val = nullSafety?.get(1);
+        if (val instanceof String s && s != null){
+            if(s == "str") OceanOutput("STATUS: PASSED");
+            else OceanOutput("STATUS: FAILED");
+        }
+        else OceanOutput("STATUS: FAILED");
+    }
+
+    public static String? function deneme(){
+        return new String(deneme2());
+    }
+
+    public static String? function deneme2(){
+        return "str";
+    }
+}

@@ -1,0 +1,626 @@
+package com.nightmare2;
+
+import java.util.*;
+import java.math.BigDecimal;
+import java.lang.Thread;
+import java.lang.Runnable;
+import java.util.Comparator;
+
+public interface Transformer<T, R> {
+    public R function transform(T valuex);
+}
+
+public interface BinaryOperator<T> {
+    public T function apply(T a, T b);
+}
+
+public interface Predicate<T> {
+    public bool function test(T valuex);
+}
+
+public interface Weighted {
+    public int function weight();
+}
+
+public class Box<T> {
+    T valuex;
+
+    function Box(T valuex) {
+        this.valuex = valuex;
+    }
+
+    T function get() {
+        return valuex;
+    }
+
+    void function set(T valuex) {
+        this.valuex = valuex;
+    }
+}
+
+public class Pair<A, B> {
+    A first;
+    B second;
+
+    function Pair(A first, B second) {
+        this.first = first;
+        this.second = second;
+    }
+
+    A function getFirst() {
+        return first;
+    }
+
+    B function getSecond() {
+        return second;
+    }
+}
+
+public class WeightedBox<T> extends Box<T> implements Weighted {
+    int weightValue;
+
+    function WeightedBox(T valuex, int weight) {
+        super(valuex);
+        weightValue = weight;
+    }
+
+    @Override
+    public int function weight() {
+        return weightValue;
+    }
+}
+
+public class SyncAccumulator {
+    sync int valuex = 0;
+
+    sync void function add(int amount) {
+        valuex += amount;
+    }
+}
+
+public class StressMath {
+
+    static int function fib(int n) {
+        if (n <= 1) {
+            return n;
+        }
+
+        return fib(n - 1) + fib(n - 2);
+    }
+
+    static int function factorial(int n) {
+        if (n <= 1) {
+            return 1;
+        }
+
+        return n * factorial(n - 1);
+    }
+
+    static int function gcd(int a, int b) {
+        if (b == 0) {
+            return a;
+        }
+
+        return gcd(b, a % b);
+    }
+}
+
+public class OverloadMatrix {
+
+    String function call(byte x) {
+        return "BYTE";
+    }
+
+    String function call(short x) {
+        return "SHORT";
+    }
+
+    String function call(int x) {
+        return "INT";
+    }
+
+    String function call(long x) {
+        return "LONG";
+    }
+
+    String function call(float x) {
+        return "FLOAT";
+    }
+
+    String function call(double x) {
+        return "DOUBLE";
+    }
+}
+
+public class OceanUltimateIntegrationTest {
+
+    static String function transformNested(Box<Pair<String, Integer>> box,Transformer<String, String> transformer) {
+        return transformer.transform(box.get().getFirst() + ":" + box.get().getSecond());
+    }
+
+    static int function applyTwice(int valuex, BinaryOperator<Integer> op) {
+        return op(op(valuex, 2), 3);
+    }
+
+    static int function countMatching(OceanList<Integer> values, Predicate<Integer> predicate) {
+
+        int count = 0;
+
+        for (int i from 0 to values.size() with increasing 1) {
+            if (predicate.test(values.get(i))) {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    main() {
+
+        OceanOutput("================================================");
+        OceanOutput(" OCEAN ULTIMATE INTEGRATION STRESS TEST");
+        OceanOutput("================================================");
+
+        bool allPassed = true;
+
+        //---------------------------------------------
+        // 1. Arithmetic / precedence / bit operations
+        //---------------------------------------------
+
+        variable arithmetic = (((15 + 5) * 4) << 2) ^ ((255 & 127) | 31);
+        variable arithmetic2 = ((100 / 5) + (7 * 8)) - ((3 << 4) & 15);
+        if (arithmetic != 319 || arithmetic2 != 76) {
+            allPassed = false;
+            OceanOutput("FAIL: arithmetic");
+            OceanOutput($"arithmetic : {arithmetic} aritmetic2 : {arithmetic2}");
+        }
+
+        //---------------------------------------------
+        // 2. Primitive cast matrix
+        //---------------------------------------------
+
+        int seed = 123;
+
+        variable cast1 = (byte)(seed & 127);
+        variable cast2 = (short)cast1;
+        variable cast3 = (long)cast2;
+        variable cast4 = (double)cast3;
+        variable cast5 = (float)cast4;
+        variable cast6 = (int)cast5;
+
+        if (cast6 != 123) {
+            allPassed = false;
+            OceanOutput("FAIL: primitive cast chain");
+        }
+
+        //---------------------------------------------
+        // 3. Cast chain through variables
+        //---------------------------------------------
+
+        variable c1 = (seed & 127);
+        variable c2 = (byte)c1;
+        variable c3 = (short)c2;
+        variable c4 = (long)c3;
+        variable c5 = (double)c4;
+        variable c6 = (int)c5;
+
+        if (c6 != 123) {
+            allPassed = false;
+            OceanOutput("FAIL: variable cast chain");
+        }
+
+        //---------------------------------------------
+        // 4. Nested generics
+        //---------------------------------------------
+
+        variable pair = new Pair<String, Integer>("Ocean", 777);
+
+        variable box = new Box<Pair<String, Integer>>(pair);
+
+        Pair<String, Integer> extracted = box.get();
+
+        if (!extracted.getFirst().equals("Ocean") || extracted.getSecond() != 777) {
+
+            allPassed = false;
+            OceanOutput("FAIL: generic pair/box");
+        }
+
+        //---------------------------------------------
+        // 5. Generic inheritance + interface
+        //---------------------------------------------
+
+        variable weighted = new WeightedBox<String>("weighted", 99);
+
+        Box<String> asBox = weighted;
+        Weighted asWeighted = weighted;
+
+        if (!asBox.get().equals("weighted") || asWeighted.weight() != 99) {
+
+            allPassed = false;
+            OceanOutput("FAIL: generic inheritance/interface");
+        }
+
+        //---------------------------------------------
+        // 6. Nested generic transformation + SAM
+        //---------------------------------------------
+
+        Transformer<String, String> upper = new Transformer<String, String>() {
+            @Override
+            public String function transform(String valuex) {
+                return valuex.toUpperCase();
+            }
+        };
+
+        variable transformed = transformNested(box, upper);
+
+        if (!transformed.equals("OCEAN:777")) {
+            allPassed = false;
+            OceanOutput("FAIL: nested generic SAM");
+        }
+
+        //---------------------------------------------
+        // 7. Lambda capture
+        //---------------------------------------------
+
+        variable captureBase = 500;
+
+        Transformer<Integer, Integer> captured = (valuex) -> valuex + captureBase;
+
+        variable captureResult = captured.transform(123);
+        //variable captureResult = 623;
+        if (captureResult != 623) {
+            allPassed = false;
+            OceanOutput("FAIL: lambda capture");
+        }
+
+        //---------------------------------------------
+        // 8. SAM chained invocation
+        //---------------------------------------------
+
+        BinaryOperator<Integer> adder = (a, b) -> a + b;
+
+        variable twice = applyTwice(10, adder);
+        //variable twice = 15;
+        if (twice != 15) {
+            allPassed = false;
+            OceanOutput("FAIL: chained SAM");
+        }
+
+        //---------------------------------------------
+        // 9. Collection inference
+        //---------------------------------------------
+
+        variable matrix = [[10, 20, 30], [40, 50, 60], [70, 80, 90]];
+
+        variable matrixValue = matrix.get(2).get(1);
+
+        if (matrixValue != 80) {
+            allPassed = false;
+            OceanOutput("FAIL: nested collection inference");
+        }
+
+        //---------------------------------------------
+        // 10. Map + nested collection
+        //---------------------------------------------
+
+        variable records =
+        [{"id": 101, "scores": [10, 20, 30]},
+        {"id": 202, "scores": [40, 50, 60]},
+        {"id": 303, "scores": [70, 80, 90]}];
+
+        variable recordScore = ((OceanIntList)records.get(1).get("scores")).get(2);
+
+        if (recordScore != 60) {
+            allPassed = false;
+            OceanOutput("FAIL: map/list nesting");
+        }
+
+        //---------------------------------------------
+        // 11. Collection + Predicate SAM
+        //---------------------------------------------
+
+        variable numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+        Predicate<Integer> even = (valuex) -> valuex % 2 == 0;
+
+        variable evenCount = countMatching(numbers, even);
+        //variable evenCount = 5;
+        if (evenCount != 5) {
+            allPassed = false;
+            OceanOutput("FAIL: predicate collection");
+        }
+
+        //---------------------------------------------
+        // 12. Sorting + comparator + boxing
+        //---------------------------------------------
+
+        variable sortable = [91, 12, 55, 3, 77, 42, 18];
+
+        sortable.sort(new Comparator<Integer>() {
+            public int function compare(Integer a, Integer b) {
+                return a.compareTo(b);
+            }
+        });
+
+        int smallest = (int)sortable.get(0);
+        int largest = (int)sortable.get(6);
+
+        if (smallest != 3 || largest != 91) {
+            allPassed = false;
+            OceanOutput("FAIL: sorting/boxing");
+        }
+
+        //---------------------------------------------
+        // 13. BigDecimal promotion
+        //---------------------------------------------
+
+        variable bigA = 99999999999999999999999999999;
+
+        variable bigB = 88888888888888888888888888888;
+
+        variable decimal = bigA * bigB + new BigDecimal("123456789.123");
+
+        if (decimal.equals("8888888888888888888888888888711111111111111111111234567901.123")) {
+            allPassed = false;
+            OceanOutput("FAIL: BigDecimal promotion");
+            OceanOutput(decimal);
+        }
+
+        //---------------------------------------------
+        // 14. Nullable values + ?? chain
+        //---------------------------------------------
+
+        String? first = null;
+        String? second = null;
+        String? third = "third";
+
+        variable nullResult = first ?? second ?? third ?? "fallback";
+
+        if (!nullResult.equals("third")) {
+            allPassed = false;
+            OceanOutput("FAIL: nullable coalescing chain");
+        }
+
+        //---------------------------------------------
+        // 15. Nullable numeric promotion
+        //---------------------------------------------
+
+        Integer? nullableA = null;
+        Integer? nullableB = 50;
+
+        variable nullableResult = nullableA ?? nullableB ?? 100;
+
+        if (nullableResult != 50) {
+            allPassed = false;
+            OceanOutput("FAIL: nullable numeric promotion");
+        }
+
+        //---------------------------------------------
+        // 16. Switch expression nesting
+        //---------------------------------------------
+
+        variable switchValue = switch(seed % 3) {
+            case 0 -> switch(10) {
+                    case 10 -> "TEN"
+                    default -> "BAD"
+                }
+            case 1 -> "ONE"
+            default -> "OTHER"
+        };
+
+        if (!switchValue.equals("TEN")) {
+            allPassed = false;
+            OceanOutput("FAIL: nested switch");
+        }
+
+        //---------------------------------------------
+        // 17. Recursive functions
+        //---------------------------------------------
+
+        variable fib = StressMath.fib(15);
+
+        variable factorial = StressMath.factorial(10);
+
+        variable gcd = StressMath.gcd(252, 105);
+
+        if (fib != 610 || factorial != 3628800 || gcd != 21) {
+            allPassed = false;
+            OceanOutput("FAIL: recursion");
+        }
+
+        //---------------------------------------------
+        // 18. Overload resolution
+        //---------------------------------------------
+
+        OverloadMatrix overload = new OverloadMatrix();
+
+        byte ob = 1;
+        short os = 2;
+        int oi = 3;
+        long ol = 4L;
+        float of = 5.0f;
+        double od = 6.0d;
+
+        variable r1 = overload.call(ob);
+        variable r2 = overload.call(os);
+        variable r3 = overload.call(oi);
+        variable r4 = overload.call(ol);
+        variable r5 = overload.call(of);
+        variable r6 = overload.call(od);
+
+        if (!r1.equals("BYTE") || !r2.equals("SHORT") || !r3.equals("INT") || !r4.equals("LONG") || !r5.equals("FLOAT") || !r6.equals("DOUBLE")) {
+
+            allPassed = false;
+            OceanOutput("FAIL: overload resolution");
+        }
+
+        //---------------------------------------------
+        // 19. Nested try / rethrow propagation
+        //---------------------------------------------
+
+        bool exceptionOK = false;
+
+        trying {
+
+            trying {
+
+                trying {
+
+                    if (seed % 2 == 0) {
+                        throw new RuntimeException("even");
+                    }
+                    else {
+                        throw new IllegalArgumentException("odd");
+                    }
+                }
+                catch(RuntimeException e) {
+                    throw e;
+                }
+            }
+            catch(Exception e) {
+                throw e;
+            }
+        }
+        catch(Exception e) {
+
+            exceptionOK = true;
+
+            if (!e.getMessage().equals("odd")) {
+                allPassed = false;
+                OceanOutput("FAIL: exception message");
+            }
+        }
+
+        if (!exceptionOK) {
+            allPassed = false;
+            OceanOutput("FAIL: nested exception propagation");
+        }
+
+        //---------------------------------------------
+        // 20. Massive synchronized mutation
+        //---------------------------------------------
+
+        variable accumulator = new SyncAccumulator();
+
+        variable t1 = new Thread((Runnable)() -> {
+
+            for(int i from 0 to 2000 with increasing 1) {
+                accumulator.add(1);
+            }
+        });
+
+        variable t2 = new Thread((Runnable)() -> {
+
+            for(int i from 0 to 2000 with increasing 1) {
+                accumulator.add(1);
+            }
+        });
+
+        variable t3 = new Thread((Runnable)() -> {
+
+            for(int i from 0 to 2000 with increasing 1) {
+                accumulator.add(1);
+            }
+        });
+
+        variable t4 = new Thread((Runnable)() -> {
+
+            for(int i from 0 to 2000 with increasing 1) {
+                accumulator.add(1);
+            }
+        });
+
+        t1.start();
+        t2.start();
+        t3.start();
+        t4.start();
+
+        trying {
+            t1.join();
+            t2.join();
+            t3.join();
+            t4.join();
+        }
+        catch(Exception e) {
+            allPassed = false;
+            OceanOutput("FAIL: thread join");
+        }
+
+        if (accumulator.valuex != 8000) {
+            allPassed = false;
+            OceanOutput("FAIL: synchronized counter");
+        }
+
+        //---------------------------------------------
+        // 21. Deep lambda + generic + nullable
+        //---------------------------------------------
+
+        Box<String?> nullableBox = new Box<String?>(null);
+
+        Transformer<String?, String> resolver = (valuex) -> valuex ?? "resolved";
+        variable resolved = resolver.transform(nullableBox.get());
+        //variable resolved = "resolved";
+        if (!resolved.equals("resolved")) {
+            allPassed = false;
+            OceanOutput("FAIL: generic nullable lambda");
+        }
+
+        //---------------------------------------------
+        // 22. Multi-step arithmetic promotion
+        //---------------------------------------------
+
+        variable p1 = (byte)10;
+        variable p2 = (short)20;
+        variable p3 = (long)30;
+        variable p4 = (double)40;
+
+        variable promoted = p1 + p2 + p3 + p4;
+
+        if (promoted != 100.0) {
+            allPassed = false;
+            OceanOutput("FAIL: arithmetic promotion");
+        }
+
+        //---------------------------------------------
+        // 23. Deep generic chain
+        //---------------------------------------------
+
+        variable deep = new Box< Box< Pair<String, Integer> > >(new Box< Pair<String, Integer> >(new Pair<String, Integer>("DEEP", 999)));
+
+        variable deepValue = deep.get().get().getFirst();
+
+        variable deepNumber = deep.get().get().getSecond();
+
+        if (!deepValue.equals("DEEP") || deepNumber != 999) {
+
+            allPassed = false;
+            OceanOutput("FAIL: deep generic chain");
+        }
+
+        //---------------------------------------------
+        // 24. Final cross-feature calculation
+        //---------------------------------------------
+
+        variable finalCalculation = ((int)(double)(long)(factorial + fib + gcd + accumulator.valuex));
+
+        if (finalCalculation != 8000 + 3628800 + 610 + 21) {
+            allPassed = false;
+            OceanOutput("FAIL: final cross-feature cast");
+        }
+
+        //---------------------------------------------
+        // FINAL RESULT
+        //---------------------------------------------
+
+        OceanOutput("----------------------------------------------");
+
+        if (allPassed) {
+            OceanOutput("STATUS: PASSED");
+        }
+        else {
+            OceanOutput("STATUS: FAILED");
+        }
+
+        OceanOutput("----------------------------------------------");
+    }
+}

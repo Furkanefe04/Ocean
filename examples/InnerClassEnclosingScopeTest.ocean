@@ -1,0 +1,59 @@
+package com.resources;
+
+public class InnerClassEnclosingScopeTest {
+    public static int sOuterVal = 500;
+    public static String sOuterMessage = "Hello from Outer";
+
+    public static int function getStaticMultiplier(int factor) {
+        return sOuterVal * factor;
+    }
+
+    public static String function getMessage() {
+        return sOuterMessage + "!";
+    }
+
+    public static class Level1Nested {
+        public static int sLevel1Val = 50;
+
+        public int function testAccessLevel1() {
+            sOuterVal += 100; // mutate outer static field
+            int calc = getStaticMultiplier(2);
+            return sOuterVal + calc + sLevel1Val; // 600 + 1200 + 50 = 1850
+        }
+
+        public static class Level2Nested {
+            public int function testDeepAccess() {
+                // Access Level1 static, Outer static, and Outer static method
+                return sOuterVal + sLevel1Val + getStaticMultiplier(1); // 600 + 50 + 600 = 1250
+            }
+
+            public String function testStringAccess() {
+                return getMessage();
+            }
+        }
+    }
+
+    public static void function main(String[] args) {
+        Level1Nested l1 = new Level1Nested();
+        int r1 = l1.testAccessLevel1();
+        if (r1 != 1850) {
+            OceanOutput("FAILED: Level1Nested access, expected 1850 but got " + r1);
+            return;
+        }
+
+        Level1Nested.Level2Nested l2 = new Level1Nested.Level2Nested();
+        int r2 = l2.testDeepAccess();
+        if (r2 != 1250) {
+            OceanOutput("FAILED: Level2Nested deep access, expected 1250 but got " + r2);
+            return;
+        }
+
+        String msg = l2.testStringAccess();
+        if (!msg.equals("Hello from Outer!")) {
+            OceanOutput("FAILED: Level2Nested message access, got " + msg);
+            return;
+        }
+
+        OceanOutput("STATUS: PASSED");
+    }
+}

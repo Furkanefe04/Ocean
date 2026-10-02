@@ -1,0 +1,60 @@
+package test;
+
+public class Coordinates {
+    public int x = 10, y = 20, z = 30;
+    public String label = "Origin", meta = "3D";
+    private final double scaleX = 1.0, scaleY = 2.0;
+
+    public double function getScaledSum() {
+        return (this.x * this.scaleX) + (this.y * this.scaleY) + this.z;
+    }
+}
+
+public class MultiVariableStressTest {
+    public static main(String[] args) {
+        // 1. Primitive multi-variable declarations with expressions
+        int a = 1, b = 2, c = 3;
+        verify a + b + c == 6;
+
+        // 2. Sequential dependency in same declaration line
+        int first = 10, second = first * 2, third = second + first;
+        verify first == 10;
+        verify second == 20;
+        verify third == 30;
+
+        // 3. Mixed uninitialized and initialized variables
+        int p, q = 100, r;
+        p = 50;
+        r = p + q;
+        verify r == 150;
+
+        // 4. Value (inferred immutable) multi-declarations
+        value alpha = "Hello", beta = "World", sep = " ";
+        verify (alpha + sep + beta).equals("Hello World");
+
+        // 5. Variable (inferred mutable) multi-declarations
+        variable count = 0, sum = 0, step = 5;
+        while (count<9) {
+            count += 1;
+            sum += step;
+        }
+        verify count == 9;
+        verify sum == 45;
+
+        // 6. Final typed multi-declarations
+        final double pi = 3.14159, e = 2.71828;
+        verify pi > 3.0;
+        verify e > 2.0;
+
+        // 7. Multi-field class instance verification
+        Coordinates coords = new Coordinates();
+        verify coords.x == 10;
+        verify coords.y == 20;
+        verify coords.z == 30;
+        verify coords.label.equals("Origin");
+        verify coords.meta.equals("3D");
+        verify coords.getScaledSum() == 80.0;
+
+        System.out.println("MultiVariableStressTest passed successfully!");
+    }
+}

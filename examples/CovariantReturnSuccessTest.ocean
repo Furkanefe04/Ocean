@@ -1,0 +1,27 @@
+package com.resources;
+
+class Base {
+    Object function getValue() {
+        return "Base value";
+    }
+}
+
+class Derived extends Base {
+    // Covariant return type: String is a subtype of Object
+    String function getValue() {
+        return "Derived value";
+    }
+}
+
+class CovariantReturnSuccessTest {
+    static main() {
+        Derived d = new Derived();
+        String val = d.getValue();
+        OceanOutput(val);
+        if (val == "Derived value") {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

@@ -1,0 +1,137 @@
+package com.enterprise.booking;
+
+import com.enterprise.core.CoreEntity;
+import com.enterprise.core.GenericListWrapper;
+import com.enterprise.core.Result;
+import com.enterprise.auth.UserSession;
+import com.enterprise.auth.AuthManager;
+import com.enterprise.inventory.Flight;
+import com.enterprise.inventory.Seat;
+
+public class Passenger {
+    public String firstName;
+    public String lastName;
+    public String passportNumber;
+
+    public static Passenger function create(String f, String l, String p) {
+        Passenger pass = new Passenger();
+        pass.firstName = f;
+        pass.lastName = l;
+        pass.passportNumber = p;
+        return pass;
+    }
+}
+
+public class Ticket extends CoreEntity {
+    public String flightNumber;
+    public String seatNo;
+    public Passenger passenger;
+    public double price;
+
+    public static Ticket function create(String id, String fNum, String sNo, Passenger p, double pr) {
+        Ticket t = new Ticket();
+        t.id = id;
+        t.flightNumber = fNum;
+        t.seatNo = sNo;
+        t.passenger = p;
+        t.price = pr;
+        return t;
+    }
+}
+
+public class BookingOrder extends CoreEntity {
+    public Ticket ticket;
+    public double totalAmount;
+    public bool isPaid;
+    public UserSession session;
+
+    public static BookingOrder function create(String id, Ticket t, double amt, UserSession s) {
+        BookingOrder o = new BookingOrder();
+        o.id = id;
+        o.ticket = t;
+        o.totalAmount = amt;
+        o.isPaid = false;
+        o.session = s;
+        return o;
+    }
+}
+
+public class PaymentGateway {
+    public static bool function chargeCard(String cardNum, double amount) {
+        if (cardNum == null || cardNum.isEmpty()) return false;
+        return amount > 0.0;
+    }
+}
+
+public class LedgerManager {
+    public GenericListWrapper<BookingOrder> ledger;
+
+    public static LedgerManager function create() {
+        LedgerManager lm = new LedgerManager();
+        lm.ledger = GenericListWrapper.create();
+        return lm;
+    }
+
+    public void function recordOrder(BookingOrder order) {
+        ledger.add(order);
+    }
+
+    public int function getCount() {
+        return ledger.size();
+    }
+
+    public BookingOrder function getOrder(int idx) {
+        return ledger.get(idx);
+    }
+}
+
+public class BookingProcessor {
+    public LedgerManager ledger;
+
+    public static BookingProcessor function create(LedgerManager lm) {
+        BookingProcessor bp = new BookingProcessor();
+        bp.ledger = lm;
+        return bp;
+    }
+
+    public Result<BookingOrder> function processBooking(UserSession session, Flight flight, Passenger passenger, String seatNo, String cardNum, double price) {
+        Result<BookingOrder>? res = null;
+        trying {
+            AuthManager.verifyBookingAccess(session);
+
+            Seat? targetSeat = null;
+            Seat[] seats = flight.seats;
+            for (int i from 0 to seats.length with increasing 1) {
+                if (seats[i].seatNo.equals(seatNo)) {
+                    targetSeat = seats[i];
+                }
+            }
+
+            if (targetSeat == null) {
+                res = (Result) Result.fail("Seat " + seatNo + " not found on this flight!");
+            } else {
+                if (targetSeat.isReserved) {
+                    res = (Result) Result.fail("Seat " + seatNo + " is already reserved!");
+                } else {
+                    targetSeat.isReserved = true;
+
+                    bool paid = PaymentGateway.chargeCard(cardNum, price);
+                    if (!paid) {
+                        targetSeat.isReserved = false;
+                        res = (Result) Result.fail("Payment authorization failed!");
+                    } else {
+                        Ticket t = Ticket.create("TKT-" + flight.flightNumber + "-" + seatNo, flight.flightNumber, seatNo, passenger, price);
+                        BookingOrder order = BookingOrder.create("ORD-" + t.id, t, price, session);
+                        order.isPaid = true;
+
+                        ledger.recordOrder(order);
+                        res = (Result) Result.ok(order, "Booking successful!");
+                    }
+                }
+            }
+        } catch (java.lang.Exception e) {
+            res = (Result) Result.fail("Security violation: " + e.getMessage());
+        }
+        return res;
+    }
+}

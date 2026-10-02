@@ -1,0 +1,52 @@
+package com.resources;
+
+public class ParentAccess {
+    public int pubField = 100;
+    protected int protField = 200;
+    private int privField = 300;
+
+    public function ParentAccess() {
+        super();
+    }
+
+    public int function getPub() {
+        return pubField;
+    }
+
+    protected int function getProt() {
+        return protField;
+    }
+
+    private int function getPriv() {
+        return privField;
+    }
+
+    public int function testInternalPrivate() {
+        return getPriv() + privField;
+    }
+}
+
+public class ChildAccess extends ParentAccess {
+    public function ChildAccess() {
+        super();
+    }
+
+    public int function testInheritedAccess() {
+        return pubField + protField + getProt();
+    }
+}
+
+public class AccessControlStressTest {
+    static main() {
+        ChildAccess child = new ChildAccess();
+        int val1 = child.getPub();
+        int val2 = child.testInheritedAccess();
+        int val3 = child.testInternalPrivate();
+        
+        if (val1 == 100 && val2 == 500 && val3 == 600) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

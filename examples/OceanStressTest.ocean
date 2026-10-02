@@ -1,0 +1,46 @@
+package com.resources;
+
+class StressNode {
+    variable val = 0;
+    StressNode? nxt = null;
+}
+
+class OceanStressTest {
+    main() {
+        OceanOutput("=============================================");
+        OceanOutput("   OCEAN COMPILER BOUNDARY STRESS TEST       ");
+        OceanOutput("=============================================");
+
+        // 1. RECURSIVE DATA STRUCTURE
+        variable h = new StressNode();
+        h.val = 10;
+        variable s = new StressNode();
+        s.val = 20;
+        h.nxt = s;
+
+        StressNode? c = h;
+        while (c != null) {
+            OceanOutput("Node Value: " + c.val);
+            c = c.nxt;
+        }
+        OceanOutput("Recursive traversal OK.");
+
+        variable pass = false;
+        StressNode? c2 = h;
+        if (c2 != null && c2.val == 10) {
+            c2 = c2.nxt;
+            if (c2 != null && c2.val == 20) {
+                c2 = c2.nxt;
+                if (c2 == null) {
+                    pass = true;
+                }
+            }
+        }
+
+        if (pass) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

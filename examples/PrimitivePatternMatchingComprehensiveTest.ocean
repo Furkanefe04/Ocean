@@ -1,0 +1,127 @@
+data class DataReading(int sensorId, double value);
+
+class PrimitivePatternMatchingComprehensiveTest {
+
+    static String function describeNumber(Object? val) {
+        return switch (val) {
+            case char c -> "CHAR: " + c
+            case byte b -> "BYTE: " + b
+            case short s -> "SHORT: " + s
+            case int i when i > 10000 -> "LARGE_INT: " + i
+            case int i -> "INT: " + i
+            case long l -> "LONG: " + l
+            case float f -> "FLOAT: " + f
+            case double d -> "DOUBLE: " + d
+            case bool b -> "BOOL: " + b
+            default -> "OTHER"
+        };
+    }
+
+    static void function classifyWithStatement(Object? val) {
+        switch (val) {
+            case byte b:
+                OceanOutput("STMT_BYTE: " + b);
+                stop;
+            case int i when i == 42:
+                OceanOutput("STMT_ANSWER_OF_UNIVERSE: " + i);
+                stop;
+            case int i:
+                OceanOutput("STMT_INT: " + i);
+                stop;
+            case double d:
+                OceanOutput("STMT_DOUBLE: " + d);
+                stop;
+            case bool b:
+                OceanOutput("STMT_BOOL: " + b);
+                stop;
+            default:
+                OceanOutput("STMT_OTHER");
+                stop;
+        }
+    }
+
+    static String function checkReading(DataReading reading) {
+        return switch (reading) {
+            case DataReading(byte id, double val) when val > 100.0 -> "HIGH_VAL_BYTE_SENSOR[" + id + "]=" + val
+            case DataReading(byte id, double val) -> "BYTE_SENSOR[" + id + "]=" + val
+            case DataReading(int id, double val) -> "INT_SENSOR[" + id + "]=" + val
+            default -> "UNKNOWN_SENSOR"
+        };
+    }
+
+    static main() {
+        OceanOutput("=== PRIMITIVE PATTERN MATCHING COMPREHENSIVE TEST ===");
+
+        // 1. Switch Expression Primitive Matching
+        OceanOutput(describeNumber(12));
+        OceanOutput(describeNumber(300));
+        OceanOutput(describeNumber(50000));
+        OceanOutput(describeNumber(100000000000L));
+        OceanOutput(describeNumber(3.14159));
+        OceanOutput(describeNumber(true));
+        OceanOutput(describeNumber('Z'));
+        OceanOutput(describeNumber("Hello World"));
+
+        // 2. Switch Statement Primitive Matching
+        classifyWithStatement(10);
+        classifyWithStatement(42);
+        classifyWithStatement(9999);
+        classifyWithStatement(2.718);
+        classifyWithStatement(false);
+        classifyWithStatement(null);
+
+        // 3. Instanceof Primitive Pattern & Narrowing/Widening
+        Object o1 = 42;
+        Object o2 = 500;
+        Object o3 = 3.14;
+        Object o4 = "ocean";
+        Object? o5 = null;
+
+        if (o1 instanceof byte b1) {
+            OceanOutput("o1 fits byte: " + b1);
+        }
+        if (o2 instanceof byte b2) {
+            OceanOutput("o2 fits byte (BUG)");
+        } else {
+            OceanOutput("o2 exceeds byte bounds");
+        }
+        if (o3 instanceof int i3) {
+            OceanOutput("o3 is int (BUG)");
+        } else {
+            OceanOutput("o3 is fractional double");
+        }
+        if (o4 instanceof int) {
+            OceanOutput("o4 is int (BUG)");
+        } else {
+            OceanOutput("o4 is string, not int");
+        }
+        if (o5 instanceof int) {
+            OceanOutput("o5 is int (BUG)");
+        } else {
+            OceanOutput("o5 is null, not int");
+        }
+
+        // 4. Record Pattern Deconstruction with Primitive Patterns
+        DataReading r1 = new DataReading(5, 150.0);
+        DataReading r2 = new DataReading(5, 25.0);
+        DataReading r3 = new DataReading(99999, 10.0);
+
+        OceanOutput(checkReading(r1));
+        OceanOutput(checkReading(r2));
+        OceanOutput(checkReading(r3));
+
+        // 5. Unnamed Primitive Patterns
+        Object testObj = 12345;
+        variable unnamedRes = switch (testObj) {
+            case int _ -> "MATCHED_UNNAMED_INT"
+            default -> "UNNAMED_OTHER"
+        };
+        OceanOutput(unnamedRes);
+
+        if (unnamedRes.equals("MATCHED_UNNAMED_INT")) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

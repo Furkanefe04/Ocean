@@ -1,0 +1,53 @@
+package com.resources;
+
+interface Printable {
+    void function printHeader() {
+        OceanOutput("--- DEFAULT HEADER ---");
+    }
+
+    String function formatValue(int val) {
+        return "VAL: " + val;
+    }
+
+    void function printFooter();
+}
+
+class ConsolePrinter implements Printable {
+    public void function printFooter() {
+        OceanOutput("--- FOOTER ---");
+    }
+}
+
+class CustomPrinter implements Printable {
+    public void function printHeader() {
+        OceanOutput("=== CUSTOM HEADER ===");
+    }
+
+    public void function printFooter() {
+        OceanOutput("=== CUSTOM FOOTER ===");
+    }
+}
+
+class InterfaceDefaultMethodTest {
+    main() {
+        OceanOutput("=== INTERFACE DEFAULT METHOD TEST ===");
+        
+        Printable p1 = new ConsolePrinter();
+        p1.printHeader();
+        variable f1 = p1.formatValue(42);
+        OceanOutput("ConsolePrinter Formatted: " + f1);
+        p1.printFooter();
+
+        Printable p2 = new CustomPrinter();
+        p2.printHeader();
+        variable f2 = p2.formatValue(99);
+        OceanOutput("CustomPrinter Formatted: " + f2);
+        p2.printFooter();
+
+        if ("VAL: 42".equals(f1) && "VAL: 99".equals(f2)) {
+            OceanOutput("STATUS: PASSED - Interface Default Methods Validated");
+        } else {
+            OceanOutput("STATUS: FAILED - Interface Default Methods Validation Mismatch");
+        }
+    }
+}

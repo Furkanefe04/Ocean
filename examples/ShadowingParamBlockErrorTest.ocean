@@ -1,0 +1,12 @@
+package com.resources;
+
+class ShadowingParamBlockErrorTest {
+    void function process(String name) {
+        if (true) {
+            String name = "shadowed"; // MUST FAIL: Değişken 'name' bu metot kapsamında zaten tanımlı.
+            OceanOutput(name);
+        }
+    }
+
+    main() {}
+}

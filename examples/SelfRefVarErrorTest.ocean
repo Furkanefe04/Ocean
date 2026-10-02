@@ -1,0 +1,8 @@
+package com.resources;
+
+class SelfRefVarErrorTest {
+    main() {
+        int x = x + 1;
+        OceanOutput(x);
+    }
+}

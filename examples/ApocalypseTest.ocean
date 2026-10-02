@@ -1,0 +1,282 @@
+package com.apocalypse;
+
+import java.math.BigDecimal;
+
+interface Worker {
+    int function run(int x);
+}
+
+class Parent {
+
+    int base = 10;
+
+    function Parent(){}
+
+    int function calc(int x){
+        return x + base;
+    }
+}
+
+class Child extends Parent {
+
+    int base = 20;
+
+    @Override
+    int function calc(int x){
+        return super.calc(x) * 2;
+    }
+}
+
+class Counter {
+
+    sync int valuex = 0;
+
+    sync void function inc(){
+        valuex++;
+    }
+}
+
+class MathEngine {
+
+    static long function power(long a,int b){
+        if(b == 0) return 1;
+        return a * power(a,b-1);
+    }
+}
+
+class Overload {
+
+    void function test(int x){
+        OceanOutput("int");
+    }
+
+    void function test(long x){
+        OceanOutput("long");
+    }
+
+    void function test(byte x){
+        OceanOutput("byte");
+    }
+
+    void function test(float x){
+        OceanOutput("float");
+    }
+
+    void function test(short x){
+        OceanOutput("short");
+    }
+
+    void function test(double x){
+        OceanOutput("double");
+    }
+}
+
+class ApocalypseTest {
+
+    static int global = 100;
+
+    main(){
+
+        OceanOutput("===== APOCALYPSE TEST =====");
+
+        //----------------------------------
+        // 1 Scope shadow hell
+        //----------------------------------
+
+        /*int x = 10;
+
+        if(true){
+
+            int x = 20;
+
+            if(true){
+                int x = 30;
+                OceanOutput(x);
+            }
+
+            OceanOutput(x);
+        }
+
+        OceanOutput(x);*/
+
+        //----------------------------------
+        // 2 Operator precedence nightmare
+        //----------------------------------
+
+        variable op = ((5+3*2)<<2)^15&7|100-(8/2);
+
+        OceanOutput(op);
+
+        //----------------------------------
+        // 3 Numeric promotion chaos
+        //----------------------------------
+
+        variable num = 5 + 5L + 5.5f + 10.2 + new BigDecimal("99");
+
+        OceanOutput(num);
+
+        //----------------------------------
+        // 4 Recursion pressure
+        //----------------------------------
+
+        variable pow = MathEngine.power(2,15);
+
+        OceanOutput(pow);
+
+        //----------------------------------
+        // 5 Inheritance + override
+        //----------------------------------
+
+        Child c = new Child();
+
+        OceanOutput(c.calc(5));
+
+        //----------------------------------
+        // 6 Massive overload test
+        //----------------------------------
+
+        Overload ov = new Overload();
+
+        byte b = 5;
+        short s = 5;
+        int i = 5;
+        long l = 5L;
+        float f = 5.0f;
+        double d = 5.0d;
+
+        ov.test(b);
+        ov.test(s);
+        ov.test(i);
+        ov.test(l);
+        ov.test(f);
+        ov.test(d);
+
+        //----------------------------------
+        // 7 Lambda capture mutation
+        //----------------------------------
+
+        int local = 50;
+
+        variable r = (Runnable) () -> {
+
+            OceanOutput(local);
+
+            int temp = local * 2;
+
+            OceanOutput(temp);
+        };
+
+        r();
+
+        //----------------------------------
+        // 8 Exception rethrow chain
+        //----------------------------------
+
+        trying{
+
+            trying{
+
+                throw new RuntimeException("boom");
+
+            } catch(Exception e){
+
+                throw e;
+            }
+
+        } catch(Exception e){
+
+            OceanOutput("caught");
+        }
+
+        //----------------------------------
+        // 9 Thread synchronization
+        //----------------------------------
+
+        Counter counter = new Counter();
+
+        variable t1 = new Thread((Runnable) () -> {
+
+            for(int j from 0 to 2000 with increasing 1){
+                counter.inc();
+            }
+        });
+
+        variable t2 = new Thread((Runnable) () -> {
+
+            for(int j from 0 to 2000 with increasing 1){
+                counter.inc();
+            }
+        });
+
+        variable t3 = new Thread((Runnable) () -> {
+
+            for(int j from 0 to 2000 with increasing 1){
+                counter.inc();
+            }
+        });
+
+        t1.start();
+        t2.start();
+        t3.start();
+
+        trying{
+            t1.join();
+            t2.join();
+            t3.join();
+        }
+        catch(Exception e){
+            OceanOutput(e.getMessage());
+        }
+
+        OceanOutput(counter.valuex);
+
+        //----------------------------------
+        // 10 Switch madness
+        //----------------------------------
+
+        variable sw = switch(3){
+
+            case 1 -> "one"
+
+            case 2 -> "two"
+
+            case 3 -> switch(2){
+
+                case 2 -> "nested"
+
+                default -> "fail"
+            }
+
+            default -> "fail"
+        };
+
+        OceanOutput(sw);
+
+        //----------------------------------
+        // 11 Collection inference hell
+        //----------------------------------
+
+        variable complex = [{"nums":[1,2,3,4], "flags":#{1,2,3,4,4,4,2}}];
+
+        OceanOutput(complex);
+
+        //----------------------------------
+        // 12 Cast pressure
+        //----------------------------------
+
+        variable casted = (int)((double)((long)((short)((byte)127))));
+
+        OceanOutput(casted);
+
+        //----------------------------------
+        // FINAL
+        //----------------------------------
+
+        if(pow == 32768 && counter.valuex == 6000 && sw.equals("nested") && casted == 127){
+            OceanOutput("STATUS PASSED");
+        }
+        else{
+            OceanOutput("STATUS FAILED");
+        }
+    }
+}

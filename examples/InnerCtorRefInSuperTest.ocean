@@ -1,0 +1,20 @@
+package com.resources;
+
+import java.util.function.Function;
+
+class InnerCtorRefInSuperTest {
+    static class Super {
+        Super(Function creator) {}
+    }
+
+    class Inner extends Super {
+        Inner(Object? something) {
+            super(Inner::new);
+        }
+    }
+
+    main() {
+        new Inner(null);
+        OceanOutput("STATUS: PASSED");
+    }
+}

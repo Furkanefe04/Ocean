@@ -1,0 +1,20 @@
+package com.resources;
+    class Product {
+    variable buyPrice = 0;
+    variable sellPrice = 0;
+}
+
+class BarcodeMinimal {
+    main() {
+        Product p = new Product();
+        p.buyPrice = 10;
+        p.sellPrice = 15;
+        variable profit = p.sellPrice - p.buyPrice;
+        OceanOutput("Kar: " + profit);
+        if (profit == 5) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

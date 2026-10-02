@@ -1,0 +1,291 @@
+package com.nightmare;
+
+import java.util.*;
+import java.math.BigDecimal;
+import java.lang.Thread;
+import java.lang.Runnable;
+
+class GenericBox<T> {
+    T val;
+
+    function GenericBox(T val){
+        this.val = val;
+    }
+
+    T function get(){
+        return val;
+    }
+}
+
+class Pair < A, B > {
+    A first;
+    B second;
+
+    function Pair(A first, B second){
+        this.first = first;
+        this.second = second;
+    }
+
+    A function getFirst(){
+        return first;
+    }
+
+    B function getSecond(){
+        return second;
+    }
+}
+
+class AtomicCounter {
+    sync int val = 0;
+
+    sync void function increment(int amount){
+        val += amount;
+    }
+}
+
+class NightmareInteractiveTest {
+    main(){
+        OceanOutput("==========================================");
+        OceanOutput(" OCEAN INTERACTIVE NIGHTMARE TEST");
+        OceanOutput("==========================================");
+
+        //-----------------------------------
+        // 1. INPUT
+        //-----------------------------------
+
+        OceanOutput("Enter seed:");
+
+        int rawSeed = OceanInput().nextInt();
+        int seed = rawSeed < 1 ? 1 : rawSeed;
+
+        OceanOutput("Enter worker count:");
+
+        int rawWorkers = OceanInput().nextInt();
+        int w1 = rawWorkers < 1 ? 1 : rawWorkers;
+        int workers = w1 > 8 ? 8 : w1;
+
+        OceanOutput("Enter iterations:");
+
+        int rawIterations = OceanInput().nextInt();
+        int iterations = rawIterations < 1 ? 1 : rawIterations;
+
+        //-----------------------------------
+        // 3. DEEP ARITHMETIC
+        //-----------------------------------
+
+        variable arithmetic = (((((seed + 3) * 5) << 3) & 255) ^ (seed * 7) | 77) - ((seed * 6) / 2);
+
+        OceanOutput("Arithmetic:", arithmetic);
+
+        //-----------------------------------
+        // 4. GENERIC CHAIN
+        //-----------------------------------
+
+        variable generic = new GenericBox <GenericBox<GenericBox <Pair<Integer,String>>>>(new GenericBox<GenericBox<Pair<Integer,String>>>(new GenericBox < Pair < Integer, String>>(new Pair < Integer, String >(seed,"ocean"))));
+        GenericBox< GenericBox<Pair<Integer,String>>> g1 = generic.get();
+        GenericBox<Pair<Integer,String>> g2 = g1.get();
+        Pair<Integer, String> pair = g2.get();
+
+        OceanOutput("Generic:", pair.getFirst(), pair.getSecond());
+
+        //-----------------------------------
+        // 5. NESTED COLLECTION INFERENCE
+        //-----------------------------------
+
+        variable matrix = [{
+        "a": [[seed, seed + 1, seed + 2], [seed + 3, seed + 4, seed + 5], [seed + 6, seed + 7, seed + 8]],
+        "b": [[workers, workers + 1, workers + 2], [iterations, iterations + 1, iterations + 2], [arithmetic, arithmetic + 1, arithmetic + 2]],
+        "c": #{seed, workers, iterations, arithmetic, seed, workers}
+        }];
+
+        variable collectionValue = ((OceanList<OceanList>)matrix.getFirst().get("b")).getFirst().get(2);
+
+        OceanOutput("Collection:", collectionValue);
+
+
+        //-----------------------------------
+        // 6. RECURSION DEPENDS ON INPUT
+        //-----------------------------------
+
+        variable fibInput = seed % 15;
+
+        variable fibonacci = fib(fibInput);
+
+        OceanOutput("Fib:", fibonacci);
+
+        //-----------------------------------
+        // 7. BIG DECIMAL
+        //-----------------------------------
+
+        variable big = new BigDecimal(seed) * new BigDecimal("99999999999999999999999999999") + new BigDecimal("123456789.123");
+
+        OceanOutput("BigDecimal:", big);
+
+        //-----------------------------------
+        // 8. LAMBDA CAPTURE
+        //-----------------------------------
+
+        variable captured = seed * 10;
+
+        variable runnable = (Runnable) () -> {
+            variable local = captured + arithmetic;
+
+            OceanOutput("Lambda:", local);
+        };
+
+        runnable();
+
+        //-----------------------------------
+        // 9. MASSIVE CONCURRENCY
+        //-----------------------------------
+
+        variable counter = new AtomicCounter();
+
+        variable threads = [];
+
+        for(int w from 0 to workers with increasing 1){
+            variable thread =
+            new Thread(() -> {
+                for(int i from 0 to iterations with increasing 1){
+                    counter.increment(seed % 5 + 1);
+                }
+            });
+
+            threads.add(thread);
+
+            thread.start();
+        }
+
+        //-----------------------------------
+        // 10. JOIN ALL THREADS
+        //-----------------------------------
+
+        trying{
+            for(int i from 0 to threads.size() with increasing 1){
+                ((Thread)threads.get(i)).join();
+            }
+        }
+
+        catch(Exception e){
+            OceanOutput("THREAD ERROR:", e.getMessage());
+        }
+
+        //-----------------------------------
+        // 11. EXPECTED CONCURRENCY RESULT
+        //-----------------------------------
+
+        variable increment = seed % 5 + 1;
+
+        variable expected = workers * iterations * increment;
+
+        OceanOutput("Counter:", counter.val);
+
+        OceanOutput("Expected:", expected);
+
+        //-----------------------------------
+        // 12. NULL COALESCING
+        //-----------------------------------
+
+        String? first = null;
+        String? second = null;
+
+        if(seed % 2 == 0){
+            first = "even";
+        }
+
+        if(seed % 3 == 0){
+            second = "divisible";
+        }
+
+        variable nullResult = first ?? second ?? "fallback";
+
+        OceanOutput("Null:", nullResult);
+
+        //-----------------------------------
+        // 13. CAST CHAIN
+        //-----------------------------------
+
+        variable c1 = (long)(seed & 127);
+        variable c2 = (byte)c1;
+        variable c3 = (short)c2;
+        variable c4 = (long)c3;
+        variable c5 = (double)c4;
+        variable c6 = (int)c5;
+        variable cast = c6;
+
+        //-----------------------------------
+        // 14. SWITCH EXPRESSION
+        //-----------------------------------
+
+        variable switchResult = switch(seed % 4) {
+            case 0 -> switch(workers % 3) {
+                case 0 -> "A"
+                case 1 -> "B"
+                default -> "C"
+            }
+            case 1 -> "D"
+            case 2 -> "E"
+            default -> "F"
+        };
+
+        OceanOutput("Switch:", switchResult);
+
+        //-----------------------------------
+        // 15. EXCEPTION PROPAGATION
+        //-----------------------------------
+
+        variable exceptionOK = false;
+
+        trying {
+            trying {
+                trying {
+                    if(seed % 2 == 0) {
+                        throw new RuntimeException("even-seed");
+                    }
+                    else {
+                        throw new IllegalArgumentException("odd-seed");
+                    }
+                } catch(RuntimeException e) {
+                    throw e;
+                }
+            } catch(Exception e) {
+                throw e;
+            }
+        } catch(Exception e) {
+            exceptionOK = true;
+            OceanOutput("Exception:", e.getMessage());
+        }
+
+        //-----------------------------------
+        // 16. FINAL VALIDATION
+        //-----------------------------------
+
+        variable genericOK = pair.getFirst() == seed && pair.getSecond().equals("ocean");
+        variable collectionOK = collectionValue == (workers + 2);
+        variable counterOK = counter.val == expected;
+        variable castOK = cast == (seed & 127);
+        variable exceptionCheck = exceptionOK;
+        variable arithmeticOK = arithmetic == (((((seed + 3) * 5) << 3) & 255) ^ (seed * 7) | 77) - ((seed * 6) / 2);
+
+        //-----------------------------------
+        // FINAL
+        //-----------------------------------
+
+        if(genericOK && collectionOK && counterOK && castOK && exceptionCheck && arithmeticOK) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+            OceanOutput("genericOK =", genericOK);
+            OceanOutput("collectionOK =", collectionOK);
+            OceanOutput("counterOK =", counterOK);
+            OceanOutput("castOK =", castOK);
+            OceanOutput("exceptionOK =", exceptionCheck);
+            OceanOutput("arithmeticOK =", arithmeticOK);
+        }
+    }
+
+    static int function fib(int n){
+        if(n <= 1) return n;
+        return fib(n - 1) + fib(n - 2);
+    }
+}

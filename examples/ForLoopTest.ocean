@@ -1,0 +1,42 @@
+package com.resources;
+
+class ForLoopTest {
+    static main() {
+        int iterations = 1000000000;
+        int warmUp = 5;
+        int trials = 5;
+        
+        OceanOutput("--- Ocean Loop (1B iterations) Benchmark ---");
+
+
+        long totalTimeNs = 0;
+        bool passed = true;
+        for (int i from 0 to trials with increasing 1) {
+            long start = System.nanoTime();
+            long resultx = runLoop(iterations);
+            long end = System.nanoTime();
+            bool a = true;
+            long durationNs = end - start;
+            totalTimeNs = totalTimeNs + durationNs;
+            OceanOutput("Trial " + (i+1) + ": " + (durationNs / 1000000) + " ms (sum=" + resultx + ")");
+            if (resultx != 499999999500000000) {
+                passed = false;
+            }
+        }
+        
+        OceanOutput("Average Time: " + (totalTimeNs / trials / 1000000) + " ms");
+        if (passed) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+
+    private static long function runLoop(int iterations) {
+        long sum = 0;
+        for (int i from 1 to iterations with increasing 1) {
+            sum = sum + i;
+        }
+        return sum;
+    }
+}

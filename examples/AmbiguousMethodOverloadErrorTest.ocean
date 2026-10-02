@@ -1,0 +1,19 @@
+package test;
+
+public class AmbiguousTester {
+    public static String function resolve(String s, Object o) {
+        return "1";
+    }
+
+    public static String function resolve(Object o, String s) {
+        return "2";
+    }
+}
+
+public class AmbiguousMethodOverloadErrorTest {
+    public static void function main(String[] args) {
+        // Both resolve(String, Object) and resolve(Object, String) match with ("a", "b").
+        // Neither is more specific than the other, so this must trigger an ambiguity compile error.
+        AmbiguousTester.resolve("a", "b");
+    }
+}

@@ -1,0 +1,32 @@
+package com.resources;
+    class StringExtensions {
+    public void String.function greet() {
+        OceanOutput("Hello, I am a String and my content is: " + this);
+    }
+    
+    public int int.function square() {
+        return this * this;
+    }
+}
+
+class ExtensionTest {
+    static main() {
+        OceanOutput("--- Extension Method Test ---");
+        
+        String s = "Ocean";
+        s.greet();
+        
+        int n = 5;
+        int res = n.square();
+        OceanOutput("5 squared is: " + res);
+        
+        OceanOutput("Testing literal extension:");
+        "Literal".greet();
+        
+        if (res == 25 && s.equals("Ocean")) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

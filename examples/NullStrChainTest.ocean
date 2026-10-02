@@ -1,0 +1,26 @@
+class NullStrChainTest {
+    main(String[] args) {
+        variable x = 10;
+
+        String? str1 = null;
+        String? str2 = null;
+
+        if (x % 2 == 0) {
+            str1 ="f";
+        }
+        if (x % 3 == 0){
+            str2 = "g";
+        }
+
+        variable str3 = str1 ?? str2 ?? "furkan";
+
+        OceanOutput(str3);
+
+        if (str3 == "f"){
+            OceanOutput("STATUS: PASSED");
+        }
+        else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

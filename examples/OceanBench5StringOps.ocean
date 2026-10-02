@@ -1,0 +1,15 @@
+package com.resources;
+
+class OceanBench5StringOps {
+    static main() {
+        long start = System.nanoTime();
+        int total = 0;
+        int n = 200000;
+        for (int i from 0 to n - 1 with increasing 1) {
+            String s = "ocean_bench_" + i + "_string_operation_test";
+            total = total + s.length();
+        }
+        long end = System.nanoTime();
+        OceanOutput("total_chars=" + total + " | time_ms=" + ((end - start) / 1000000));
+    }
+}

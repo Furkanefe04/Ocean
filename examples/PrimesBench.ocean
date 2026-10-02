@@ -1,0 +1,38 @@
+package com.resources;
+import java.lang.System;
+class PrimesBench {
+    static int function countPrimes(int limit) {
+        int count = 0;
+        for (int i from 1 to limit with increasing 1) {
+            int isPrime = 1;
+            for (int j from 2 to limit with increasing 1) {
+                if (j * j > i) {
+                    stop;
+                }
+                if (i % j == 0) {
+                    isPrime = 0;
+                    stop;
+                }
+            }
+            if (isPrime == 1) {
+                count = count + 1;
+            }
+        }
+        return count;
+    }
+
+
+    main() {
+        int limit = 2000000;
+        long start = System.currentTimeMillis();
+        int count = countPrimes(limit);
+        long end = System.currentTimeMillis();
+        long dur = end - start;
+        OceanOutput("OCEAN Count: " + count + ", Time: " + dur + " ms");
+        if (count == 148934) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

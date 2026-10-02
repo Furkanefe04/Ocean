@@ -1,0 +1,48 @@
+package com.resources;
+    class SwitchLambdaTest {
+    main() {
+        int r1 = 0;
+        int r2 = 0;
+        int r3 = 0;
+        
+        int x = 1;
+        OceanOutput("Testing case 1 (should print only 1):");
+        switch (x) {
+            case 1 -> { OceanOutput("1"); r1 = 1; }
+            case 2 -> {
+                OceanOutput("2");
+                OceanOutput("deneme");
+            }
+            case 0 -> OceanOutput("0");
+        }
+
+        x = 2;
+        OceanOutput("Testing case 2 (should print 2 and deneme):");
+        switch (x) {
+            case 1 -> OceanOutput("1");
+            case 2 -> {
+                OceanOutput("2");
+                OceanOutput("deneme");
+                r2 = 1;
+            }
+            case 0 -> OceanOutput("0");
+        }
+
+        x = 5;
+        OceanOutput("Testing default case (should print default):");
+        switch (x) {
+            case 1 -> OceanOutput("1");
+            case 2 -> {
+                OceanOutput("2");
+                OceanOutput("deneme");
+            }
+            default -> { OceanOutput("default"); r3 = 1; }
+        }
+        
+        if (r1 == 1 && r2 == 1 && r3 == 1) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

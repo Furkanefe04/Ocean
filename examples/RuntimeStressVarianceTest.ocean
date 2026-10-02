@@ -1,0 +1,208 @@
+﻿package com.resources;
+
+// =========================================================================
+// 1. DERİN POLİMORFİK HİYERARŞİ VE KOVARYANT METOT OVERRIDE
+// =========================================================================
+
+class Item {
+    int id;
+    function Item(int id) { this.id = id; }
+    int function getId() { return id; }
+    String function describe() { return $"Item#{id}"; }
+}
+
+class AnimalItem extends Item {
+    int power;
+    function AnimalItem(int id, int power) {
+        super(id);
+        this.power = power;
+    }
+    int function getPower() { return power; }
+
+    @Override
+    String function describe() { return $"AnimalItem#{id}(P:{power})"; }
+}
+
+class DogItem extends AnimalItem {
+    String breed;
+    function DogItem(int id, int power, String breed) {
+        super(id, power);
+        this.breed = breed;
+    }
+    String function getBreed() { return breed; }
+    @Override
+    String function describe() { return $"DogItem#{id}(Breed:{breed},P:{power})"; }
+}
+
+// =========================================================================
+// 2. VARYANS VE REKÜRSİF VERİ YAPILARI (Linked Node & Pipeline)
+// =========================================================================
+
+// Rekürsif Kovaryant Düğüm (Linked List)
+class CovariantNode<+T> {
+    T val;
+    CovariantNode<T>? next;
+
+    function CovariantNode(T val, CovariantNode<T>? nxt) {
+        this.val = val;
+        next = nxt;
+    }
+
+    T function getValue() { return val; }
+    CovariantNode<T>? function getNext() { return next; }
+}
+
+// Çok Kademeli Fonksiyonel Dönüştürücü (-A, +B)
+class Transformer<-A, +B> {
+    B defaultOutput;
+    function Transformer(B def) { defaultOutput = def; }
+    B function transform(A input) {
+        return defaultOutput;
+    }
+}
+
+// İki Kademeli Akış İşlemcisi (-In, +Out)
+class PipelineStep<-In, +Out> {
+    Out sample;
+    function PipelineStep(Out s) { sample = s; }
+    Out function process(In input) {
+        return sample;
+    }
+}
+
+// 3 Parametreli Matris Kafesi (+X, -Y, +Z)
+class TriMatrix<+X, -Y, +Z> {
+    X xVal;
+    Z zVal;
+    function TriMatrix(X x, Z z) {
+        xVal = x;
+        zVal = z;
+    }
+    X function getX() { return xVal; }
+    Z function getZ() { return zVal; }
+    void function consumeY(Y y) { }
+}
+
+// =========================================================================
+// 3. RUNTIME STRESS TEST (JVM Virtual Dispatch, Boxing, Unboxing, Recursion)
+// =========================================================================
+
+class RuntimeStressVarianceTest {
+    static main() {
+        OceanOutput("=================================================");
+        OceanOutput("  RUNTIME VARIANCE & BYTECODE STRESS TEST        ");
+        OceanOutput("=================================================");
+        int totalPassed = 0;
+        int stateChecksum = 0;
+
+        DogItem husky = new DogItem(1001, 85, "Husky");
+        DogItem retriever = new DogItem(1002, 90, "Golden");
+        AnimalItem tiger = new AnimalItem(2001, 99);
+        Item stone = new Item(3001);
+
+        // -----------------------------------------------------------------
+        // [SENARYO 1] Rekürsif Kovaryant Zincir Gezintisi (Linked List Traversal)
+        // DogItem listesi oluşturulur -> En üst Item düğümüne kovaryant atanır
+        // -----------------------------------------------------------------
+        CovariantNode<DogItem> n1 = new CovariantNode<DogItem>(husky, null);
+        CovariantNode<DogItem> n2 = new CovariantNode<DogItem>(retriever, n1);
+        
+        // Kovaryant Yukarı Dönüşüm: Node<DogItem> -> Node<Item>
+        CovariantNode<Item> itemChain = n2;
+        
+        int chainLen = 0;
+        CovariantNode<Item>? curr = itemChain;
+        while (curr != null) {
+            chainLen++;
+            Item? it = curr?.getValue();
+            if (it != null) {
+                stateChecksum = stateChecksum + it.getId();
+            }
+            curr = curr?.getNext();
+        }
+
+        if (chainLen == 2 && stateChecksum == 2003) {
+            OceanOutput($"[PASS 1] Rekürsif Kovaryant Zincir Gezintisi Başarılı (Checksum: {stateChecksum}).");
+            totalPassed++;
+        }
+
+        // -----------------------------------------------------------------
+        // [SENARYO 2] Çoklu Sanal Metot Dispatch & Polimorfik String Üretimi
+        // -----------------------------------------------------------------
+        Item poly1 = husky;
+        Item poly2 = tiger;
+        Item poly3 = stone;
+
+        String desc1 = poly1.describe();
+        String desc2 = poly2.describe();
+        String desc3 = poly3.describe();
+
+        bool d1Ok = desc1.contains("DogItem") && desc1.contains("Husky");
+        bool d2Ok = desc2.contains("AnimalItem") && desc2.contains("99");
+        bool d3Ok = desc3.contains("Item#3001");
+
+        if (d1Ok && d2Ok && d3Ok) {
+            OceanOutput("[PASS 2] Polimorfik Virtual Dispatch & String Üretimi Başarılı.");
+            totalPassed++;
+        }
+
+        // -----------------------------------------------------------------
+        // [SENARYO 3] Çok Kademeli Çapraz Fonksiyonel Boru Hattı (-In, +Out)
+        // PipelineStep<Item, DogItem> -> PipelineStep<AnimalItem, AnimalItem> -> PipelineStep<DogItem, Item>
+        // -----------------------------------------------------------------
+        PipelineStep<Item, DogItem> step1 = new PipelineStep<Item, DogItem>(husky);
+        PipelineStep<AnimalItem, AnimalItem> step2 = step1;
+        PipelineStep<DogItem, Item> step3 = step2;
+
+        Item outItem = step3.process(retriever);
+        if (outItem.getId() == 1001 && outItem.describe().contains("Husky")) {
+            OceanOutput("[PASS 3] Çok Kademeli Çapraz Fonksiyonel Pipeline Başarılı.");
+            totalPassed++;
+        }
+
+        // -----------------------------------------------------------------
+        // [SENARYO 4] Matris Varyans Kafesi Üzerinde Çift Tüketim ve Çıktı Doğrulama
+        // TriMatrix<DogItem, Item, DogItem> -> TriMatrix<AnimalItem, DogItem, Item>
+        // -----------------------------------------------------------------
+        TriMatrix<DogItem, Item, DogItem> tri1 = new TriMatrix<DogItem, Item, DogItem>(husky, retriever);
+        TriMatrix<AnimalItem, DogItem, Item> tri2 = tri1;
+
+        tri2.consumeY(husky);
+        AnimalItem resX = tri2.getX();
+        Item resZ = tri2.getZ();
+
+        if (resX.getPower() == 85 && resZ.getId() == 1002) {
+            OceanOutput("[PASS 4] Matris Varyans Kafesi ve Runtime Erişimleri Başarılı.");
+            totalPassed++;
+        }
+
+        // -----------------------------------------------------------------
+        // [SENARYO 5] Güvenli Null Coalescing (`??`) ve Polimorfik Tip Birleşimi
+        // -----------------------------------------------------------------
+        DogItem? maybeDog = null;
+        AnimalItem fallback = ((AnimalItem) maybeDog) ?? tiger;
+        
+        if (fallback.getId() == 2001 && fallback.getPower() == 99) {
+            OceanOutput("[PASS 5] Null Coalescing Polimorfik Birleşimi Başarılı.");
+            totalPassed++;
+        }
+
+        // -----------------------------------------------------------------
+        // [SENARYO 6] Toplu Hesaplama ve Durum Bütünlüğü Doğrulaması
+        // -----------------------------------------------------------------
+        int totalPower = husky.getPower() + retriever.getPower() + tiger.getPower();
+        if (totalPower == (85 + 90 + 99)) {
+            OceanOutput($"[PASS 6] Toplam Güç Sağlaması Başarılı: {totalPower}");
+            totalPassed++;
+        }
+
+        OceanOutput("-------------------------------------------------");
+        OceanOutput($"Toplam Başarılı Test Aşaması: {totalPassed} / 6");
+
+        if (totalPassed == 6) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

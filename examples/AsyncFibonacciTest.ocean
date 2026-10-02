@@ -1,0 +1,38 @@
+package com.asynctest;
+
+public class AsyncFibonacciTest {
+
+    public static async int function asyncFib(int n) {
+        if (n <= 1) {
+            return n;
+        }
+        variable f1 = asyncFib(n - 1);
+        variable f2 = asyncFib(n - 2);
+        
+        int r1 = await f1;
+        int r2 = await f2;
+        
+        return r1 + r2;
+    }
+
+    public static async void function run() {
+        int n = 8;
+        variable fut = asyncFib(n);
+        int res = await fut;
+        OceanOutput("Fibonacci(" + n + ") = " + res);
+        if (res == 21) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+
+    static main() {
+        OceanOutput("==============================================");
+        OceanOutput("===          ASYNC FIBONACCI STRESS TEST   ===");
+        OceanOutput("==============================================");
+        variable f = run();
+        f.join();
+        OceanOutput("==============================================");
+    }
+}

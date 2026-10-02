@@ -1,0 +1,45 @@
+package com.trading.analytics;
+
+import com.trading.core.OrderListWrapper;
+import com.trading.model.MatchResult;
+
+public class TradingAnalytics {
+    public static double function calculateCumulativeVolume(OrderListWrapper<MatchResult> list) {
+        double vol = 0.0;
+        for (int i from 0 to list.size() with increasing 1) {
+            MatchResult mr = list.get(i);
+            if (mr.success) {
+                vol = vol + (mr.price * mr.quantity);
+            }
+        }
+        return vol;
+    }
+
+    public static double function calculateTotalFeesCollected(OrderListWrapper<MatchResult> list) {
+        double fees = 0.0;
+        for (int i from 0 to list.size() with increasing 1) {
+            MatchResult mr = list.get(i);
+            if (mr.success) {
+                // Collect platform fee of 0.2%
+                fees = fees + (mr.price * mr.quantity * 0.002);
+            }
+        }
+        return fees;
+    }
+}
+
+public class SystemStatus {
+    public int orderBookLevels = 0;
+    public int totalActiveOrders = 0;
+
+    public static SystemStatus function create(int levels, int active) {
+        SystemStatus s = new SystemStatus();
+        s.orderBookLevels = levels;
+        s.totalActiveOrders = active;
+        return s;
+    }
+
+    public String function getStatusSummary() {
+        return "Core Orderbook Status: Levels = " + orderBookLevels + ", Queue length = " + totalActiveOrders;
+    }
+}

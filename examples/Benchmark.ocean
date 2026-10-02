@@ -1,0 +1,332 @@
+package com.resourcesx;
+
+import java.util.ArrayList;
+import java.math.BigDecimal;
+
+public class Benchmark {
+    static BigDecimal money;
+    static variable name = "";
+    static variable processCount = 0;
+    static variable knowledge = 0;
+    static ArrayList<Item?> products;
+    static int idCount = 0;
+    static ArrayList<Item?> productList;
+
+    main() {
+        OceanOutput("Ä°sminizi girin : ");
+        name = OceanInput().nextLine();
+        OceanOutput("BaÅŸlangÄ±Ã§ ParasÄ±nÄ± gir");
+        // Using explicit cast to ensure the compiler picks the String constructor
+        money = new BigDecimal((String)OceanInput().next());
+        
+        variable runtime = true;
+        products = new ArrayList();
+        initProductList();
+        while (runtime){
+            OceanOutput("\n--- ANA MENÃœ ---");
+            OceanOutput($"[Bakiye: {money} TL] [Bilgi: {knowledge}]");
+            OceanOutput("1-) ÃœrÃ¼n Al");
+            OceanOutput("2-) ÃœrÃ¼n Listele / Kullan");
+            OceanOutput("3-) ÃœrÃ¼n Sat");
+            OceanOutput("4-) Para Ekle");
+            OceanOutput("5-) Kasa Sorgusu");
+            OceanOutput("0-) Ã‡Ä±kÄ±ÅŸ");
+            int choice = OceanInput().nextInt();
+            if(choice == 1){
+                buyItem();
+            }
+            else if(choice == 2){
+                listItem();
+            }
+            else if(choice == 3){
+                sellItem();
+            }
+            else if(choice == 4){
+                addMoney();
+            }
+            else if(choice == 5){
+                queryingMoney();
+            }
+            else if(choice == 0){
+                runtime = false;
+            }
+            else{
+                OceanOutput("GeÃ§ersiz iÅŸlem yaptÄ±nÄ±z");
+            }
+        }
+    }
+
+    static void function initProductList(){
+        productList = new ArrayList();
+        productList.add(createItem(0,"Macbook Pro",95000));
+        productList.add(createItem(0,"Asus ROG",65000));
+        productList.add(createItem(2,"iPhone 15",55000));
+        productList.add(createItem(2,"Samsung S24",50000));
+        productList.add(createItem(1,"LEGO Seti",2500));
+        productList.add(createItem(3,"Ocean Programlama",1200));
+        productList.add(createItem(3,"Algoritmalar 101",800));
+    }
+
+    static Item? function createItem(int itemType,String name,double price){
+        if(itemType == 0){
+            idCount=idCount+1;
+            return new Laptop(name,BigDecimal.valueOf(price),100,idCount);
+        }
+        else if (itemType == 1){
+            idCount=idCount+1;
+            return new Toys(name,BigDecimal.valueOf(price),idCount);
+        }
+        else if (itemType == 2){
+            idCount=idCount+1;
+            return new Phone(name, BigDecimal.valueOf(price), "Modern", idCount);
+        }
+        else if (itemType == 3){
+            idCount=idCount+1;
+            return new Book(name, BigDecimal.valueOf(price), "Anonim", 300, idCount);
+        }
+        else{
+            return null;
+        }
+    }
+
+    static bool function buyItem(){
+        OceanOutput("--- Mevcut ÃœrÃ¼nler ---");
+        for(int i from 0 to productList.size() with increasing 1){
+            Item? item = productList.get(i);
+            OceanOutput($"{i+1}-) {item?.getName()} - Fiyat: {item?.getPrice()} TL");
+        }
+        OceanOutput("Almak istediÄŸiniz Ã¼rÃ¼n numarasÄ±nÄ± girin (0: Geri):");
+        int choice = OceanInput().nextInt();
+        if(choice <= 0 || choice > productList.size()) return false;
+        
+        Item? i = (Item)productList.get(choice-1);
+        if(money.compareTo(i?.getPrice()) >= 0){
+            products.add(i);
+            money = money - i?.getPrice();
+            OceanOutput($"{i?.getName()} baÅŸarÄ±yla alÄ±ndÄ±!");
+            return true;
+        }
+        else{
+            OceanOutput("Ä°ÅŸlem baÅŸarÄ±sÄ±z: Para yetersiz");
+            return false;
+        }
+    }
+
+    static void function listItem(){
+        if(products.size() == 0){
+            OceanOutput("HenÃ¼z hiÃ§ Ã¼rÃ¼nÃ¼nÃ¼z yok.");
+            return;
+        }
+        OceanOutput("--- Sahip OlduÄŸunuz ÃœrÃ¼nler ---");
+        for(int i from 0 to products.size() with increasing 1){
+            Item? item = products.get(i);
+            OceanOutput($"{i+1}-) {item?.getName()} (Kondisyon: %{item?.getCondition()})");
+        }
+        OceanOutput("Ä°ÅŸlem yapmak istediÄŸiniz Ã¼rÃ¼nÃ¼n numarasÄ±nÄ± girin (0: Geri)");
+        int choice = OceanInput().nextInt();
+        if(choice > 0 && choice <= products.size()){
+            Item? selected = (Item)products.get(choice-1);
+            OceanOutput($"SeÃ§ilen ÃœrÃ¼n: {selected?.getName()}");
+            OceanOutput("1-) Kullan");
+            OceanOutput("2-) Ã–zel Ã–zelliÄŸi GÃ¶r");
+            OceanOutput("3-) Tamir Et (200 TL)");
+            int action = OceanInput().nextInt();
+            if(action == 1){
+                selected?.use();
+            }
+            else if(action == 2){
+                selected?.SpecialFeature();
+            }
+            else if(action == 3){
+                BigDecimal cost = new BigDecimal("200");
+                if(money.compareTo(cost) >= 0){
+                    selected?.repair();
+                    money = money - cost; 
+                } else {
+                    OceanOutput("Tamir iÃ§in paranÄ±z yetersiz!");
+                }
+            }
+        }
+    }
+
+    static void function sellItem(){
+        if(products.size() == 0){
+            OceanOutput("Satacak Ã¼rÃ¼nÃ¼nÃ¼z yok.");
+            return;
+        }
+        OceanOutput("--- Satmak Ä°stediÄŸiniz ÃœrÃ¼n ---");
+        for(int i from 0 to products.size() with increasing 1){
+            Item item = (Item)products.get(i);
+            OceanOutput($"{i+1}-) {item.getName()} (SatÄ±ÅŸ FiyatÄ±: {item.getSellValue()} TL)");
+        }
+        int choice = OceanInput().nextInt();
+        if(choice > 0 && choice <= products.size()){
+            Item selected = (Item)products.get(choice-1);
+            BigDecimal val = selected.getSellValue();
+            money = money + val; 
+            products.remove(choice-1);
+            OceanOutput($"{selected.getName()} satÄ±ldÄ±. {val} TL kazandÄ±nÄ±z.");
+        }
+    }
+
+    static void function addMoney(){
+        OceanOutput("MiktarÄ± Girin");
+        // Using explicit cast here as well
+        BigDecimal amount = new BigDecimal((String)OceanInput().next());
+        money = money + amount; 
+    }
+
+    static void function queryingMoney(){
+        OceanOutput($"Kasada ÅŸuan {money} TL var");
+    }
+}
+
+abstract class Item{
+    variable name = "";
+    variable price = new BigDecimal("0");
+    variable itemID = 0;
+    variable condition = 100;
+
+    function Item(String name,BigDecimal price,int itemID){
+        this.name = name;
+        this.price = price;
+        this.itemID = itemID;
+        condition = 100;
+    }
+
+    String function getName(){
+        return name?.toString()??"";
+    }
+
+    BigDecimal function getPrice(){
+        return price;
+    }
+
+    int function getID(){
+        return itemID;
+    }
+
+    int function getCondition(){
+        return condition;
+    }
+
+    BigDecimal function getSellValue(){
+        BigDecimal cond = BigDecimal.valueOf(condition);
+        BigDecimal hundred = new BigDecimal("100");
+        BigDecimal factor = new BigDecimal("0.7");
+        return price * cond / hundred * factor; 
+    }
+
+    void function degrade(int amount){
+        condition = condition - amount;
+        if(condition < 0) condition = 0;
+    }
+
+    void function repair(){
+        condition = 100;
+        OceanOutput($"{name} tamir edildi!");
+    }
+
+    abstract void function SpecialFeature();
+    abstract void function use();
+}
+
+class Laptop extends Item{
+    variable batteryLevel = 100;
+    variable runState = false;
+    function Laptop(String name, BigDecimal price, int batteryLevel,int itemID){
+        super(name,price,itemID);
+        this.batteryLevel = batteryLevel;
+        runState = false;
+    }
+
+    void function SpecialFeature() {
+        OceanOutput("TaÅŸÄ±nabilir bilgisayar, yÃ¼ksek iÅŸlem gÃ¼cÃ¼.");
+    }
+
+    void function use() {
+        if(condition < 20){
+            OceanOutput("Laptop bozuk, Ã¶nce tamir etmelisiniz!");
+            return;
+        }
+        run();
+        degrade(15);
+    }
+
+    void function run(){
+        if(runState){
+            OceanOutput("Laptop zaten Ã‡alÄ±ÅŸÄ±yor");
+            return;
+        }
+        runState = true;
+        OceanOutput("Laptop Ã§alÄ±ÅŸmaya baÅŸladÄ±. Parlak ekran aÃ§Ä±ldÄ±!");
+    }
+
+    void function turnOff(){
+        if(!runState){
+            OceanOutput("Laptop zaten kapalÄ±");
+        }
+        runState = false;
+        OceanOutput("Laptop kapatÄ±ldÄ±. Ä°yi geceler.");
+    }
+}
+
+class Toys extends Item {
+    function Toys(String name, BigDecimal price,int itemID){
+        super(name,price,itemID);
+    }
+
+    void function SpecialFeature() {
+        OceanOutput("EÄŸlence amaÃ§lÄ±, fiziksel dayanÄ±klÄ±lÄ±k.");
+    }
+
+    void function use() {
+        OceanOutput($"{name} ile oynuyorsunuz. Ã‡ok eÄŸlenceli!");
+        degrade(5);
+    }
+}
+
+class Phone extends Item {
+    variable model = "";
+    function Phone(String name, BigDecimal price, String model, int itemID){
+        super(name, price, itemID);
+        this.model = model;
+    }
+
+    void function SpecialFeature() {
+        OceanOutput("Ä°letiÅŸim ve mobil uygulamalar.");
+    }
+
+    void function use() {
+        if(condition < 10){
+            OceanOutput("Telefonun ekranÄ± kÄ±rÄ±k, arama yapÄ±lamÄ±yor!");
+            return;
+        }
+        OceanOutput($"{name} ({model}) Ã¼zerinden arama yapÄ±lÄ±yor...");
+        degrade(10);
+    }
+}
+
+class Book extends Item {
+    variable author = "";
+    variable pageCount = 0;
+    function Book(String name, BigDecimal price, String author, int pageCount, int itemID){
+        super(name, price, itemID);
+        this.author = author;
+        this.pageCount = pageCount;
+    }
+
+    void function SpecialFeature() {
+        OceanOutput($"Yazar: {author}, Sayfa: {pageCount}");
+    }
+
+    void function use() {
+        if(condition < 20){
+            OceanOutput("Kitap Ã§ok yÄ±pranmÄ±ÅŸ, okunamÄ±yor!");
+            return;
+        }
+        OceanOutput($"{name} okunuyor... Bilgi seviyeniz artÄ±yor!");
+        Benchmark.knowledge = Benchmark.knowledge + 5;
+        degrade(20);
+    }
+}

@@ -1,0 +1,31 @@
+package resources;
+class Parent {
+    static {StaticInitTest.val=StaticInitTest.val+ StaticInitTest.log("Parent"); }
+}
+
+class Child extends Parent {
+    static {StaticInitTest.val=StaticInitTest.val+StaticInitTest.log("Child"); }
+}
+
+
+class StaticInitTest {
+    static String val = "";
+    static {
+        val=val+log("Test");
+    }
+
+    main(String[] args) {
+        Child c = new Child();
+        if (val.equals("TestParentChild")){
+            OceanOutput("STATUS: PASSED");
+        }
+        else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+
+    public static String function log(String s){
+        OceanOutput(s);
+        return s;
+    }
+}

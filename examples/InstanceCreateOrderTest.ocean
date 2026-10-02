@@ -1,0 +1,43 @@
+class Parent {
+    int x = InstanceCreateOrderTest.init("Parent field");
+
+    static {
+
+        InstanceCreateOrderTest.init("Parent static block");
+    }
+    //{} (instance block) henüz gramerde tanımlı değil
+    {
+        InstanceCreateOrderTest.init("Parent instance block");
+    }
+
+    function Parent() {
+        InstanceCreateOrderTest.init("Parent ctor");
+    }
+}
+
+class Child extends Parent {
+    int y = InstanceCreateOrderTest.init("Child field");
+
+    static {
+        InstanceCreateOrderTest.init("Child static block");
+    }
+    {
+        InstanceCreateOrderTest.init("Child instance block");
+    }
+
+    function Child() {
+        InstanceCreateOrderTest.init("Child ctor");
+    }
+}
+
+class InstanceCreateOrderTest {
+    main() {
+        Parent c = new Child();
+        OceanOutput("STATUS: PASSED");
+    }
+
+    public static int function init(String s) {
+        OceanOutput(s);
+        return 1;
+    }
+}

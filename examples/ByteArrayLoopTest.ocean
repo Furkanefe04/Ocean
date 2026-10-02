@@ -1,0 +1,32 @@
+class ByteArrayLoopTest {
+    static main() {
+        // Test byte array loop
+        byte[] bytes = new byte[3];
+        bytes[0] = (byte) 10;
+        bytes[1] = (byte) 20;
+        bytes[2] = (byte) 30;
+        
+        int sum = 0;
+        for (byte b in bytes) {
+            sum = sum + (int) b;
+        }
+        
+        // Test bool array loop
+        bool[] bools = new bool[2];
+        bools[0] = true;
+        bools[1] = false;
+        
+        int trueCount = 0;
+        for (bool val in bools) {
+            if (val) {
+                trueCount = trueCount + 1;
+            }
+        }
+        
+        if (sum == 60 && trueCount == 1) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

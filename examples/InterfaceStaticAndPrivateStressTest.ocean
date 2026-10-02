@@ -1,0 +1,44 @@
+package test;
+
+public interface MathService {
+    // 1. Static interface method
+    public static int function add(int a, int b) {
+        return a + b;
+    }
+
+    // 2. Abstract interface method
+    int function multiply(int a, int b);
+
+    // 3. Private helper method in interface
+    private String function tag(String label, int val) {
+        return label + ": " + val;
+    }
+
+    // 4. Default method calling abstract and private methods
+    String function describeProduct(int a, int b) {
+        int prod = multiply(a, b);
+        return tag("PRODUCT", prod);
+    }
+}
+
+public class StandardMath implements MathService {
+    public int function multiply(int a, int b) {
+        return a * b;
+    }
+}
+
+public class InterfaceStaticAndPrivateStressTest {
+    public static main(String[] args) {
+        // Test static method on interface
+        int sum = MathService.add(15, 25);
+        verify sum == 40;
+
+        // Test default method dispatch calling abstract + private methods
+        MathService service = new StandardMath();
+        verify service.multiply(3, 4) == 12;
+        String desc = service.describeProduct(3, 4);
+        verify desc.equals("PRODUCT: 12");
+
+        System.out.println("InterfaceStaticAndPrivateStressTest passed successfully!");
+    }
+}

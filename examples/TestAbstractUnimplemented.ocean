@@ -1,0 +1,11 @@
+package com.resources;
+
+public interface Runner {
+    void function runx();
+}
+
+class TestAbstractUnimplemented implements Runner {
+    main() {
+        OceanOutput("AbstractUnimplemented");
+    }
+}

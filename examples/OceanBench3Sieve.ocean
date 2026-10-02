@@ -1,0 +1,29 @@
+package com.resources;
+
+class OceanBench3Sieve {
+    static main() {
+        int limit = 2000000;
+        bool[] sieve = new bool[limit + 1];
+        for (int i from 2 to limit with increasing 1) {
+            sieve[i] = true;
+        }
+        long start = System.nanoTime();
+        int i = 2;
+        while (i <= limit) {
+            if (sieve[i]) {
+                int j = i + i;
+                while (j <= limit) {
+                    sieve[j] = false;
+                    j = j + i;
+                }
+            }
+            i = i + 1;
+        }
+        int count = 0;
+        for (int k from 2 to limit with increasing 1) {
+            if (sieve[k]) count = count + 1;
+        }
+        long end = System.nanoTime();
+        OceanOutput("primes(2M)=" + count + " | time_ms=" + ((end - start) / 1000000));
+    }
+}

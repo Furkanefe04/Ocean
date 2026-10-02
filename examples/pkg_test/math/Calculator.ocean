@@ -1,0 +1,15 @@
+package math;
+
+public class Calculator {
+    public static int function add(int a, int b) {
+        return a + b;
+    }
+    
+    public static int function multiply(int a, int b) {
+        return a * b;
+    }
+    
+    public static int function square(int n) {
+        return n * n;
+    }
+}

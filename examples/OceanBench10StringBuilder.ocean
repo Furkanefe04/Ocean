@@ -1,0 +1,22 @@
+package com.resources;
+
+
+class OceanBench10StringBuilder {
+    static main() {
+        int n = 100000;
+        long start = System.nanoTime();
+        long total = 0L;
+        for (int i from 0 to n - 1 with increasing 1) {
+            StrBuilder sb = new StrBuilder();
+            sb.append(i);
+            sb.append(42);
+            sb.append(i + 1);
+            sb.append(99);
+            sb.append(i * 2);
+            String s = sb.toString();
+            total = total + s.length();
+        }
+        long end = System.nanoTime();
+        OceanOutput("total_len=" + total + " | time_ms=" + ((end - start) / 1000000));
+    }
+}

@@ -1,0 +1,11 @@
+class NewConstantFolderFeaturesTest {
+    main(){
+        String str = "abc";
+        if(str.startsWith("a")&&str.endsWith("c")&&str.replace("abc","def").equals("def")&&str.repeat(3).equals("abcabcabc")){
+            OceanOutput("STATUS: PASSED");
+        }
+        else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

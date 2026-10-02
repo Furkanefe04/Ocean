@@ -1,0 +1,26 @@
+package com.resources;
+
+import java.util.Objects;
+
+@Inline
+class UserId {
+    public int id;
+    function UserId(int id) {
+        this.id = id;
+    }
+}
+
+class InlineValueClassTest {
+    static main() {
+        OceanOutput("=== INLINE VALUE CLASS TEST START ===");
+
+        UserId uid = new UserId(42);
+        OceanOutput("User ID: " + uid.id);
+
+        if (uid.id == 42) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

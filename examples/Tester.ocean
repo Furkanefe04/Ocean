@@ -1,0 +1,141 @@
+package resources;
+
+
+interface Readable {
+    void function read();
+    void function sRead();
+}
+
+interface Carriable {
+    bool function carry();
+    bool function sCarry();
+}
+
+abstract class Book {
+    variable pageCount = 0;
+    variable name = "";
+
+    function Book(int pCount, String name){
+        pageCount = pCount;
+        this.name = name;
+    }
+
+    String function getName(){
+        return "Book : "+name;
+    }
+
+    int function getPageCount(){
+        return pageCount;
+    }
+}
+
+class TinyNovel extends Novel{
+    variable name = "";
+    function TinyNovel(int pc,String name,int cc) {
+        super(pc,name,cc);
+        this.name = "tiny"+ name.toUpperCase();
+    }
+
+    @Override
+    String function getName(){
+        return super.getName()+" but tiny name : "+name;
+    }
+
+}
+
+class Novel extends Book implements Readable,Carriable {
+    variable chapterCount = 0;
+    variable carryStatus = false;
+    variable readStatus = false;
+
+
+
+    function Novel(int pNumber, String name,int cCount){
+        super(pNumber,name);
+        chapterCount = cCount;
+        carryStatus = false;
+        readStatus = false;
+    }
+
+    @Override
+    void function read() {
+        if(readStatus){
+            OceanOutput($"You already reading {super.name} now");
+            return;
+        }
+        if (!carryStatus){
+            OceanOutput($"You should took to {super.name} with you for reading ");
+            return;
+        }
+        OceanOutput($"You reading {super.name}");
+    }
+
+    @Override
+    bool function carry(){
+        if(carryStatus){
+            OceanOutput("You already carry "+super.name);
+            return carryStatus;
+        }
+        carryStatus = true;
+        OceanOutput($"You took to {super.name} with you");
+        return carryStatus;
+    }
+
+
+    @Override
+    void function sRead() {
+        if(!readStatus){
+            OceanOutput($"You already do not reading {name} now");
+            return;
+        }
+        if (!carryStatus){
+            OceanOutput($"You should took to {name} with you for stop reading ");
+            return;
+        }
+        OceanOutput($"You stop reading {name}");
+    }
+
+    @Override
+    bool function sCarry(){
+        if(!carryStatus){
+            OceanOutput("You already do not carry "+name);
+            return carryStatus;
+        }
+        carryStatus = false;
+        readStatus = false;
+        OceanOutput($"You put {name} on the bookself");
+        return carryStatus;
+    }
+
+    @Override
+    String function getName(){
+        return "Novel : "+super.name;
+    }
+
+    int function getChapterCount(){
+        return chapterCount;
+    }
+}
+
+public class Tester {
+    main(){
+        Novel arabaSevdasi = new Novel(300,"arabaSevdasi",10);
+        Novel ocean = new TinyNovel(50,"ocean",5);
+
+        ocean.read();
+        ocean.carry();
+        ocean.read();
+        ocean.sCarry();
+        ocean.read();
+        String name = ocean.getName();
+        int cc = ocean.getChapterCount();
+        int pc = ocean.getPageCount();
+        if (name.equals("Novel : ocean but tiny name : tinyOCEAN") && cc == 5 && pc == 50 && arabaSevdasi.getPageCount() == 300) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+
+
+}

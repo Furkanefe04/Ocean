@@ -1,0 +1,125 @@
+package com.resources;
+    class FullFeatureTest {
+    int counter;
+    public static int globalCount;
+
+    function FullFeatureTest() {
+        counter = 0;
+    }
+
+    main() {
+        bool caughtCustom = false;
+        bool caughtRuntime = false;
+        bool finallyExecuted = false;
+
+        OceanOutput("========== COMPOUND ASSIGNMENT ==========");
+        int x = 10;
+        x += 5;
+        OceanOutput($"10 += 5 = {x}");
+        x -= 3;
+        OceanOutput($"15 -= 3 = {x}");
+        x *= 2;
+        OceanOutput($"12 *= 2 = {x}");
+        x /= 6;
+        OceanOutput($"24 /= 6 = {x}");
+        x %= 3;
+        OceanOutput($"4 %= 3 = {x}");
+
+        OceanOutput("========== INCREMENT/DECREMENT ==========");
+        int a = 10;
+        a++;
+        OceanOutput($"10++ = {a}");
+        a--;
+        OceanOutput($"11-- = {a}");
+        ++a;
+        OceanOutput($"++10 = {a}");
+        --a;
+        OceanOutput($"--11 = {a}");
+
+        OceanOutput("========== THROW/CATCH ==========");
+        trying {
+            throw new Exception("custom error from Ocean!");
+        } catch (Exception e) {
+            OceanOutput($"Caught: {e.getMessage()}");
+            caughtCustom = true;
+        }
+
+        trying {
+            throw new RuntimeException("runtime error!");
+        } catch (RuntimeException e) {
+            OceanOutput($"Caught runtime: {e.getMessage()}");
+            caughtRuntime = true;
+        } finally {
+            OceanOutput("Finally block executed");
+            finallyExecuted = true;
+        }
+
+        OceanOutput("========== INSTANCEOF ==========");
+        variable str = "Hello";
+        variable num = new Integer(42);
+        bool instanceOfOk = false;
+        if (str instanceof String) {
+            OceanOutput("str is String: true");
+            instanceOfOk = true;
+        }
+        OceanOutput("instanceof test passed");
+
+        OceanOutput("========== DO-WHILE ==========");
+        int i = 0;
+        do {
+            i++;
+        } while (i < 5);
+        OceanOutput($"do-while result: {i}");
+
+        int j = 10;
+        do {
+            j++;
+        } while (j < 5);
+        OceanOutput($"do-while skip: {j}");
+
+        OceanOutput("========== TYPE INFERENCE ==========");
+        variable inferredInt = 42;
+        variable inferredStr = "Hello Ocean";
+        variable inferredBool = true;
+        variable inferredDouble = 3.14;
+        OceanOutput($"int={inferredInt} str={inferredStr} bool={inferredBool} double={inferredDouble}");
+
+        OceanOutput("========== FOR-EACH & LOOPS ==========");
+        int[] arr = new int[5];
+        for (int k from 0 to 4 with increasing 1) {
+            arr[k] = k * 10;
+        }
+        for (int val in arr) {
+            OceanOutput($"arr val: {val}");
+        }
+
+        OceanOutput("========== COMPOUND ON ARRAYS ==========");
+        int[] nums = new int[3];
+        nums[0] = 10;
+        nums[1] = 20;
+        nums[2] = 30;
+        OceanOutput($"Before: {nums[0]} {nums[1]} {nums[2]}");
+
+        bool passed = true;
+        if (x != 1) { passed = false; }
+        if (a != 10) { passed = false; }
+        if (!caughtCustom) { passed = false; }
+        if (!caughtRuntime) { passed = false; }
+        if (!finallyExecuted) { passed = false; }
+        if (!instanceOfOk) { passed = false; }
+        if (i != 5) { passed = false; }
+        if (j != 11) { passed = false; }
+        if (inferredInt != 42) { passed = false; }
+        if (inferredStr != "Hello Ocean") { passed = false; }
+        if (inferredBool != true) { passed = false; }
+        if (inferredDouble != 3.14) { passed = false; }
+        if (arr[0] != 0 || arr[1] != 10 || arr[2] != 20 || arr[3] != 30 || arr[4] != 0) { passed = false; }
+        if (nums[0] != 10 || nums[1] != 20 || nums[2] != 30) { passed = false; }
+
+        if (passed) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

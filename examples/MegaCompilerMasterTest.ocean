@@ -1,0 +1,212 @@
+package com.resources;
+
+import java.lang.AutoCloseable;
+import java.lang.Runnable;
+import java.lang.Exception;
+import java.lang.RuntimeException;
+import java.lang.IllegalArgumentException;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
+// Functional Interface
+interface MasterSupplier {
+    Object function get();
+}
+
+// 1. Sealed Abstract Class & Permitted Inheritance
+abstract sealed class AbstractCalculation restricts SimpleCalc, AdvancedCalc {
+    abstract int function execute(int val);
+}
+
+final class SimpleCalc extends AbstractCalculation {
+    int function execute(int val) {
+        return val * 2;
+    }
+}
+
+final class AdvancedCalc extends AbstractCalculation {
+    int function execute(int val) {
+        return val * 3 + 1;
+    }
+}
+
+// 2. Data Class
+data class ComputationResult(int id, String status);
+
+// 3. AutoCloseable Resource
+class AuditLogger implements AutoCloseable {
+    variable logCount = 0;
+    public void function close() {
+        OceanOutput("LOG: AuditLogger resource closed cleanly.");
+    }
+}
+
+// 4. Helper Class with Method References and Default Parameters
+class MasterHelper {
+    function MasterHelper() {
+    }
+
+    static int function singleProcess(int x) {
+        return x * 2;
+    }
+
+    static int function processValue(int a, int b = 10, int c = 5) {
+        return a + b * c;
+    }
+
+    int function computeInstance(int input) {
+        return input * 10;
+    }
+}
+
+// 5. Generic Container Class
+class GenericContainer<T> {
+    variable item;
+    function GenericContainer(Object item) {
+        this.item = item;
+    }
+    Object function getItem() {
+        return item;
+    }
+}
+
+// 6. Pattern Matching Class Hierarchy
+class BaseEvent {
+    variable eventId = 1;
+}
+
+class DataEvent extends BaseEvent {
+    int payloadCode;
+    function DataEvent(int code) {
+        payloadCode = code;
+    }
+}
+
+// 7. Master Test Runner
+class MegaCompilerMasterTest {
+    public sync int globalCounter = 0;
+
+    public lock void function safeIncrement() {
+        globalCounter = globalCounter + 1;
+    }
+
+    static int function fibonacci(int n) {
+        if (n <= 1) return n;
+        return fibonacci(n - 1) + fibonacci(n - 2);
+    }
+
+    main() {
+        OceanOutput("=== STARTING MEGA COMPILER MASTER TEST ===");
+        variable passedChecks = 0;
+
+        // CHECK 1: Sealed Class Inheritance & Polymorphism
+        AbstractCalculation calc1 = new SimpleCalc();
+        AbstractCalculation calc2 = new AdvancedCalc();
+        if (calc1.execute(10) == 20 && calc2.execute(10) == 31) {
+            passedChecks = passedChecks + 1;
+            OceanOutput("CHECK 1 PASSED: Sealed Class & Restricts Polymorphism");
+        }
+
+        // CHECK 2: Default Method Parameters & Delegation
+        variable r1 = MasterHelper.processValue(100);              // 100 + 10 * 5 = 150
+        variable r2 = MasterHelper.processValue(100, 20);          // 100 + 20 * 5 = 200
+        variable r3 = MasterHelper.processValue(100, 20, 2);       // 100 + 20 * 2 = 140
+        if (r1 == 150 && r2 == 200 && r3 == 140) {
+            passedChecks = passedChecks + 1;
+            OceanOutput("CHECK 2 PASSED: Default Parameters & Overload Delegation");
+        }
+
+        // CHECK 3: Bare & Casted Method References (Static, Instance, Constructor)
+        MasterHelper helper = new MasterHelper();
+        variable refStatic = (Function) MasterHelper::singleProcess;
+        variable refInstance = (Function) helper::computeInstance;
+        variable refCtor = (Supplier) MasterHelper::new;
+
+        if (refStatic != null && refInstance != null && refCtor != null) {
+            passedChecks = passedChecks + 1;
+            OceanOutput("CHECK 3 PASSED: Bare & Casted Method References");
+        }
+
+        // CHECK 4: Lambda Closures with Multi-Variable Capture
+        variable factor = 5;
+        variable offset = 12;
+        MasterSupplier lambdaSupplier = () -> {
+            return factor * 10 + offset; // 50 + 12 = 62
+        };
+        if ("62".equals("" + lambdaSupplier.get())) {
+            passedChecks = passedChecks + 1;
+            OceanOutput("CHECK 4 PASSED: Lambda Closure & Local Variable Capture");
+        }
+
+        // CHECK 5: Try-With-Resources & Exception Handling (Multi-Catch + Finally)
+        bool caughtExpected = false;
+        trying (AuditLogger logger = new AuditLogger()) {
+            trying {
+                throw new IllegalArgumentException("Test Error");
+            } catch (IllegalArgumentException e) {
+                caughtExpected = true;
+                OceanOutput("Caught expected exception: " + e.getMessage());
+            } finally {
+                OceanOutput("Inner finally executed.");
+            }
+        }
+        if (caughtExpected) {
+            passedChecks = passedChecks + 1;
+            OceanOutput("CHECK 5 PASSED: Try-With-Resources & Multi-Catch Exception Unwinding");
+        }
+
+        // CHECK 6: Data Class Auto-Generated Members
+        ComputationResult res = new ComputationResult(101, "COMPLETED");
+        if (res.getId() == 101 && "COMPLETED".equals(res.getStatus())) {
+            passedChecks = passedChecks + 1;
+            OceanOutput("CHECK 6 PASSED: Data Class Auto-Generated Accessors");
+        }
+
+        // CHECK 7: Pattern Matching & InstanceOf Scoping
+        BaseEvent event = new DataEvent(999);
+        if (event instanceof DataEvent dev) {
+            if (dev.payloadCode == 999) {
+                passedChecks = passedChecks + 1;
+                OceanOutput("CHECK 7 PASSED: Pattern Matching & InstanceOf Scoping");
+            }
+        }
+
+        // CHECK 8: Concurrency (sync field, lock method, lock block)
+        MegaCompilerMasterTest masterTest = new MegaCompilerMasterTest();
+        masterTest.safeIncrement();
+        lock(masterTest) {
+            masterTest.globalCounter = masterTest.globalCounter + 9;
+        }
+        if (masterTest.globalCounter == 10) {
+            passedChecks = passedChecks + 1;
+            OceanOutput("CHECK 8 PASSED: Synchronization & Thread Safety");
+        }
+
+        // CHECK 9: Generic Container & Type Safety
+        GenericContainer<String> container = new GenericContainer<String>("OceanCompilerV3");
+        if ("OceanCompilerV3".equals(container.getItem())) {
+            passedChecks = passedChecks + 1;
+            OceanOutput("CHECK 9 PASSED: Generic Container & Type Bounds");
+        }
+
+        // CHECK 10: Fibonacci Recursion & Array Range Operations
+        variable fibResult = fibonacci(10); // 55
+        int[] arr = new int[5];
+        for (variable idx from 0 to 5 with increasing 1) {
+            arr[idx] = (idx + 1) * 10;
+        }
+        variable arrSum = arr[0] + arr[1] + arr[2] + arr[3] + arr[4]; // 10+20+30+40+50 = 150
+        if (fibResult == 55 && arrSum == 150) {
+            passedChecks = passedChecks + 1;
+            OceanOutput("CHECK 10 PASSED: Recursion & Array Operations");
+        }
+
+        OceanOutput("==========================================");
+        if (passedChecks == 10) {
+            OceanOutput("STATUS: PASSED - ALL 10 COMPOSITE CHECKS SUCCESSFUL!");
+        } else {
+            OceanOutput("STATUS: FAILED - Passed " + passedChecks + "/10 checks");
+        }
+        OceanOutput("==========================================");
+    }
+}

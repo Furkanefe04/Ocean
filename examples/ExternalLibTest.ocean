@@ -1,0 +1,33 @@
+package com.resources;
+import org.apache.commons.lang3.StringUtils;
+
+class ExternalLibTest {
+    main() {
+        Output("--- External Library Test (Apache Commons) ---");
+        
+        variable original = "   Ocean Compiler   ";
+        
+        // Use StringUtils.trim()
+        variable trimmed = StringUtils.trim(original);
+        Output("Original: [" + original + "]");
+        Output("Trimmed : [" + trimmed + "]");
+        
+        // Use StringUtils.capitalize()
+        variable capitalized = StringUtils.capitalize("ocean");
+        Output("Capitalized: " + capitalized);
+        
+        // Use StringUtils.isBlank()
+        variable blank = StringUtils.isBlank("   ");
+        Output("Is Blank: " + blank);
+        
+        // Use StringUtils.reverse()
+        variable reversed = StringUtils.reverse("Ocean");
+        Output("Reversed: " + reversed);
+        
+        if (trimmed == "Ocean Compiler" && capitalized == "Ocean" && blank == true && reversed == "naecO") {
+            Output("STATUS: PASSED");
+        } else {
+            Output("STATUS: FAILED");
+        }
+    }
+}

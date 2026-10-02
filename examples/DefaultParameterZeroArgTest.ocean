@@ -1,0 +1,85 @@
+﻿package com.resources;
+
+class Calculator {
+    public int function compute(int base = 100, int multiplier = 2, int adder = 5) {
+        return (base * multiplier) + adder;
+    }
+
+    public String function formatGreeting(String prefix = "Hello", String name = "Ocean", String suffix = "!") {
+        return prefix + ", " + name + suffix;
+    }
+}
+
+class DefaultParameterZeroArgTest {
+    static int function calculate(int a = 10, int b = 20, int c = 30) {
+        return a + b + c;
+    }
+
+    static double function multiply(double x = 2.5, double y = 4.0) {
+        return x * y;
+    }
+
+    static main() {
+        // 1. Static method called with 0 arguments (all defaults)
+        int r0 = calculate();
+
+        // 2. Static method called with 1 argument (remaining defaults)
+        int r1 = calculate(50);
+
+        // 3. Static method called with 2 arguments (remaining default)
+        int r2 = calculate(50, 100);
+
+        // 4. Static method called with 3 arguments (no defaults)
+        int r3 = calculate(50, 100, 200);
+
+        // 5. Static double method with 0 arguments
+        double m0 = multiply();
+
+        // 6. Instance method with 0 arguments
+        Calculator calc = new Calculator();
+        int c0 = calc.compute();
+        int c1 = calc.compute(5);
+        String g0 = calc.formatGreeting();
+
+        bool passed = true;
+
+        if (r0 != 60) {
+            OceanOutput("FAILED r0: expected 60, got " + r0);
+            passed = false;
+        }
+        if (r1 != 100) {
+            OceanOutput("FAILED r1: expected 100, got " + r1);
+            passed = false;
+        }
+        if (r2 != 180) {
+            OceanOutput("FAILED r2: expected 180, got " + r2);
+            passed = false;
+        }
+        if (r3 != 350) {
+            OceanOutput("FAILED r3: expected 350, got " + r3);
+            passed = false;
+        }
+        if (m0 != 10.0) {
+            OceanOutput("FAILED m0: expected 10.0, got " + m0);
+            passed = false;
+        }
+        if (c0 != 205) {
+            OceanOutput("FAILED c0: expected 205, got " + c0);
+            passed = false;
+        }
+        if (c1 != 15) {
+            OceanOutput("FAILED c1: expected 15, got " + c1);
+            passed = false;
+        }
+        if (g0 != "Hello, Ocean!") {
+            OceanOutput("FAILED g0: expected 'Hello, Ocean!', got " + g0);
+            passed = false;
+        }
+
+        if (passed) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

@@ -1,0 +1,12 @@
+package com.resources;
+    class HelperClass {
+    variable count = 0;
+    
+    main() {
+        OceanOutput("HelperClass.main called!");
+    }
+    
+    static String function greet(String name) {
+        return $"Greetings, {name}!";
+    }
+}

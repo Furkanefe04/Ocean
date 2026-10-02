@@ -1,0 +1,10 @@
+package error_tests;
+
+class BitwiseErrorTest {
+    static main() {
+        double d = 3.14;
+        int x = 2;
+        // Shift operation on double is not allowed
+        double res = d << x;
+    }
+}

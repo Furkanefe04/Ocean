@@ -1,0 +1,27 @@
+package com.resources;
+
+interface IService {
+    int function compute(int val);
+}
+
+class ServiceImpl implements IService {
+    public int function compute(int val) {
+        return val * 10;
+    }
+}
+
+class DevirtualizationTest {
+    static main() {
+        OceanOutput("=== MONOMORPHIC DEVIRTUALIZATION TEST START ===");
+
+        IService service = new ServiceImpl();
+        int resultx = service.compute(42);
+
+        OceanOutput("Result: " + resultx);
+        if (resultx == 420) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

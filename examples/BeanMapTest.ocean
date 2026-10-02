@@ -1,0 +1,31 @@
+import java.util.ArrayList;
+import org.apache.commons.beanutils.BeanMap;
+import resources.A;
+import com.resources.BitwiseLongTest;
+
+public class SimpleBean {
+    private String name;
+    function SimpleBean(String name) {
+        this.name = name;
+    }
+    String function getName() {
+        return name;
+    }
+    void function setName(String n) {
+        name = n;
+    }
+}
+
+class BeanMapTest {
+    main() {
+        SimpleBean bean = new SimpleBean("Ocean");
+        BeanMap map = new BeanMap(bean);
+        String name = (String) map.get("name");
+        OceanOutput("name: " + name);
+        if (name.equals("Ocean")) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

@@ -1,0 +1,17 @@
+package com.resources;
+    class MissingReturnTest {
+    static int function add(int a, int b) {
+        int x = a + b;
+        return x;
+    }
+
+    main() {
+        int resultx = add(10, 5);
+        Output(resultx);
+        if (resultx == 15) {
+            Output("STATUS: PASSED");
+        } else {
+            Output("STATUS: FAILED");
+        }
+    }
+}

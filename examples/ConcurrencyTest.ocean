@@ -1,0 +1,34 @@
+package tests;
+
+class ConcurrencyTest {
+    public sync int counter = 0;
+    public static sync int globalCounter = 0;
+
+    public lock void function increment() {
+        this.counter = this.counter + 1;
+    }
+
+    public static lock void function incrementGlobal() {
+        globalCounter = globalCounter + 1;
+    }
+
+    void function testLockBlock() {
+        lock(this) {
+            OceanOutput("Within locked block");
+        }
+    }
+
+    static main() {
+        variable testObj = new ConcurrencyTest();
+        testObj.increment();
+        ConcurrencyTest.incrementGlobal();
+        testObj.testLockBlock();
+        OceanOutput("Concurrency test completed successfully!");
+
+        if (testObj.counter == 1 && ConcurrencyTest.globalCounter == 1) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

@@ -1,0 +1,29 @@
+package com.resources;
+
+class LambdaTestQ {
+
+    main() {
+        variable deneme = new int[1];
+        deneme[0] = 0;
+        Output("--- Lambda Test ---");
+        
+        variable r = (Runnable) () -> {
+            Output("Hello from lambda!");
+        };
+        
+        r();
+        
+        variable msg = "Captured Variable";
+        variable r2 = (Runnable) () -> {
+            Output(msg);
+            deneme[0]++;
+        };
+        r2();
+        if (deneme[0] == 1){
+            Output("STATUS: PASSED");
+        }
+        else {
+            Output("STATUS: FAILED");
+        }
+    }
+}

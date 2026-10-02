@@ -1,0 +1,9 @@
+class GenericTypeErrorTest {
+
+    main(){
+        OceanList<OceanMap<String, OceanMap<String, Integer>>> datax = [
+        {"user": {"age": 25}},
+        {"user": {"age": "twenty"}}
+        ];
+    }
+}

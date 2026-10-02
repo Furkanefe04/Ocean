@@ -1,0 +1,8 @@
+package com.resources;
+
+class ValueReassignmentErrorTest {
+    static main() {
+        value x = 10;
+        x = 20; // MUST FAIL: Final değişken 'x' yeniden atanamaz
+    }
+}

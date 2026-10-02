@@ -1,0 +1,18 @@
+package com.resources;
+    class SafeTest {
+    static main() {
+        String s = "hello";
+        int len = s?.length() ?? 0;
+        OceanOutput("Len: " + len);
+        
+        String? n = null;
+        int nlen = n?.length() ?? 0;
+        OceanOutput("Null len: " + nlen);
+
+        if (len == 5 && nlen == 0) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

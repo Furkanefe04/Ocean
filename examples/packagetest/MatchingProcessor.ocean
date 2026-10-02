@@ -1,0 +1,123 @@
+package com.trading.engine;
+
+import java.lang.Exception;
+import com.trading.core.OrderListWrapper;
+import com.trading.model.LimitOrder;
+import com.trading.model.MatchResult;
+import com.trading.model.ExecutionReport;
+import com.trading.wallet.Wallet;
+import com.trading.wallet.Ledger;
+
+public class PriceLevel {
+    public double price;
+    public OrderListWrapper<LimitOrder> orders;
+
+    public static PriceLevel function create(double p) {
+        PriceLevel pl = new PriceLevel();
+        pl.price = p;
+        pl.orders = OrderListWrapper.create();
+        return pl;
+    }
+}
+
+public class OrderBook {
+    public String symbol;
+    public OrderListWrapper<LimitOrder> bids;
+    public OrderListWrapper<LimitOrder> asks;
+
+    public static OrderBook function create(String sym) {
+        OrderBook ob = new OrderBook();
+        ob.symbol = sym;
+        ob.bids = OrderListWrapper.create();
+        ob.asks = OrderListWrapper.create();
+        return ob;
+    }
+}
+
+public class TransactionFeeCalculator {
+    public static double function calculateFee(double amt, String tier) {
+        if (tier.equals("VIP")) {
+            return amt * 0.001; // 0.1% maker/taker VIP fee
+        }
+        return amt * 0.002; // 0.2% standard fee
+    }
+}
+
+public class ClearingHouse {
+    public static MatchResult function clearMatch(Wallet buyer, Wallet seller, double price, double quantity, String symbol, Ledger ledger, String tier) {
+        MatchResult? res = null;
+        trying {
+            double totalFiat = price * quantity;
+            double buyerFee = TransactionFeeCalculator.calculateFee(totalFiat, tier);
+
+            // Verify and clear Fiat from Buyer
+            buyer.withdraw("USD", totalFiat + buyerFee);
+            seller.deposit("USD", totalFiat);
+
+            // Verify and clear Crypto from Seller
+            seller.withdraw(symbol, quantity);
+            buyer.deposit(symbol, quantity);
+
+            // Log transactional double entry clearing audit trail
+            ledger.logTransfer(buyer.accountId, seller.accountId, "USD", totalFiat);
+            ledger.logTransfer(seller.accountId, buyer.accountId, symbol, quantity);
+
+            res = MatchResult.create(buyer.accountId, seller.accountId, price, quantity, true, "Clearing completed successfully.");
+        } catch (Exception e) {
+            res = MatchResult.create(buyer.accountId, seller.accountId, price, quantity, false, "Clearing failed: " + e.getMessage());
+        }
+        return res;
+    }
+}
+
+public class MatchingProcessor {
+    public OrderBook book;
+    public Ledger ledger;
+
+    public static MatchingProcessor function create(OrderBook ob, Ledger lg) {
+        MatchingProcessor mp = new MatchingProcessor();
+        mp.book = ob;
+        mp.ledger = lg;
+        return mp;
+    }
+
+    public MatchResult function submitOrder(LimitOrder order, Wallet buyerWallet, Wallet sellerWallet, String tier) {
+        MatchResult? res = null;
+        if (order.side.equals("BUY")) {
+            // Check asks (sell orders)
+            LimitOrder? matchedAsk = null;
+            for (int i from 0 to book.asks.size() with increasing 1) {
+                LimitOrder ask = book.asks.get(i);
+                if (ask.price <= order.price && ask.quantity == order.quantity) {
+                    matchedAsk = ask;
+                }
+            }
+
+            if (matchedAsk != null) {
+                // Clear match
+                res = ClearingHouse.clearMatch(buyerWallet, sellerWallet, matchedAsk.price, order.quantity, order.symbol, ledger, tier);
+            } else {
+                book.bids.add(order);
+                res = MatchResult.create(buyerWallet.accountId, "NONE", order.price, order.quantity, false, "Order queued in BIDS book.");
+            }
+        } else {
+            // Check bids (buy orders)
+            LimitOrder? matchedBid = null;
+            for (int i from 0 to book.bids.size() with increasing 1) {
+                LimitOrder bid = book.bids.get(i);
+                if (bid.price >= order.price && bid.quantity == order.quantity) {
+                    matchedBid = bid;
+                }
+            }
+
+            if (matchedBid != null) {
+                // Clear match
+                res = ClearingHouse.clearMatch(buyerWallet, sellerWallet, order.price, order.quantity, order.symbol, ledger, tier);
+            } else {
+                book.asks.add(order);
+                res = MatchResult.create("NONE", sellerWallet.accountId, order.price, order.quantity, false, "Order queued in ASKS book.");
+            }
+        }
+        return res;
+    }
+}

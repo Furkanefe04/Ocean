@@ -1,0 +1,13 @@
+package com.resources;
+    class SimpleInterpolationTest {
+    static void function main() {
+        String name = "World";
+        String s = $"Hello {name}";
+        OceanOutput(s);
+        if (s == "Hello World") {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

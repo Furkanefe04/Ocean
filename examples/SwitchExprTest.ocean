@@ -1,0 +1,24 @@
+package tests;
+
+class SwitchExprTest {
+    static main() {
+        int x = 5;
+        String res = switch(x) {
+            case 1 -> {
+                result "one";
+            }
+            case 2 -> {
+                result "two";
+            }
+            default -> {
+                result "other";}
+            };
+        OceanOutput("Result is: " + res);
+
+        if (res.equals("other")) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

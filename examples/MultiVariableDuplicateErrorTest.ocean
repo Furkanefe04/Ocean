@@ -1,0 +1,8 @@
+package test;
+
+public class MultiVariableDuplicateErrorTest {
+    public static main(String[] args) {
+        // Declaring duplicate variable names in the same multi-variable line must fail compilation
+        int dup = 10, dup = 20;
+    }
+}

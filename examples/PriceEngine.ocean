@@ -1,0 +1,36 @@
+package com.resources;
+    class PriceEngine {
+    variable btcBase = 0;
+    variable ethBase = 0;
+    variable tickCount = 0;
+
+    function PriceEngine(int btcStart, int ethStart) {
+        btcBase = btcStart;
+        ethBase = ethStart;
+        tickCount = 0;
+    }
+    
+    void function tick() {
+        tickCount = tickCount + 1;
+        variable cycle = tickCount % 4;
+        if (cycle == 0) { btcBase = btcBase + 100;
+            ethBase = ethBase - 20;
+        }
+        else { 
+            if (cycle == 1) { btcBase = btcBase - 50;
+                ethBase = ethBase + 40;
+            }
+            else { 
+                if (cycle == 2) {
+                    btcBase = btcBase + 70; ethBase = ethBase - 10;
+                }
+                else {
+                    btcBase = btcBase - 120; ethBase = ethBase - 10;
+                }
+            } 
+        }
+    }
+    
+    int function getBTCPrice() { return btcBase; }
+    int function getETHPrice() { return ethBase; }
+}

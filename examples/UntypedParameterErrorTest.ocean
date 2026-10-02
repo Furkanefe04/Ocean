@@ -1,0 +1,12 @@
+package com.resources;
+
+class UntypedParam {
+    function test(variable x) {
+        OceanOutput(x);
+    }
+}
+
+class UntypedParameterErrorTest {
+    main() {
+    }
+}

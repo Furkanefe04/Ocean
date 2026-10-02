@@ -1,0 +1,65 @@
+package com.resources;
+
+interface CustomPrintable {
+    void function printInfo();
+}
+
+class BaseWorker implements CustomPrintable {
+    void function printInfo() {
+        OceanOutput("BaseWorker Info");
+    }
+
+    String function process(Object obj) {
+        return "Object Overload: " + obj.toString();
+    }
+
+    String function process(String str) {
+        return "String Overload: " + str;
+    }
+
+    String function process(Number num) {
+        return "Number Overload: " + num.toString();
+    }
+}
+
+class AdvancedWorker extends BaseWorker {
+    void function printInfo() {
+        OceanOutput("AdvancedWorker Info");
+    }
+}
+
+class MethodResolutionStressTest {
+    main() {
+        OceanOutput("=== METHOD RESOLUTION STRESS TEST START ===");
+
+        variable worker = new AdvancedWorker();
+
+        // 1. Test interface method dispatch
+        CustomPrintable printable = worker;
+        printable.printInfo();
+
+        // 2. Test java.lang.Object methods on interface targets
+        OceanOutput("Interface toString: " + printable.toString());
+        OceanOutput("Interface hashCode non-zero: " + (printable.hashCode() != 0));
+
+        // 3. Test exact overload resolution
+        String res1 = worker.process("Hello Ocean");
+        OceanOutput("Overload String test: " + res1);
+
+        String res2 = worker.process(12345);
+        OceanOutput("Overload Number test: " + res2);
+
+        Object obj = "Polymorphic String";
+        String res3 = worker.process(obj);
+        OceanOutput("Overload Object test: " + res3);
+
+        if ("String Overload: Hello Ocean".equals(res1) &&
+            "Number Overload: 12345".equals(res2) &&
+            "Object Overload: Polymorphic String".equals(res3) &&
+            (printable.hashCode() != 0)) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

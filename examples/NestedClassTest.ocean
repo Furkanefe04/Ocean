@@ -1,0 +1,20 @@
+package tests;
+
+class NestedClassTest {
+    class Inner {
+        String function test() {
+            return "Nested class OK";
+        }
+    }
+    
+    static main() {
+        variable x = new NestedClassTest.Inner();
+        String result = x.test();
+        OceanOutput("Result: " + result);
+        if (result.equals("Nested class OK")) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

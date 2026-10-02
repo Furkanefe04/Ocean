@@ -1,0 +1,134 @@
+package com.sealedtest;
+
+import java.lang.Class;
+
+// Sealed Class with explicit restricts list
+public sealed class Shape restricts Circle, Rectangle {
+    public double function area() {
+        return 0.0;
+    }
+}
+
+// Subclass marked final
+public final class Circle extends Shape {
+    public double radius;
+
+    public function Circle(double radius) {
+        this.radius = radius;
+    }
+
+    @Override
+    public double function area() {
+        return 3.14159 * radius * radius;
+    }
+}
+
+// Subclass marked non-sealed
+public non-sealed class Rectangle extends Shape {
+    public double width;
+    public double height;
+
+    public function Rectangle(double w, double h) {
+        width = w;
+        height = h;
+    }
+
+    @Override
+    public double function area() {
+        return width * height;
+    }
+}
+
+// Sealed Interface with explicit restricts list
+public sealed interface Expr restricts Const, Add {
+    public int function eval();
+}
+
+public final class Const implements Expr {
+    public int val;
+
+    public function Const(int val) {
+        this.val = val;
+    }
+
+    @Override
+    public int function eval() {
+        return val;
+    }
+}
+
+public final class Add implements Expr {
+    public Expr left;
+    public Expr right;
+
+    public function Add(Expr l, Expr r) {
+        left = l;
+        right = r;
+    }
+
+    @Override
+    public int function eval() {
+        return left.eval() + right.eval();
+    }
+}
+
+public class SealedClassTest {
+
+    static main() {
+        OceanOutput("=== SEALED CLASS & INTERFACE TEST START ===");
+
+        bool shapesOk = false;
+        bool exprOk = false;
+        bool reflectionOk = false;
+
+        // 1. Shapes Test
+        Shape c = new Circle(5.0);
+        Shape r = new Rectangle(4.0, 6.0);
+
+        OceanOutput("Circle Area: " + c.area());
+        OceanOutput("Rectangle Area: " + r.area());
+
+        if (c.area() > 78.5 && r.area() == 24.0) {
+            shapesOk = true;
+        }
+
+        // 2. Sealed Interface Expr Test (Const(10) + Const(20))
+        Expr e1 = new Const(10);
+        Expr e2 = new Const(20);
+        Expr addExpr = new Add(e1, e2);
+
+        OceanOutput("Evaluated Expr Result: " + addExpr.eval());
+        if (addExpr.eval() == 30) {
+            exprOk = true;
+        }
+
+        // 3. Reflection Test (Class.isSealed() and Class.getPermittedSubclasses())
+        trying {
+            variable shapeClass = c.getClass().getSuperclass();
+            bool isSealed = shapeClass.isSealed();
+            Class[] permitted = shapeClass.getPermittedSubclasses();
+
+            OceanOutput("Is Shape Sealed: " + isSealed);
+            OceanOutput("Permitted Subclasses Count: " + permitted.length);
+            variable i = 0;
+            while (i < permitted.length) {
+                OceanOutput("Permitted Subclass [" + i + "]: " + permitted[i].getSimpleName());
+                i = i + 1;
+            }
+
+            if (isSealed && permitted.length == 2) {
+                reflectionOk = true;
+            }
+        } catch (Exception ex) {
+            OceanOutput("Reflection Exception: " + ex.getMessage());
+        }
+
+        if (shapesOk && exprOk && reflectionOk) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+
+        OceanOutput("=== SEALED CLASS & INTERFACE TEST COMPLETED ===");
+    }
+}

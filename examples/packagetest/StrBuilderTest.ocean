@@ -1,0 +1,14 @@
+package packagetest;
+
+class StrBuilderTest {
+
+    main() {
+        long start = System.nanoTime();
+        for(variable i from 0 to 10000000 with increasing 1){
+            variable builder = new StrBuilder();
+            builder.append(Integer.MAX_VALUE).append("Furkan").append(true).append(Integer.MIN_VALUE);
+        }
+        long end = System.nanoTime();
+        OceanOutput($"süre : {(end-start)/1000000} ms");
+    }
+}

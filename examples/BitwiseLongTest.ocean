@@ -1,0 +1,32 @@
+package com.resources;
+public class BitwiseLongTest {
+    main() {
+        variable a = 4294967295L; 
+        variable b = 4042322160L;
+        
+        OceanOutput("a: " + a);
+        OceanOutput("b: " + b);
+        
+        // Bitwise AND
+        variable c = a & b;
+        OceanOutput("a & b: " + c);
+        
+        // Shift left
+        variable d = 1L << 33; // Should be 8589934592
+        OceanOutput("1L << 33: " + d);
+        
+        // Shift right
+        variable e = d >> 1;
+        OceanOutput("d >> 1: " + e);
+        
+        // Bitwise NOT
+        variable f = ~0L;
+        OceanOutput("~0L: " + f); // Should be -1
+
+        if (c == 4042322160L && d == 8589934592L && e == 4294967296L && f == -1L) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

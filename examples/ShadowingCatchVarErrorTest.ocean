@@ -1,0 +1,13 @@
+package com.resources;
+
+class ShadowingCatchVarErrorTest {
+    static void function handle(Exception ex) {
+        trying {
+            throw new Exception("Error");
+        } catch (Exception ex) { // MUST FAIL: Yakalama (catch) değişkeni 'ex' bu metot kapsamında zaten tanımlı.
+            OceanOutput(ex);
+        }
+    }
+
+    main() {}
+}

@@ -1,0 +1,24 @@
+class DefaultParameterTest {
+    main(){
+        variable x = add(2,3);
+        variable y = add(2);
+        variable z = mul(2,3);
+        variable t = mul(10);
+        variable zeroAdd = add();
+        variable zeroMul = mul();
+        bool check = x == 5 && y == 2 && z == 6 && t == 10 && zeroAdd == 0 && zeroMul == 1;
+        if (check) {
+            OceanOutput("STATUS: PASSED");
+        }
+        else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+
+    static double function add(Number a = 0 , Number b = 0){
+        return a+b;
+    }
+    static double function mul(Number a =1 , Number b = 1){
+        return a*b;
+    }
+}

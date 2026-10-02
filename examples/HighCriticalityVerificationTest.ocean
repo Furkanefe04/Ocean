@@ -1,0 +1,89 @@
+package com.resources;
+
+import java.util.ArrayList;
+import java.util.List;
+
+interface ParentInterface {
+    void function performAction();
+}
+
+interface ChildInterface extends ParentInterface {
+    // inherits performAction()
+}
+
+class TestImplementer implements ChildInterface {
+    @Override
+    void function performAction() {
+        OceanOutput("Action performed in implementer!");
+    }
+}
+
+enum VerificationEnum {
+    FIRST,
+    SECOND,
+    THIRD
+}
+
+class HighCriticalityVerificationTest {
+    main() {
+        OceanOutput("=== HIGH CRITICALITY VERIFICATION TEST START ===");
+
+        // 1. GF4: For-in Generic Iterable Type
+        ArrayList<String> list = new ArrayList<String>();
+        list.add("ocean");
+        list.add("compiler");
+        list.add("verification");
+
+        int totalLength = 0;
+        for (variable s in list) {
+            // calling length() and toUpperCase() is only allowed if s is correctly resolved as String (not Object)
+            int len = s.length();
+            totalLength = totalLength + len;
+            String upper = s.toUpperCase();
+            OceanOutput(upper + " (length: " + len + ")");
+        }
+
+        // 2. SF3: Transitive Interface Override
+        ChildInterface impl = new TestImplementer();
+        impl.performAction();
+
+        // 3. BF4: Enum Switch Comparison
+        VerificationEnum enumVal = VerificationEnum.SECOND;
+        String switchOutput = "";
+
+
+
+        switch (enumVal) {
+            case VerificationEnum.FIRST:
+                OceanOutput("Enum: FIRST");
+                switchOutput = switchOutput + "FIRST;";
+            case VerificationEnum.SECOND:
+                OceanOutput("Enum: SECOND");
+                switchOutput = switchOutput + "SECOND;";
+            case VerificationEnum.THIRD:
+                OceanOutput("Enum: THIRD");
+                switchOutput = switchOutput + "THIRD;";
+            default:
+                OceanOutput("Enum: UNKNOWN");
+                switchOutput = switchOutput + "UNKNOWN;";
+        }
+
+        // 4. BF4: Enum Switch Expression
+        VerificationEnum enumVal2 = VerificationEnum.THIRD;
+        variable resultStr = switch (enumVal2) {
+            case VerificationEnum.FIRST -> "Result FIRST"
+            case VerificationEnum.SECOND -> "Result SECOND"
+            case VerificationEnum.THIRD -> "Result THIRD"
+            default -> "Result UNKNOWN"
+        };
+        OceanOutput("Switch Expr: " + resultStr);
+
+        if (totalLength == 25 && switchOutput == "SECOND;THIRD;UNKNOWN;" && resultStr == "Result THIRD") {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+        OceanOutput("=== HIGH CRITICALITY VERIFICATION TEST COMPLETED ===");
+    }
+}
+// Force Recompile Timestamp: 2026-06-20T17:34:00

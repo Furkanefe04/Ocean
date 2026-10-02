@@ -1,0 +1,277 @@
+package com.ultra;
+
+
+// =====================================================
+// 1. Recursive F-Bounded Interface Chain
+// =====================================================
+
+interface Node<T <: Node<T>> {
+    T function next();
+}
+
+class BaseNode<T <: BaseNode<T>> implements Node<T> {
+    T nextNode;
+
+    void function setNext(T node) {
+        nextNode = node;
+    }
+
+    @Override
+    T function next() {
+        return nextNode;
+    }
+}
+
+class IntNode extends BaseNode<IntNode> {
+    int valuex;
+
+    function IntNode(int valuex) {
+        this.valuex = valuex;
+    }
+
+}
+
+// =====================================================
+// 2. Triple Nested Generic Container
+// =====================================================
+
+class Triple<A, B, C> {
+    A a;
+    B b;
+    C c;
+
+    function Triple(A a, B b, C c) {
+        this.a = a;
+        this.b = b;
+        this.c = c;
+    }
+
+    A function first() { return a; }
+    B function second() { return b; }
+    C function third() { return c; }
+}
+
+// =====================================================
+// 3. Deep Generic Inheritance
+// =====================================================
+
+class Level1<T> {
+    T valuex;
+
+    function Level1(T valuex) {
+        this.valuex = valuex;
+    }
+
+    T function get() {
+        return valuex;
+    }
+}
+
+class Level2<T> extends Level1<T> {
+    function Level2(T valuex) {
+        super(valuex);
+    }
+}
+
+class Level3<T> extends Level2<T> {
+    function Level3(T valuex) {
+        super(valuex);
+    }
+}
+
+class Level4<T> extends Level3<T> {
+    function Level4(T valuex) {
+        super(valuex);
+    }
+}
+
+// =====================================================
+// 4. Method Generic Shadow Hell
+// =====================================================
+
+class ShadowHell<T> {
+
+    T classField;
+
+    function ShadowHell(T valuex) {
+        classField = valuex;
+    }
+
+    public <T> T function identity(T valuex) {
+        return valuex;
+    }
+
+    public <T> T function doubleIdentity(T valuex) {
+        T local = valuex;
+        return local;
+    }
+
+    T function getClassField() {
+        return classField;
+    }
+}
+
+// =====================================================
+// 5. Generic Interface Override Chaos
+// =====================================================
+
+interface Producer<T> {
+    T function produce();
+}
+
+abstract class AbstractProducer<T> implements Producer<T> {}
+
+class StringProducer extends AbstractProducer<String> {
+    @Override
+    String function produce() {
+        return "STRING_OK";
+    }
+}
+
+class IntegerProducer extends AbstractProducer<Integer> {
+    @Override
+    Integer function produce() {
+        return Integer.valueOf(999);
+    }
+}
+
+// =====================================================
+// 6. Static Generic Method Chain
+// =====================================================
+
+class MathUtil {
+
+    public static <A <: Number, B <: Number> Number function add(A a, B b) {
+        return a + b;
+    }
+
+    public static <A <: Number, B <: Number> Number function multiply(A a, B b) {
+        return a * b;
+    }
+
+    public static <T> T function echo(T valuex) {
+        return valuex;
+    }
+}
+
+// =====================================================
+// 7. Generic Object Swapping
+// =====================================================
+
+class Box<T> {
+    T valuex;
+
+    function Box(T valuex) {
+        this.valuex = valuex;
+    }
+
+    T function get() {
+        return valuex;
+    }
+
+    void function set(T val) {
+        valuex = val;
+    }
+}
+
+class SwapUtil {
+    public static <T> void function swap(Box<T> a, Box<T> b) {
+        T temp = a.get();
+        a.set(b.get());
+        b.set(temp);
+    }
+}
+
+// =====================================================
+// MAIN TEST
+// =====================================================
+
+class UltraGenericTest {
+
+    main() {
+
+        OceanOutput("==== ULTRA GENERIC TEST START ====");
+
+        // Test 1 Recursive F-Bounded
+
+        IntNode n1 = new IntNode(10);
+        IntNode n2 = new IntNode(20);
+
+        n1.setNext(n2);
+
+        int recursiveCheck = n1.next().valuex;
+
+        OceanOutput(recursiveCheck);
+
+        // Test 2 Triple Nested
+
+        Triple<String,Integer,Double> triple = new Triple<String,Integer,Double>("Hello", 55, 12.5);
+
+        OceanOutput(triple.first());
+        OceanOutput(triple.second());
+        OceanOutput(triple.third());
+
+        // Test 3 Deep inheritance
+
+        Level4<String> deep = new Level4<String>("DeepValue");
+
+        String deepCheck = deep.get();
+
+        OceanOutput(deepCheck);
+
+        // Test 4 Shadow Hell
+
+        ShadowHell<String> shadow = new ShadowHell<String>("CLASS_DATA");
+
+        Integer x = shadow.identity(Integer.valueOf(999));
+        Double y = shadow.doubleIdentity(Double.valueOf(14.5));
+
+        OceanOutput(shadow.getClassField());
+        OceanOutput(x);
+        OceanOutput(y);
+
+        // Test 5 Producer
+
+        Producer<String> p1 = new StringProducer();
+        Producer<Integer> p2 = new IntegerProducer();
+
+        String s = p1.produce();
+        Integer i = p2.produce();
+
+        OceanOutput(s);
+        OceanOutput(i);
+
+        // Test 6 Static generic chain
+
+        Number a = MathUtil.add(10, 20.5);
+        Number b = MathUtil.multiply(5, 8);
+
+        OceanOutput(a);
+        OceanOutput(b);
+
+        // Test 7 Swap generic
+
+        Box<String> b1 = new Box<String>("FIRST");
+        Box<String> b2 = new Box<String>("SECOND");
+
+        SwapUtil.swap(b1,b2);
+
+        OceanOutput(b1.get());
+        OceanOutput(b2.get());
+
+        // Final verification
+
+        if (recursiveCheck == 20 && triple.first().equals("Hello") &&
+        triple.second() == 55 && deepCheck.equals("DeepValue") &&
+        x == 999 && y == 14.5 && s.equals("STRING_OK") &&
+        i == 999 && a.doubleValue() == 30.5 && b.intValue() == 40 &&
+        b1.get().equals("SECOND") && b2.get().equals("FIRST")) {
+            OceanOutput("STATUS: PASSED");
+        }
+        else {
+            OceanOutput("STATUS: FAILED");
+        }
+
+        OceanOutput("==== ULTRA GENERIC TEST END ====");
+    }
+}

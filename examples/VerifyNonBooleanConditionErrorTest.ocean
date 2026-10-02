@@ -1,0 +1,8 @@
+package ocean.test;
+
+class VerifyNonBooleanConditionErrorTest {
+    static main() {
+        int num = 42;
+        verify num : "Number is not boolean";
+    }
+}

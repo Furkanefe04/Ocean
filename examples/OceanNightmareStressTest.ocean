@@ -1,0 +1,289 @@
+package com.nightmare;
+
+import java.util.*;
+import java.math.BigDecimal;
+
+class Alpha<T> {
+    T valuex;
+
+    function Alpha(T v){
+        valuex = v;
+    }
+
+    T function get(){
+        return valuex;
+    }
+}
+
+class Beta<X,Y> {
+
+    X first;
+    Y second;
+
+    function Beta(X a,Y b){
+        first = a;
+        second = b;
+    }
+
+    X function getFirst(){
+        return first;
+    }
+
+    Y function getSecond(){
+        return second;
+    }
+}
+
+class Counter {
+
+    sync int val = 0;
+
+    sync void function inc(){
+        val++;
+    }
+}
+
+class MathUtil {
+
+    static int function fib(int n){
+        if(n <= 1) return n;
+        return fib(n-1)+fib(n-2);
+    }
+
+    static int function factorial(int n){
+        if(n <= 1) return 1;
+        return n * factorial(n-1);
+    }
+}
+
+class OverloadTest {
+    void function foo(byte x){
+        OceanOutput("byte");
+    }
+
+    void function foo(short x){
+        OceanOutput("short");
+    }
+
+    void function foo(int x){
+        OceanOutput("int");
+    }
+
+    void function foo(long x){
+        OceanOutput("long");
+    }
+
+    void function foo(float x){
+        OceanOutput("float");
+    }
+
+    void function foo(double x){
+        OceanOutput("double");
+    }
+}
+
+class OceanNightmareStressTest {
+
+    main(){
+        OceanOutput("===== NIGHTMARE TEST =====");
+
+        //-----------------------------------
+        // 1 Deep arithmetic precedence
+        //-----------------------------------
+
+        variable a = (((((2+3)*5)<<3)&255)^123|77)-((5*6)/2);
+
+        OceanOutput(a);
+
+        //-----------------------------------
+        // 2 Extreme nested generics
+        //-----------------------------------
+
+        variable nested = new Alpha<Alpha<Alpha<Beta<Integer,String>>>>(new Alpha<Alpha<Beta<Integer,String>>>(new Alpha<Beta<Integer,String>>(new Beta<Integer,String>(999,"ocean"))));
+        Alpha<Alpha<Beta<Integer,String>>> nested1 = nested.get();
+        Alpha<Beta<Integer,String>> nested2 = nested1.get();
+        Beta<Integer,String> nested3 = nested2.get();
+        OceanOutput(nested3.getFirst(),nested3.getSecond());
+
+        variable listNestedx = [{
+            "a":[[1,2,3],[4,5,6],[7,8,9]],
+            "b":[[10,11,12],[13,14,15],[16,17,18]],
+            "c":#{1,3,3,5,5,8,5,5,1,2,1}
+        }];
+        OceanOutput(((OceanList<OceanList>)listNestedx.getFirst().get("b")).getFirst().get(2));
+        //-----------------------------------
+        // 3 Recursive stack pressure
+        //-----------------------------------
+
+        variable fib = MathUtil.fib(12);
+        variable fact = MathUtil.factorial(10);
+
+        OceanOutput(fib);
+        OceanOutput(fact);
+
+        //-----------------------------------
+        // 4 BigDecimal promotion chaos
+        //-----------------------------------
+
+        variable bd = 99999999999999999999999999999 * 88888888888888888888888888888 + new BigDecimal("123456789.123");
+
+        OceanOutput(bd);
+
+        //-----------------------------------
+        // 5 Lambda capture chain
+        //-----------------------------------
+
+        variable x = 777;
+
+        variable r = (Runnable) () -> {
+            OceanOutput(x);
+            variable y = x + 100;
+            OceanOutput(y);
+        };
+
+        r();
+
+        //-----------------------------------
+        // 6 Massive threading
+        //-----------------------------------
+
+        variable counter = new Counter();
+
+        variable t1 = new Thread(() -> {
+            for(int i from 0 to 3000 with increasing 1){
+                counter.inc();
+            }
+        });
+
+        variable t2 = new Thread(() -> {
+            for(int i from 0 to 3000 with increasing 1){
+                counter.inc();
+            }
+        });
+
+        variable t3 = new Thread(() -> {
+            for(int i from 0 to 3000 with increasing 1){
+                counter.inc();
+            }
+        });
+
+        t1.start();
+        t2.start();
+        t3.start();
+
+        trying{
+            t1.join();
+            t2.join();
+            t3.join();
+        }
+        catch(Exception e){
+            OceanOutput(e.getMessage());
+        }
+
+        OceanOutput(counter.val);
+
+        //-----------------------------------
+        // 7 Overload resolution
+        //-----------------------------------
+
+        OverloadTest t = new OverloadTest();
+
+        byte b = 1;
+        short s = 2;
+        int i = 3;
+        long l = 4L;
+        float f = 5.0f;
+        double d = 6.0d;
+
+        t.foo(b);
+        t.foo(s);
+        t.foo(i);
+        t.foo(l);
+        t.foo(f);
+        t.foo(d);
+
+        //-----------------------------------
+        // 8 Switch nesting
+        //-----------------------------------
+
+        variable sw = switch(10){
+
+            case 10 -> switch(20){
+
+                case 20 -> switch(30){
+
+                    case 30 -> "deep"
+
+                    default -> "fail"
+                }
+
+                default -> "fail"
+            }
+
+            default -> "fail"
+        };
+
+        OceanOutput(sw);
+
+        //-----------------------------------
+        // 9 Null coalescing chain
+        //-----------------------------------
+
+        String? aa = null;
+        String? bb = null;
+
+        variable resultx = aa ?? bb ?? "fallback";
+
+        OceanOutput(resultx);
+
+        //-----------------------------------
+        // 10 Complex collection inference
+        //-----------------------------------
+
+        variable complex = [{"nums":[1,2,3,4], "vals":[5,6,7,8]}];
+
+        OceanOutput(complex);
+
+        //-----------------------------------
+        // 11 Cast chain
+        //-----------------------------------
+
+        variable casted = (int)((double)((long)((short)((byte)100))));
+
+        OceanOutput(casted);
+
+        //-----------------------------------
+        // 12 Exception propagation
+        //-----------------------------------
+
+        trying{
+            trying{
+                trying{
+                    throw new RuntimeException("boom");
+                }
+                catch(RuntimeException e){
+                    throw e;
+                }
+            }
+
+            catch(Exception e){
+                throw e;
+            }
+        }
+
+        catch(Exception e){
+            OceanOutput("caught");
+        }
+
+        //-----------------------------------
+        // FINAL CHECK
+        //-----------------------------------
+
+        if(fact == 3628800 && fib == 144 && counter.val == 9000 && sw.equals("deep") && casted == 100){
+            OceanOutput("STATUS: PASSED");
+        }
+        else{
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

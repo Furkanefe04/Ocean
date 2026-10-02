@@ -1,0 +1,300 @@
+﻿package com.resources;
+
+// =========================================================================
+// 1. DERİN TİP HİYERARŞİSİ VE ÇOKLU ARAYÜZLER (6 Seviyeli Ağaç)
+// =========================================================================
+
+interface Identifiable {
+    int function getId();
+}
+
+interface Named extends Identifiable {
+    String function getName();
+}
+
+class Entity implements Named {
+    int id;
+    String name;
+    function Entity(int id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+    @Override
+    int function getId() { return id; }
+    @Override
+    String function getName() { return name; }
+}
+
+class LivingThing extends Entity {
+    int energy;
+    function LivingThing(int id, String name, int energy) {
+        super(id, name);
+        this.energy = energy;
+    }
+    int function getEnergy() { return energy; }
+}
+
+class Animal extends LivingThing {
+    function Animal(int id, String name, int energy) {
+        super(id, name, energy);
+    }
+}
+
+class Canine extends Animal {
+    function Canine(int id, String name, int energy) {
+        super(id, name, energy);
+    }
+}
+
+class Dog extends Canine {
+    function Dog(int id, String name, int energy) {
+        super(id, name, energy);
+    }
+}
+
+class Husky extends Dog {
+    function Husky(int id, String name, int energy) {
+        super(id, name, energy);
+    }
+}
+
+class SiberianHusky extends Husky {
+    String eyeColor;
+    function SiberianHusky(int id, String name, int energy, String eyeColor) {
+        super(id, name, energy);
+        this.eyeColor = eyeColor;
+    }
+    String function getEyeColor() { return eyeColor; }
+}
+
+class Feline extends Animal {
+    function Feline(int id, String name, int energy) {
+        super(id, name, energy);
+    }
+}
+
+class Cat extends Feline {
+    function Cat(int id, String name, int energy) {
+        super(id, name, energy);
+    }
+}
+
+class PersianCat extends Cat {
+    function PersianCat(int id, String name, int energy) {
+        super(id, name, energy);
+    }
+}
+
+// =========================================================================
+// 2. GELİŞMİŞ VARYANS SINIFLARI VE FONKSİYONEL YAPILAR
+// =========================================================================
+
+// Covariant Producer
+class Producer<+T> {
+    T val;
+    function Producer(T val) { this.val = val; }
+    T function produce() { return val; }
+}
+
+// Contravariant Consumer
+class Consumer<-T> {
+    int consumedCount = 0;
+    function Consumer() { }
+    void function consume(T item) {
+        consumedCount++;
+    }
+    int function getCount() { return consumedCount; }
+}
+
+// Çift Girdili Fonksiyonel Dönüştürücü (-In1, -In2, +Out)
+class BiFunction<-In1, -In2, +Out> {
+    Out fixedOutput;
+    function BiFunction(Out out) { fixedOutput = out; }
+    Out function apply(In1 a, In2 b) {
+        return fixedOutput;
+    }
+}
+
+// Fonksiyonel Boru Hattı / Pipeline (-A, +B)
+class Pipeline<-A, +B> {
+    B res;
+    function Pipeline(B res) { this.res = res; }
+    B function execute(A input) {
+        return res;
+    }
+}
+
+// 4 Parametreli Karışık Varyans Kafesi (+C1, -K1, +C2, Invar)
+class QuadLattice<+C1, -K1, +C2, Invar> {
+    C1 item1;
+    C2 item2;
+    Invar invariantTag;
+
+    function QuadLattice(C1 c1, C2 c2, Invar tag) {
+        item1 = c1;
+        item2 = c2;
+        invariantTag = tag;
+    }
+
+    C1 function getFirst() { return item1; }
+    C2 function getSecond() { return item2; }
+    Invar function getTag() { return invariantTag; }
+    void function feedKey(K1 key) { }
+}
+
+// =========================================================================
+// 3. HARDCORE TEST SENARYOLARI
+// =========================================================================
+
+class MegaVarianceHardcoreTest {
+    static main() {
+        OceanOutput("=================================================");
+        OceanOutput("   MEGA VARIANCE (+/-) HARDCORE STRESS TEST      ");
+        OceanOutput("=================================================");
+        int totalPassed = 0;
+
+        SiberianHusky balto = new SiberianHusky(101, "Balto", 95, "IceBlue");
+        PersianCat fluffy = new PersianCat(202, "Fluffy", 80);
+        Dog rex = new Dog(105, "Rex", 90);
+
+        // -----------------------------------------------------------------
+        // [TEST 1] 6 Seviyeli Derin Kovaryant Yukarı Dönüşüm
+        // SiberianHusky -> Husky -> Dog -> Canine -> Animal -> LivingThing -> Entity -> Named
+        // -----------------------------------------------------------------
+        Producer<SiberianHusky> prodHusky = new Producer<SiberianHusky>(balto);
+        Producer<Husky> prod1 = prodHusky;
+        Producer<Dog> prod2 = prod1;
+        Producer<Canine> prod3 = prod2;
+        Producer<Animal> prod4 = prod3;
+        Producer<LivingThing> prod5 = prod4;
+        Producer<Entity> prod6 = prod5;
+        Producer<Named> prodTop = prod6;
+
+        if (prodTop.produce().getName() == "Balto" && prodTop.produce().getId() == 101) {
+            OceanOutput("[PASS 1] 6-Seviyeli Derin Kovaryant Zincirleme Başarılı.");
+            totalPassed++;
+        }
+
+        // -----------------------------------------------------------------
+        // [TEST 2] 6 Seviyeli Derin Kontravaryant Aşağı Dönüşüm
+        // Consumer<Entity> -> Consumer<LivingThing> -> ... -> Consumer<SiberianHusky>
+        // -----------------------------------------------------------------
+        Consumer<Entity> consEntity = new Consumer<Entity>();
+        Consumer<LivingThing> c1 = consEntity;
+        Consumer<Animal> c2 = c1;
+        Consumer<Canine> c3 = c2;
+        Consumer<Dog> c4 = c3;
+        Consumer<Husky> c5 = c4;
+        Consumer<SiberianHusky> consHusky = c5;
+
+        consHusky.consume(balto);
+        if (consEntity.getCount() == 1) {
+            OceanOutput("[PASS 2] 6-Seviyeli Derin Kontravaryant Zincirleme Başarılı.");
+            totalPassed++;
+        }
+
+        // -----------------------------------------------------------------
+        // [TEST 3] Çift Girdili Fonksiyonel Varyans: BiFunction<-In1, -In2, +Out>
+        // BiFunction<LivingThing, Animal, SiberianHusky>
+        //   -> BiFunction<Dog, Canine, Animal>
+        //   -> BiFunction<SiberianHusky, Dog, Entity>
+        // -----------------------------------------------------------------
+        BiFunction<LivingThing, Animal, SiberianHusky> biFunc = new BiFunction<LivingThing, Animal, SiberianHusky>(balto);
+        BiFunction<Dog, Canine, Animal> biStep1 = biFunc;
+        BiFunction<SiberianHusky, Dog, Entity> biStep2 = biStep1;
+
+        Entity biRes = biStep2.apply(balto, rex);
+        if (biRes.getName() == "Balto") {
+            OceanOutput("[PASS 3] Çift Girdili Fonksiyonel Varyans (BiFunction) Başarılı.");
+            totalPassed++;
+        }
+
+        // -----------------------------------------------------------------
+        // [TEST 4] Varyans Terslenmesi (Kovaryant İçinde Kontravaryant)
+        // Consumer<Entity> <: Consumer<SiberianHusky> olduğundan
+        // Producer<Consumer<Entity>> -> Producer<Consumer<SiberianHusky>> GEÇERLİDİR!
+        // -----------------------------------------------------------------
+        Producer<Consumer<Entity>> nestInv1 = new Producer<Consumer<Entity>>(consEntity);
+        Producer<Consumer<SiberianHusky>> nestInv2 = nestInv1;
+        nestInv2.produce().consume(balto);
+        if (consEntity.getCount() == 2) {
+            OceanOutput("[PASS 4] Varyans Terslenmesi (Producer<Consumer<T>>) Başarılı.");
+            totalPassed++;
+        }
+
+        // -----------------------------------------------------------------
+        // [TEST 5] 4 Boyutlu Kafes (QuadLattice<+C1, -K1, +C2, Invar>)
+        // QuadLattice<SiberianHusky, LivingThing, PersianCat, String>
+        //   -> QuadLattice<Canine, Animal, Feline, String>
+        //   -> QuadLattice<Entity, SiberianHusky, Animal, String>
+        // -----------------------------------------------------------------
+        QuadLattice<SiberianHusky, LivingThing, PersianCat, String> quad1 =
+            new QuadLattice<SiberianHusky, LivingThing, PersianCat, String>(balto, fluffy, "INVAR_STAMP_77");
+
+        QuadLattice<Canine, Animal, Feline, String> quad2 = quad1;
+        QuadLattice<Entity, SiberianHusky, Animal, String> quad3 = quad2;
+
+        quad3.feedKey(balto);
+        if (quad3.getFirst().getName() == "Balto" &&
+            quad3.getSecond().getName() == "Fluffy" &&
+            quad3.getTag() == "INVAR_STAMP_77") {
+            OceanOutput("[PASS 5] 4 Boyutlu Karışık Varyans Kafesi Başarılı.");
+            totalPassed++;
+        }
+
+        // -----------------------------------------------------------------
+        // [TEST 6] 3 Katmanlı İç İçe Kovaryans
+        // Producer<Producer<Producer<SiberianHusky>>> -> Producer<Producer<Producer<Entity>>>
+        // -----------------------------------------------------------------
+        Producer<Producer<Producer<SiberianHusky>>> pDeep1 =
+            new Producer<Producer<Producer<SiberianHusky>>>(
+                new Producer<Producer<SiberianHusky>>(
+                    new Producer<SiberianHusky>(balto)
+                )
+            );
+        Producer<Producer<Producer<Entity>>> pDeepTop = pDeep1;
+
+        if (pDeepTop.produce().produce().produce().getName() == "Balto") {
+            OceanOutput("[PASS 6] 3 Katmanlı İç İçe Kovaryans Başarılı.");
+            totalPassed++;
+        }
+
+        // -----------------------------------------------------------------
+        // [TEST 7] Çapraz Polimorfik Boru Hattı Zincirleme
+        // Pipeline<Animal, SiberianHusky> -> Pipeline<Dog, Entity>
+        // -----------------------------------------------------------------
+        Pipeline<Animal, SiberianHusky> pipe1 = new Pipeline<Animal, SiberianHusky>(balto);
+        Pipeline<Dog, Entity> pipe2 = pipe1;
+        Entity pipeRes = pipe2.execute(rex);
+
+        if (pipeRes.getName() == "Balto") {
+            OceanOutput("[PASS 7] Çapraz Polimorfik Pipeline Zincirleme Başarılı.");
+            totalPassed++;
+        }
+
+        // -----------------------------------------------------------------
+        // [TEST 8] Çoklu Kardeş Dallanma (Feline vs Canine)
+        // QuadLattice<PersianCat, Dog, SiberianHusky, String>
+        //   -> QuadLattice<Animal, SiberianHusky, Animal, String>
+        // -----------------------------------------------------------------
+        QuadLattice<PersianCat, Dog, SiberianHusky, String> crossBranch1 =
+            new QuadLattice<PersianCat, Dog, SiberianHusky, String>(fluffy, balto, "BRANCH_OK");
+        QuadLattice<Animal, SiberianHusky, Animal, String> crossBranch2 = crossBranch1;
+
+        if (crossBranch2.getFirst().getName() == "Fluffy" &&
+            crossBranch2.getSecond().getName() == "Balto" &&
+            crossBranch2.getTag() == "BRANCH_OK") {
+            OceanOutput("[PASS 8] Çoklu Kardeş Dallanma (Cross-Branch Variance) Başarılı.");
+            totalPassed++;
+        }
+
+        OceanOutput("-------------------------------------------------");
+        OceanOutput($"Toplam Başarılı Test Aşaması: {totalPassed} / 8");
+
+        if (totalPassed == 8) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

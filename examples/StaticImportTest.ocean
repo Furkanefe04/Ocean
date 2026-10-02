@@ -1,0 +1,30 @@
+package tests;
+
+import static java.lang.Math.PI;
+import static java.lang.Math.sin;
+import static java.lang.Integer.parseInt;
+
+class StaticImportTest {
+    main() {
+        double val = sin(PI / 2.0);
+        int parsed = parseInt("123");
+        OceanOutput("sin(pi/2) is: " + val);
+        OceanOutput("parsed integer is: " + parsed);
+
+        // Check sin(pi/2) is very close to 1.0 (difference < 0.001)
+        double diff = val - 1.0;
+        if (diff < 0.0) {
+            diff = 0.0 - diff;
+        }
+
+        if (diff < 0.001 && parsed == 123) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+
+    void function deneme(){
+        OceanOutput(" deneme");
+    }
+}

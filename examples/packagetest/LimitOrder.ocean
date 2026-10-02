@@ -1,0 +1,75 @@
+package com.trading.model;
+
+import com.trading.core.TradeEntity;
+
+public class LimitOrder extends TradeEntity {
+    public String accountId;
+    public String symbol;
+    public String side; // "BUY" or "SELL"
+    public double price;
+    public double quantity;
+
+    public static LimitOrder function create(String id, String acc, String sym, String side, double pr, double qty) {
+        LimitOrder o = new LimitOrder();
+        o.id = id;
+        o.accountId = acc;
+        o.symbol = sym;
+        o.side = side;
+        o.price = pr;
+        o.quantity = qty;
+        o.timestamp = 1000.0;
+        return o;
+    }
+}
+
+public class MatchResult {
+    public String buyerId;
+    public String sellerId;
+    public double price;
+    public double quantity;
+    public bool success;
+    public String message;
+
+    public static MatchResult function create(String b, String s, double p, double q, bool succ, String msg) {
+        MatchResult mr = new MatchResult();
+        mr.buyerId = b;
+        mr.sellerId = s;
+        mr.price = p;
+        mr.quantity = q;
+        mr.success = succ;
+        mr.message = msg;
+        return mr;
+    }
+}
+
+public class ExecutionReport extends TradeEntity {
+    public String buyerId;
+    public String sellerId;
+    public double quantity;
+    public double price;
+    public double fees;
+
+    public static ExecutionReport function create(String id, String b, String s, double q, double p, double f) {
+        ExecutionReport er = new ExecutionReport();
+        er.id = id;
+        er.buyerId = b;
+        er.sellerId = s;
+        er.quantity = q;
+        er.price = p;
+        er.fees = f;
+        er.timestamp = 2000.0;
+        return er;
+    }
+}
+
+public class TradeInfo {
+    public String matchCode;
+    public String status;
+
+    public static TradeInfo function create(String code, String stat) {
+        TradeInfo ti = new TradeInfo();
+        ti.matchCode = code;
+        ti.status = stat;
+        return ti;
+    }
+}

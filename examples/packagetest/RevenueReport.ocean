@@ -1,0 +1,41 @@
+package com.enterprise.analytics;
+
+import com.enterprise.booking.LedgerManager;
+import com.enterprise.booking.BookingOrder;
+
+public class RevenueReport {
+    public static double function calculateTotalRevenue(LedgerManager lm) {
+        double total = 0.0;
+        for (int i from 0 to lm.getCount() with increasing 1) {
+            BookingOrder order = lm.getOrder(i);
+            if (order.isPaid) {
+                total = total + order.totalAmount;
+            }
+        }
+        return total;
+    }
+
+    public static double function calculateAverageTicketValue(LedgerManager lm) {
+        int count = lm.getCount();
+        if (count == 0) return 0.0;
+        double rev = calculateTotalRevenue(lm);
+        return rev / (double) count;
+    }
+}
+
+public class MetricTracker {
+    int successes = 0;
+    int failures = 0;
+
+    public void function trackSuccess() {
+        successes = successes + 1;
+    }
+
+    public void function trackFailure() {
+        failures = failures + 1;
+    }
+
+    public String function getSummary() {
+        return "Metrics Summary: Successes = " + successes + ", Failures = " + failures;
+    }
+}

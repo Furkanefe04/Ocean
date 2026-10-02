@@ -1,0 +1,11 @@
+package com.resources;
+
+class GenericArrayCreationErrorTest<T> {
+    void function test() {
+        T[] arr = new T[10];
+    }
+
+    static main() {
+        OceanOutput("Test");
+    }
+}

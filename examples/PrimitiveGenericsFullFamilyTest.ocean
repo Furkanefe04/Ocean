@@ -1,0 +1,21 @@
+package com.resources;
+
+class PrimitiveGenericsFullFamilyTest {
+    static main() {
+        OceanOutput("=== PRIMITIVE GENERICS FULL FAMILY TEST START ===");
+
+        variable intList = [10, 20, 30];
+        variable longList = [100L, 200L, 300L];
+        variable doubleList = [1.5, 2.5, 3.5];
+
+        OceanOutput("IntList size: " + intList.size() + ", get(0): " + intList.get(0));
+        OceanOutput("LongList size: " + longList.size() + ", get(1): " + longList.get(1));
+        OceanOutput("DoubleList size: " + doubleList.size() + ", get(2): " + doubleList.get(2));
+
+        if (intList.size() == 3 && longList.get(1) == 200L && doubleList.get(2) == 3.5) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

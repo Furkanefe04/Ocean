@@ -1,0 +1,25 @@
+package com.resources;
+
+interface MathOp {
+    double function calculate(double base, int factor);
+}
+
+class LambdaParamCaptureTest {
+    main() {
+        double offset = 10.5;
+        long multiplier = 3L;
+        
+        variable op = (MathOp) (base, factor) -> {
+            double res = (base * multiplier) + offset + factor;
+            return res;
+        };
+        
+        double resultx = op.calculate(5.0, 2);
+        OceanOutput("Result: " + resultx);
+        if (resultx == 27.5) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

@@ -1,0 +1,28 @@
+package com.stress;
+
+class Base {
+    int x;
+
+    function Base() {
+        this(50);
+    }
+
+    function Base(int x) {
+        this.x = x;
+    }
+
+    int function getX() {
+        return x;
+    }
+}
+
+class ThisCtorTest {
+    main() {
+        Base b = new Base();
+        if (b.getX() == 50) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

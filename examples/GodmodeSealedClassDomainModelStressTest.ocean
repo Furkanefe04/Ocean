@@ -1,0 +1,154 @@
+package com.resources;
+
+import java.util.Comparator;
+
+@FunctionalInterface
+public interface EventFilter<T> {
+    public bool function accept(T event);
+}
+
+@FunctionalInterface
+public interface EventProcessor<T, R> {
+    public R function handle(T event);
+}
+
+public interface DomainEvent {
+    public String function getEventId();
+    public long function getTimestamp();
+}
+
+public class UserCreatedEvent implements DomainEvent {
+    private String eventId;
+    private String username;
+    private long timestamp;
+
+    public function UserCreatedEvent(String id, String name, long ts) {
+        eventId = id;
+        username = name;
+        timestamp = ts;
+    }
+
+    @Override
+    public String function getEventId() {
+        return eventId;
+    }
+
+    public String function getUsername() {
+        return username;
+    }
+
+    @Override
+    public long function getTimestamp() {
+        return timestamp;
+    }
+}
+
+public class UserUpdatedEvent implements DomainEvent {
+    private String eventId;
+    private String fieldName;
+    private long timestamp;
+
+    public function UserUpdatedEvent(String id, String field, long ts) {
+        eventId = id;
+        fieldName = field;
+        timestamp = ts;
+    }
+
+    @Override
+    public String function getEventId() {
+        return eventId;
+    }
+
+    public String function getFieldName() {
+        return fieldName;
+    }
+
+    @Override
+    public long function getTimestamp() {
+        return timestamp;
+    }
+}
+
+public class GodmodeSealedClassDomainModelStressTest {
+
+    public static OceanList<DomainEvent> function filterEvents(OceanList<DomainEvent> events, EventFilter<DomainEvent> filter) {
+        variable resultx = [];
+        for (int i from 0 to events.size() with increasing 1) {
+            DomainEvent ev = (DomainEvent) events.get(i);
+            if (filter.accept(ev)) {
+                resultx.add(ev);
+            }
+        }
+        return resultx;
+    }
+
+    public static OceanList<String> function processEvents(OceanList<DomainEvent> events, EventProcessor<DomainEvent, String> processor) {
+        variable resultx = [];
+        for (int i from 0 to events.size() with increasing 1) {
+            DomainEvent ev = (DomainEvent) events.get(i);
+            String output = processor.handle(ev);
+            resultx.add(output);
+        }
+        return resultx;
+    }
+
+    main() {
+        OceanOutput("=== GODMODE SEALED DOMAIN MODEL STRESS TEST START ===");
+
+        UserCreatedEvent e1 = new UserCreatedEvent("EV001", "Alice", 1000);
+        UserCreatedEvent e2 = new UserCreatedEvent("EV002", "Bob", 2000);
+        UserUpdatedEvent e3 = new UserUpdatedEvent("EV003", "email", 3000);
+        UserCreatedEvent e4 = new UserCreatedEvent("EV004", "Charlie", 4000);
+
+        variable eventStream = [e1, e2, e3, e4];
+
+        // 1. Test Custom Event Filter SAM
+        EventFilter<DomainEvent> createdOnlyFilter = new EventFilter<DomainEvent>() {
+            @Override
+            public bool function accept(DomainEvent event) {
+                return event instanceof UserCreatedEvent;
+            }
+        };
+
+        variable createdEvents = filterEvents(eventStream, createdOnlyFilter);
+        OceanOutput("Created events count: " + createdEvents.size());
+
+        // 2. Test Custom Event Processor SAM
+        EventProcessor<DomainEvent, String> formatter = new EventProcessor<DomainEvent, String>() {
+            @Override
+            public String function handle(DomainEvent event) {
+                return "LOG_" + event.getEventId() + "_" + event.getTimestamp();
+            }
+        };
+
+        variable logs = processEvents(eventStream, formatter);
+        OceanOutput("Logs count: " + logs.size() + ", log[0]: " + logs.get(0));
+
+        // 3. Map & Set Stress Test
+        variable eventMap = {"EV001": "Alice", "EV002": "Bob", "EV003": "Charlie"};
+        OceanOutput("Map size: " + eventMap.size() + ", EV001: " + eventMap.get("EV001"));
+
+        // 4. Primitive double list sorting
+        variable prices = [19.99, 5.49, 99.00, 1.25, 49.95];
+        prices.sort(new Comparator<Double>() {
+            public int function compare(Double o1, Double o2) {
+                return o1.compareTo(o2);
+            }
+        });
+        double minPrice = (double) prices.get(0);
+        double maxPrice = (double) prices.get(4);
+        OceanOutput("Sorted prices -> Min: " + minPrice + ", Max: " + maxPrice);
+
+        // Assertions
+        bool b1 = createdEvents.size() == 3;
+        bool b2 = logs.size() == 4 && logs.get(0).equals("LOG_EV001_1000");
+        bool b3 = eventMap.size() == 3 && eventMap.get("EV001").equals("Alice");
+        bool b4 = minPrice == 1.25 && maxPrice == 99.00;
+
+        if (b1 && b2 && b3 && b4) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

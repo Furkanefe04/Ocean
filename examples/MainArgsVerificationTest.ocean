@@ -1,0 +1,19 @@
+package tests;
+
+class HelperMainClass {
+    static String function mainx() {
+        return "Helper main OK";
+    }
+}
+
+class MainArgsVerificationTest {
+     main() {
+        String helperResult = HelperMainClass.mainx();
+        OceanOutput("Helper result: " + helperResult);
+        if (helperResult.equals("Helper main OK")) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

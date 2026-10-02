@@ -1,0 +1,29 @@
+package com.resources;
+class Node {
+    Node next;
+    variable val = 0;
+
+    void function setNext(Node n) {
+        next = n;
+    }
+}
+
+class RecursiveClassTest {
+    main() {
+        Node n1 = new Node();
+        n1.val = 1;
+        
+        Node n2 = new Node();
+        n2.val = 2;
+        
+        n1.setNext(n2);
+        
+        OceanOutput("Node 1 value: " + n1.val);
+        OceanOutput("Node 2 value: " + n1.next.val);
+        if (n1.val == 1 && n1.next.val == 2) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

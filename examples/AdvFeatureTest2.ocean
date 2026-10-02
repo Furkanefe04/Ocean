@@ -1,0 +1,38 @@
+package com.resources;
+    enum Priority {
+    LOW, MEDIUM, HIGH
+}
+
+@Deprecated
+class AnnotatedWithEnum {
+    // Note: Java's @Retention requires a RetentionPolicy enum. 
+    // Since we don't have easy access to Java enum definitions in ConstantFolder,
+    // we test with a simple Deprecated and our own logic if possible.
+    
+    // Testing method overloading with different precisions
+    public String function test(int i) {
+        OceanOutput("int: " + i);
+        return "int: " + i;
+    }
+    public String function test(long l) {
+        OceanOutput("long: " + l);
+        return "long: " + l;
+    }
+}
+
+class AdvFeatureTest2 {
+    static main() {
+        AnnotatedWithEnum a = new AnnotatedWithEnum();
+        String r = a.test(10); // Should prefer int
+        
+        // String optimization check again
+        String s = "Result: " + (5 + 5) + " is " + true;
+        OceanOutput(s);
+        
+        if (r == "int: 10" && s == "Result: 10 is true") {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

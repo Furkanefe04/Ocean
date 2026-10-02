@@ -1,0 +1,53 @@
+package com.resources;
+
+class Animal { }
+class Dog extends Animal { }
+class Cat extends Animal { }
+
+// 1. Covariant (Üretici) Testi
+class Producer<+T> {
+    T? function produce() { return null; }
+}
+
+// 2. Contravariant (Tüketici) Testi
+class Consumer<-T> {
+    void function consume(T item) { OceanOutput("Tüketildi"); }
+}
+
+// 3. Çoklu Parametre Testi
+class Pair<+T1, +T2> {
+    T1? function first() { return null; }
+    T2? function second() { return null; }
+}
+
+class VarianceTest {
+    main() {
+        OceanOutput("=== DİNAMİK VARİANCE TESTİ ===");
+
+        // KOVARYANS TESTİ (+T)
+        Producer<Dog> dogProducer = new Producer<Dog>();
+        Producer<Animal> animalProducer = dogProducer; // GEÇERLİ
+        OceanOutput("Kovaryans: Producer<Dog> -> Producer<Animal> başarılı");
+
+        // KONTRAVARYANS TESTİ (-T)
+        Consumer<Animal> animalConsumer = new Consumer<Animal>();
+        Consumer<Dog> dogConsumer = animalConsumer; // GEÇERLİ
+        OceanOutput("Kontravaryans: Consumer<Animal> -> Consumer<Dog> başarılı");
+        dogConsumer.consume(new Dog());
+
+        // ÇOKLU PARAMETRE TESTİ
+        Pair<Dog, Cat> dogCatPair = new Pair<Dog, Cat>();
+        Pair<Animal, Animal> animalPair = dogCatPair; // GEÇERLİ (Her ikisi de Kovaryant)
+        OceanOutput("Çoklu Parametre: Pair<Dog, Cat> -> Pair<Animal, Animal> başarılı");
+
+        bool v1 = animalProducer != null;
+        bool v2 = dogConsumer != null;
+        bool v3 = animalPair != null;
+
+        if (v1 && v2 && v3) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

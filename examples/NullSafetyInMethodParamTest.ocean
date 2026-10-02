@@ -1,0 +1,35 @@
+class NullSafetyInMethodParamTest {
+    main() {
+        generic<Integer?> i = new generic<Integer>(10);
+        //generic<Integer> x = new generic<Integer>("10"); //must be error
+        i.set(null);
+        Integer? val = i.get();// Integer val = i.get(); is caused error it's normal
+        OceanOutput(val);
+        bool step1 = (val==null);
+        i.set(100);
+        val = i.get();
+        OceanOutput(val);
+        bool step2 = (val==100);
+        if (step1 && step2){
+            OceanOutput("STATUS: PASSED");
+        }
+        else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}
+
+public class generic<T> {
+    T val;
+    function generic(T t){
+        this.val = t;
+    }
+
+    public void function set(T t){
+        this.val = t;
+    }
+
+    public T function get(){
+        return val;
+    }
+}

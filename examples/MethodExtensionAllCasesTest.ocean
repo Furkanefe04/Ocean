@@ -1,0 +1,151 @@
+package com.resources;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonElement;
+import okhttp3.HttpUrl;
+import kotlin.Pair;
+
+class CustomOceanClass {
+    public String val;
+    function CustomOceanClass(String val) {
+        this.val = val;
+    }
+}
+
+class TestExtensions {
+    // 1. Primitive int extension
+    public int int.function triple() {
+        return this * 3;
+    }
+
+    // 2. String extension
+    public String String.function uppercaseAndConcat(String suffix) {
+        return this.toUpperCase() + suffix;
+    }
+
+    // 3. ArrayList extension (boxed type / collection)
+    public int ArrayList.function getListSizeDoubled() {
+        return this.size() * 2;
+    }
+
+    // 4. HashMap extension (boxed type / collection)
+    public Object HashMap.function getOrPutDefault(Object key, Object defaultValue) {
+        if (this.containsKey(key)) {
+            return this.get(key);
+        }
+        this.put(key, defaultValue);
+        return defaultValue;
+    }
+
+    // 5. Gradle-integrated Java 3rd-party class: com.google.gson.JsonObject
+    public String? JsonObject.function getPropOrNull(String key) {
+        if (this.has(key)) {
+            JsonElement elem = this.get(key);
+            return elem.getAsString();
+        }
+        return null;
+    }
+
+    // 6. Gradle-integrated Kotlin 3rd-party class: okhttp3.HttpUrl
+    public String HttpUrl.function getFormattedHost() {
+        return "Host: " + this.host();
+    }
+
+    // 7. Kotlin standard library class: kotlin.Pair
+    public String Pair.function formatPair() {
+        return "(" + this.getFirst() + ", " + this.getSecond() + ")";
+    }
+
+    // 8. Custom Ocean class extension
+    public String CustomOceanClass.function formatValue() {
+        return "Value: " + this.val;
+    }
+}
+
+class MethodExtensionAllCasesTest {
+    static main() {
+        OceanOutput("--- Method Extension All Cases Test ---");
+
+        // 1. Check int.triple()
+        int valInt = 4;
+        int resInt = valInt.triple();
+        OceanOutput("4.triple() = " + resInt);
+
+        // 2. Check String.uppercaseAndConcat()
+        String valStr = "hello";
+        String resStr = valStr.uppercaseAndConcat(" world");
+        OceanOutput("hello.uppercaseAndConcat() = " + resStr);
+
+        // 3. Check ArrayList.getListSizeDoubled()
+        ArrayList list = new ArrayList();
+        list.add("one");
+        list.add("two");
+        int resList = list.getListSizeDoubled();
+        OceanOutput("list.getListSizeDoubled() = " + resList);
+
+        // 4. Check HashMap.getOrPutDefault()
+        HashMap map = new HashMap();
+        map.put("key1", "val1");
+        Object resMap1 = map.getOrPutDefault("key1", "defaultVal");
+        Object resMap2 = map.getOrPutDefault("key2", "defaultVal");
+        OceanOutput("map key1 = " + resMap1);
+        OceanOutput("map key2 = " + resMap2);
+
+        // 5. Check com.google.gson.JsonObject extension
+        JsonObject json = new JsonObject();
+        json.addProperty("username", "ocean_dev");
+        String? resJson = json.getPropOrNull("username");
+        String? resJsonNull = json.getPropOrNull("password");
+        OceanOutput("json username = " + resJson);
+        OceanOutput("json password = " + resJsonNull);
+
+        // 6. Check okhttp3.HttpUrl extension
+        HttpUrl url = HttpUrl.get("https://google.com/search?q=ocean");
+        String resUrl = url.getFormattedHost();
+        OceanOutput("url formatted host = " + resUrl);
+
+        // 7. Check kotlin.Pair extension and its member operations
+        Pair pairObj = new Pair("keyX", 999);
+        String resPair = pairObj.formatPair();
+        OceanOutput("pair formatted = " + resPair);
+
+        // Access and manipulate members directly
+        String pFirst = (String) pairObj.getFirst();
+        Integer pSecondObj = (Integer) pairObj.getSecond();
+        int pSecond = pSecondObj.intValue();
+        int pairCalc = pSecond + 1;
+        String pairStrConcat = pFirst + "_updated";
+        OceanOutput("pair member calculations: calc=" + pairCalc + ", concat=" + pairStrConcat);
+
+        // 8. Check CustomOceanClass.formatValue()
+        CustomOceanClass obj = new CustomOceanClass("OceanExtension");
+        String resObj = obj.formatValue();
+        OceanOutput("obj.formatValue() = " + resObj);
+
+        // Verification logic
+        bool test1 = (resInt == 12);
+        bool test2 = resStr.equals("HELLO world");
+        bool test3 = (resList == 4);
+        bool test4 = resMap1.equals("val1") && resMap2.equals("defaultVal") && map.get("key2").equals("defaultVal");
+        bool test5 = "ocean_dev".equals(resJson) && (resJsonNull == null);
+        bool test6 = "Host: google.com".equals(resUrl);
+        bool test7 = "(keyX, 999)".equals(resPair) && (pairCalc == 1000) && "keyX_updated".equals(pairStrConcat);
+        bool test8 = resObj.equals("Value: OceanExtension");
+
+        if (test1 && test2 && test3 && test4 && test5 && test6 && test7 && test8) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+            if (!test1) OceanOutput("Failed: test1 (int)");
+            if (!test2) OceanOutput("Failed: test2 (String)");
+            if (!test3) OceanOutput("Failed: test3 (ArrayList)");
+            if (!test4) OceanOutput("Failed: test4 (HashMap)");
+            if (!test5) OceanOutput("Failed: test5 (JsonObject)");
+            if (!test6) OceanOutput("Failed: test6 (HttpUrl)");
+            if (!test7) OceanOutput("Failed: test7 (Pair / Members)");
+            if (!test8) OceanOutput("Failed: test8 (CustomOceanClass)");
+        }
+    }
+}

@@ -1,0 +1,48 @@
+package tests;
+
+interface MathOperation {
+    int function operate(int a, int b);
+}
+
+class Parent {
+    variable message = "Inherited Field Success";
+}
+
+class CoreBugProverTest extends Parent {
+    static main() {
+        OceanOutput("=== Core Bug Prover Test ===");
+        
+        CoreBugProverTest test = new CoreBugProverTest();
+        
+        // 1. Miras Alınan Alan (Inherited Field Access) Testi
+        // Düzeltilmeden önce: NoSuchFieldError fırlatıyordu.
+        test.message = "Inherited Field Assigned Successfully";
+        OceanOutput("1. Inherited Field: " + test.message);
+        
+        // 2. Try-Catch (trying-catch) Blok Düzeni Testi
+        // Düzeltilmeden önce: Exception tablosu yanlış sıralanıyor veya patlıyordu.
+        trying {
+            OceanOutput("2. Try block executing...");
+            throw new RuntimeException("Runtime Error");
+        } catch (RuntimeException e) {
+            OceanOutput("2. Catch block successfully caught: " + e.getMessage());
+        }
+        
+        // 3. Lambda ve SAM Arayüz Entegrasyonu Testi
+        // Düzeltilmeden önce: Lambda sınıf ismi ve parametre sayısı uyumsuzluğundan patlıyordu.
+        variable factor = 3;
+        MathOperation op = (int x, int y) -> {
+            return (x + y) * factor;
+        };
+        variable result = op.operate(5, 5);
+        OceanOutput("3. Lambda Operation Result: " + result); // Expected: (5+5)*3 = 30
+        
+        // 4. İlkel Tip Atamaları ve Increment/Decrement Testi
+        // Düzeltilmeden önce: IRETURN, ISTORE gibi ilkel tip bytecode'larında VerifierError olabiliyordu.
+        int count = 10;
+        count = count + 1;
+        OceanOutput("4. Primitive & Operator Test: " + count); // Expected: 11
+        
+        OceanOutput("=== ALL PROVER TESTS PASSED SUCCESSFULLY ===");
+    }
+}

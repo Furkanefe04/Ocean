@@ -1,0 +1,117 @@
+package com.resources;
+
+public class BaseClass {
+    public Object function getPayload() {
+        return "BasePayload";
+    }
+}
+
+public class SubClass extends BaseClass {
+    @Override
+    public String function getPayload() {
+        return "SubPayload";
+    }
+}
+
+public interface Transformer<T, R> {
+    public R function transform(T input);
+}
+
+public class StringLengthTransformer implements Transformer<String, Integer> {
+    public Integer function transform(String input) {
+        return input.length();
+    }
+}
+
+public abstract class AbstractValidator<T> {
+    public abstract bool function validate(T item);
+}
+
+public class NonEmptyStringValidator extends AbstractValidator<String> {
+    public bool function validate(String item) {
+        return item != null && !item.isEmpty();
+    }
+}
+
+public interface AnySupplier<T> {
+    public T function supply();
+}
+
+public class FastIntSupplier implements AnySupplier<Integer> {
+    public int function supply() {
+        return 999;
+    }
+}
+
+public class SyntheticBridgeMethodTest {
+
+    public static void function testCovariantReturn() {
+        BaseClass b = new SubClass();
+        Object payload = b.getPayload();
+        if (!payload.equals("SubPayload")) {
+            OceanOutput("FAILED: Covariant return expected 'SubPayload' but got " + payload);
+            return;
+        }
+
+        SubClass s = new SubClass();
+        String strPayload = s.getPayload();
+        if (!strPayload.equals("SubPayload")) {
+            OceanOutput("FAILED: SubClass direct return expected 'SubPayload' but got " + strPayload);
+            return;
+        }
+    }
+
+    public static void function testGenericInterfaceBridge() {
+        Transformer t = new StringLengthTransformer();
+        Object resultx = t.transform("OceanLanguage");
+        if (!resultx.equals(13)) {
+            OceanOutput("FAILED: Interface bridge expected 13 but got " + resultx);
+            return;
+        }
+    }
+
+    public static void function testGenericSuperclassBridge() {
+        AbstractValidator v = new NonEmptyStringValidator();
+        bool ok = v.validate("ValidInput");
+        if (!ok) {
+            OceanOutput("FAILED: Superclass bridge expected true for 'ValidInput'");
+            return;
+        }
+    }
+
+    public static void function testPrimitiveBoxedReturnBridge() {
+        AnySupplier s = new FastIntSupplier();
+        Object val = s.supply();
+        if (!val.equals(999)) {
+            OceanOutput("FAILED: Primitive return bridge expected 999 but got " + val);
+            return;
+        }
+    }
+
+    public static void function main(String[] args) {
+        // Covariant return
+        BaseClass b = new SubClass();
+        Object payload = b.getPayload();
+
+        // Generic interface bridge
+        Transformer t = new StringLengthTransformer();
+        Object transformResult = t.transform("OceanLanguage");
+
+        // Generic superclass bridge
+        AbstractValidator v = new NonEmptyStringValidator();
+        bool validOk = v.validate("ValidInput");
+
+        // Primitive boxed return bridge
+        AnySupplier s = new FastIntSupplier();
+        Object supplyVal = s.supply();
+
+        if (payload.equals("SubPayload") &&
+            transformResult.equals(13) &&
+            validOk &&
+            supplyVal.equals(999)) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

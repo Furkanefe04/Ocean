@@ -1,0 +1,13 @@
+package com.resources;
+
+import java.lang.Enum;
+
+class Child extends Enum {
+    // java.lang.Enum is not final, but JVM forbids extending it directly for non-enum classes!
+}
+
+class EnumInheritanceTest {
+    main() {
+        OceanOutput("EnumInheritanceTest ran!");
+    }
+}

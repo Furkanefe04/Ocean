@@ -1,0 +1,18 @@
+package com.resources;
+
+class Parent {
+    public int function test() {
+        return 42;
+    }
+}
+
+class TestIncompatibleOverride extends Parent {
+    @Override
+    public String function test() {
+        return "incompatible";
+    }
+    
+    main() {
+        OceanOutput("IncompatibleOverride");
+    }
+}

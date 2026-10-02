@@ -1,0 +1,698 @@
+package com.nightmare;
+
+import java.util.concurrent.CompletableFuture;
+import static java.util.Locale.ENGLISH;
+
+// ============================================================
+// OCEAN NIGHTMARE TEST — 1000+ line ultra-stress test
+// Tests every major compiler feature in deep combination
+// ============================================================
+
+// ---- SECTION 1: Multi-level Generic Interface Hierarchy ----
+
+public interface Identifiable<ID> {
+    public ID function getId();
+}
+
+public interface Describable {
+    public String function describe();
+}
+
+public interface Persistable<ID, T> extends Identifiable<ID> {
+    public async T? function load(ID id);
+    public async void function save(T entity);
+    public async bool function delete(ID id);
+}
+
+public interface AsyncTransformable<IN, OUT> {
+    public async OUT function transformAsync(IN input);
+    public async OceanList<OUT> function transformBatchAsync(OceanList<IN> inputs);
+}
+
+// ---- SECTION 2: Custom Annotations ----
+
+public annotation Repository {
+    String name();
+    int version();
+    bool cacheable();
+}
+
+public annotation Transform {
+    String strategy();
+}
+
+public annotation Validated {
+    int minLength();
+    int maxLength();
+}
+
+// ---- SECTION 3: Sealed Domain Events ----
+
+public sealed interface DomainEvent restricts
+    UserCreatedEvent,
+    UserUpdatedEvent,
+    UserDeletedEvent,
+    UserSuspendedEvent,
+    UserVerifiedEvent {}
+
+public final class UserCreatedEvent implements DomainEvent {
+    public String userId;
+    public String username;
+    public long createdAt;
+
+    public function UserCreatedEvent(String userId, String username, long createdAt) {
+        this.userId = userId;
+        this.username = username;
+        this.createdAt = createdAt;
+    }
+
+    public String function getUserId() { return userId; }
+    public String function getUsername() { return username; }
+    public long function getCreatedAt() { return createdAt; }
+}
+
+public final class UserUpdatedEvent implements DomainEvent {
+    public String userId;
+    public String field;
+    public String oldValue;
+    public String newValue;
+
+    public function UserUpdatedEvent(String userId, String field, String oldValue, String newValue) {
+        this.userId = userId;
+        this.field = field;
+        this.oldValue = oldValue;
+        this.newValue = newValue;
+    }
+
+    public String function getUserId() { return userId; }
+    public String function getField() { return field; }
+    public String function getOldValue() { return oldValue; }
+    public String function getNewValue() { return newValue; }
+}
+
+public final class UserDeletedEvent implements DomainEvent {
+    public String userId;
+    public String reason;
+
+    public function UserDeletedEvent(String userId, String reason) {
+        this.userId = userId;
+        this.reason = reason;
+    }
+
+    public String function getUserId() { return userId; }
+    public String function getReason() { return reason; }
+}
+
+public final class UserSuspendedEvent implements DomainEvent {
+    public String userId;
+    public int durationDays;
+
+    public function UserSuspendedEvent(String userId, int durationDays) {
+        this.userId = userId;
+        this.durationDays = durationDays;
+    }
+
+    public String function getUserId() { return userId; }
+    public int function getDurationDays() { return durationDays; }
+}
+
+public final class UserVerifiedEvent implements DomainEvent {
+    public String userId;
+    public String verificationCode;
+
+    public function UserVerifiedEvent(String userId, String verificationCode) {
+        this.userId = userId;
+        this.verificationCode = verificationCode;
+    }
+
+    public String function getUserId() { return userId; }
+    public String function getVerificationCode() { return verificationCode; }
+}
+
+// ---- SECTION 4: Data Classes ----
+
+public data class User(String id, String username, String email, String role, bool active);
+
+public data class UserProfile(String userId, String displayName, int age, String bio);
+
+public data class ValidationResult(bool valid, String message, int code);
+
+// ---- SECTION 5: Generic Result Type ----
+
+public class Result<T> {
+    public T? val;
+    public String? error;
+    public bool success;
+
+    public function Result(T? val, String? error, bool success) {
+        this.val = val;
+        this.error = error;
+        this.success = success;
+    }
+
+    public static <T> Result<T> function ok(T val) {
+        return new Result<T>(val, null, true);
+    }
+
+    public static <T> Result<T> function fail(String error) {
+        return new Result<T>(null, error, false);
+    }
+
+    public T? function getValue() { return val; }
+    public String? function getError() { return error; }
+    public bool function isSuccess() { return success; }
+}
+
+// ---- SECTION 6: Generic Event Bus ----
+
+public class EventBus<E> {
+    public OceanList<E> events;
+    public int dispatchCount;
+
+    public function EventBus() {
+        events = new OceanList<E>();
+        dispatchCount = 0;
+    }
+
+    public void function publish(E event) {
+        events.add(event);
+        dispatchCount = dispatchCount + 1;
+    }
+
+    public E? function getLatest() {
+        if (events.size() == 0) return null;
+        return events.get(events.size() - 1);
+    }
+
+    public int function size() {
+        return events.size();
+    }
+}
+
+// ---- SECTION 7: Abstract Base Layer ----
+
+public abstract class BaseRepository<ID, T> {
+    public String repoName;
+    public OceanList<T> storage;
+
+    public function BaseRepository(String repoName) {
+        this.repoName = repoName;
+        storage = new OceanList<T>();
+    }
+
+    public abstract async T? function findById(ID id);
+    public abstract async bool function existsById(ID id);
+
+    public async String function getRepoNameAsync() {
+        return repoName;
+    }
+
+    public int function count() {
+        return storage.size();
+    }
+}
+
+// ---- SECTION 8: Concrete User Repository ----
+
+@Repository(name = "user_repository", version = 3, cacheable = true)
+public class UserRepository extends BaseRepository<String, User> implements Persistable<String, User> {
+
+    public EventBus<DomainEvent> eventBus;
+
+    public function UserRepository() {
+        super("UserRepository");
+        eventBus = new EventBus<DomainEvent>();
+    }
+
+    @Override
+    public async User? function findById(String id) {
+        for (int i from 0 to storage.size() with increasing 1) {
+            User u = storage.get(i);
+            if (u.getId().equals(id)) {
+                return u;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public async bool function existsById(String id) {
+        User? found = await findById(id);
+        return found != null;
+    }
+
+    @Override
+    public String function getId() {
+        return "user_repository_v3";
+    }
+
+    @Override
+    public async User? function load(String id) {
+        return await findById(id);
+    }
+
+    @Override
+    public async void function save(User user) {
+        bool exists = await existsById(user.getId());
+        if (!exists) {
+            storage.add(user);
+            eventBus.publish(new UserCreatedEvent(user.getId(), user.getUsername(), System.currentTimeMillis()));
+        } else {
+            // Update in place (remove+add)
+            for (int i from 0 to storage.size() with increasing 1) {
+                User u = storage.get(i);
+                if (u.getId().equals(user.getId())) {
+                    storage.remove(i);
+                    storage.add(user);
+                    eventBus.publish(new UserUpdatedEvent(user.getId(), "all", "old", "new"));
+                    return;
+                }
+            }
+        }
+    }
+
+    @Override
+    public async bool function delete(String id) {
+        for (int i from 0 to storage.size() with increasing 1) {
+            User u = storage.get(i);
+            if (u.getId().equals(id)) {
+                storage.remove(i);
+                eventBus.publish(new UserDeletedEvent(id, "manual_delete"));
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public async ValidationResult function validateUser(User user) {
+        // null-safe checks using ?. and ??
+        String username = user.getUsername() ?? "";
+        String email = user.getEmail() ?? "";
+
+        if (username.length() < 3) {
+            return new ValidationResult(false, "Username too short", 1001);
+        }
+        if (username.length() > 32) {
+            return new ValidationResult(false, "Username too long", 1002);
+        }
+        if (!email.contains("@")) {
+            return new ValidationResult(false, "Invalid email", 1003);
+        }
+        return new ValidationResult(true, "OK", 0);
+    }
+}
+
+// ---- SECTION 9: Transform Pipeline (Generic + Async) ----
+
+@Transform(strategy = "parallel")
+public class UserTransformer implements AsyncTransformable<User, UserProfile> {
+
+    @Override
+    public async UserProfile function transformAsync(User user) {
+        String displayName = switch(user.getRole()) {
+            case "ADMIN" -> "[ADMIN] " + user.getUsername()
+            case "MOD"   -> "[MOD] " + user.getUsername()
+            default      -> user.getUsername()
+        };
+        int age = user.getActive() ? 25 : 0;
+        return new UserProfile(user.getId(), displayName, age, "Bio for " + user.getUsername());
+    }
+
+    @Override
+    public async OceanList<UserProfile> function transformBatchAsync(OceanList<User> inputs) {
+        OceanList<UserProfile> results = new OceanList<UserProfile>();
+        for (int i from 0 to inputs.size() with increasing 1) {
+            User u = inputs.get(i);
+            variable fut = transformAsync(u);
+            UserProfile p = await fut;
+            results.add(p);
+        }
+        return results;
+    }
+}
+
+// ---- SECTION 10: Static Extension Methods ----
+
+public class NightmareExtensions {
+    // String extension
+    public static String String.function toUpperSnakeCase() {
+        return this.replace(" ", "_").toUpperCase(ENGLISH);
+    }
+
+    // Async String CompletableFuture extension
+    public static async String CompletableFuture<String>.function awaitTrimmed() {
+        String val = await this;
+        return val.trim();
+    }
+
+    // User extension method
+    public static String User.function toLogString() {
+        return "[User id=" + this.getId() + " username=" + this.getUsername() + " role=" + this.getRole() + "]";
+    }
+
+    // Result<User> extension method - async unwrap
+    public static async User? Result<User>.function awaitUnwrapped() {
+        if (!this.isSuccess()) {
+            return null;
+        }
+        return this.getValue();
+    }
+}
+
+// ---- SECTION 11: Multi-level async orchestration engine ----
+
+public class OrchestrationEngine {
+    public UserRepository repo;
+    public UserTransformer transformer;
+    public EventBus<DomainEvent> globalBus;
+    public OceanList<String> auditLog;
+
+    public function OrchestrationEngine() {
+        repo = new UserRepository();
+        transformer = new UserTransformer();
+        globalBus = new EventBus<DomainEvent>();
+        auditLog = new OceanList<String>();
+    }
+
+    public async Result<User> function createUser(String id, String username, String email, String role) {
+        User newUser = new User(id, username, email, role, true);
+
+        // Validate first
+        variable validFut = repo.validateUser(newUser);
+        ValidationResult vr = await validFut;
+
+        if (!vr.getValid()) {
+            auditLog.add("FAIL:create:" + id + ":" + vr.getMessage());
+            return Result.fail(vr.getMessage());
+        }
+
+        // Save to repo
+        variable saveFut = repo.save(newUser);
+        await saveFut;
+
+        // Mirror event to global bus
+        DomainEvent? latest = repo.eventBus.getLatest();
+        if (latest != null) {
+            globalBus.publish(latest);
+        }
+
+        auditLog.add("OK:create:" + id);
+        return Result.ok(newUser);
+    }
+
+    public async Result<UserProfile> function getUserProfile(String id) {
+        User? user = await repo.findById(id);
+
+        if (user == null) {
+            return Result.fail("User not found: " + id);
+        }
+
+        variable profFut = transformer.transformAsync(user);
+        UserProfile profile = await profFut;
+
+        auditLog.add("OK:getProfile:" + id);
+        return Result.ok(profile);
+    }
+
+    public async bool function suspendUser(String id, int days) {
+        variable existFut = repo.existsById(id);
+        bool exists = await existFut;
+        if (!exists) {
+            auditLog.add("FAIL:suspend:" + id + ":notfound");
+            return false;
+        }
+
+        repo.eventBus.publish(new UserSuspendedEvent(id, days));
+        globalBus.publish(new UserSuspendedEvent(id, days));
+        auditLog.add("OK:suspend:" + id + ":days=" + days);
+        return true;
+    }
+
+    public async bool function verifyUser(String id, String code) {
+        variable loadFut = repo.load(id);
+        User? user = await loadFut;
+        if (user == null) return false;
+
+        if (code.length() < 6) {
+            auditLog.add("FAIL:verify:" + id + ":code_too_short");
+            return false;
+        }
+
+        repo.eventBus.publish(new UserVerifiedEvent(id, code));
+        globalBus.publish(new UserVerifiedEvent(id, code));
+        auditLog.add("OK:verify:" + id);
+        return true;
+    }
+
+    public async OceanList<UserProfile> function getAllProfiles() {
+        OceanList<User> resultx = repo.storage;
+        variable batchFut = transformer.transformBatchAsync(resultx);
+        OceanList<UserProfile> out = (OceanList<UserProfile>) batchFut.join();
+        return out;
+    }
+}
+
+// ---- SECTION 12: Main Nightmare Test ----
+
+public class OceanNightmareTest {
+
+    public static async void function execute() {
+        OceanOutput("==========================================================");
+        OceanOutput("===     OCEAN NIGHTMARE ULTRA-STRESS TEST - BEGIN      ===");
+        OceanOutput("==========================================================");
+
+        OrchestrationEngine engine = new OrchestrationEngine();
+        // ---- Phase 1: Bulk User Creation (sequential to avoid shared-list race conditions) ----
+        OceanOutput("\n[PHASE 1] Bulk User Creation with Validation...");
+
+        // Valid users — await sequentially to keep storage ordering deterministic
+        Result<User> res1 = await engine.createUser("u001", "alice",     "alice@ocean.io",   "USER");
+        Result<User> res2 = await engine.createUser("u002", "bob",       "bob@ocean.io",     "MOD");
+        Result<User> res3 = await engine.createUser("u003", "charlie",   "charlie@ocean.io", "ADMIN");
+        Result<User> res4 = await engine.createUser("u004", "diana",     "diana@ocean.io",   "USER");
+        Result<User> res5 = await engine.createUser("u005", "eve",       "eve@ocean.io",     "USER");
+
+        // Invalid users — should fail validation
+        Result<User> res6 = await engine.createUser("u006", "xy",        "xy@ocean.io",      "USER"); // username too short
+        Result<User> res7 = await engine.createUser("u007", "validname", "not_an_email",     "USER"); // bad email
+
+        OceanOutput("alice created:   " + res1.isSuccess());
+        OceanOutput("bob created:     " + res2.isSuccess());
+        OceanOutput("charlie created: " + res3.isSuccess());
+        OceanOutput("diana created:   " + res4.isSuccess());
+        OceanOutput("eve created:     " + res5.isSuccess());
+        OceanOutput("xy (should FAIL): " + res6.isSuccess() + " | err=" + (res6.getError() ?? "none"));
+        OceanOutput("bad_email (should FAIL): " + res7.isSuccess() + " | err=" + (res7.getError() ?? "none"));
+
+        int createdCount = engine.repo.count();
+        OceanOutput("Repo count after creation: " + createdCount);
+
+        // ---- Phase 2: User Profile Transformation ----
+        OceanOutput("\n[PHASE 2] Profile Transformation (Generic Async)...");
+
+        Result<UserProfile> prof1 = await engine.getUserProfile("u001");
+        Result<UserProfile> prof3 = await engine.getUserProfile("u003");
+        Result<UserProfile> prof_miss = await engine.getUserProfile("u999"); // should fail
+
+        OceanOutput("alice profile: " + prof1?.getValue()?.getDisplayName());
+        OceanOutput("charlie profile: " + prof3?.getValue()?.getDisplayName());
+        OceanOutput("u999 profile (should FAIL): " + prof_miss.isSuccess());
+
+        // ---- Phase 3: Suspend & Verify Events ----
+        OceanOutput("\n[PHASE 3] Suspend & Verify + Event Bus Validation...");
+
+        bool suspend1 = await engine.suspendUser("u002", 7);
+        bool suspend2 = await engine.suspendUser("u004", 30);
+        bool suspend_miss = await engine.suspendUser("u999", 1); // not found
+
+        OceanOutput("bob suspended:   " + suspend1);
+        OceanOutput("diana suspended: " + suspend2);
+        OceanOutput("u999 suspend (should be false): " + suspend_miss);
+
+        bool ver1 = await engine.verifyUser("u001", "OCEAN1");
+        bool ver2 = await engine.verifyUser("u003", "abc");  // code too short — should fail
+        bool ver3 = await engine.verifyUser("u005", "VERIFY999");
+
+        OceanOutput("alice verified: " + ver1);
+        OceanOutput("charlie verify (short code, should be false): " + ver2);
+        OceanOutput("eve verified:   " + ver3);
+
+        // ---- Phase 4: Batch Transformation ----
+        OceanOutput("\n[PHASE 4] Batch Profile Transformation...");
+
+        variable batchFut = engine.getAllProfiles();
+        OceanList<UserProfile> allProfiles = await batchFut;
+        OceanOutput("All profiles count: " + allProfiles.size());
+
+        for (int i from 0 to allProfiles.size() with increasing 1) {
+            UserProfile p = allProfiles.get(i);
+            OceanOutput("  Profile[" + i + "]: " + p.getDisplayName() + " | age=" + p.getAge());
+        }
+
+        // ---- Phase 5: Sealed Event Bus Audit ----
+        OceanOutput("\n[PHASE 5] Sealed Domain Event Bus Audit...");
+
+        int totalRepoEvents = engine.repo.eventBus.size();
+        int totalGlobalEvents = engine.globalBus.size();
+
+        OceanOutput("Repo EventBus event count: " + totalRepoEvents);
+        OceanOutput("Global EventBus event count: " + totalGlobalEvents);
+
+        // Pattern-match on event types
+        int creates = 0;
+        int updates = 0;
+        int deletes = 0;
+        int suspends = 0;
+        int verifies = 0;
+
+        for (int i from 0 to totalRepoEvents with increasing 1) {
+            DomainEvent ev = engine.repo.eventBus.events.get(i);
+            if (ev instanceof UserCreatedEvent) {
+                creates = creates + 1;
+            } else if (ev instanceof UserUpdatedEvent) {
+                updates = updates + 1;
+            } else if (ev instanceof UserDeletedEvent) {
+                deletes = deletes + 1;
+            } else if (ev instanceof UserSuspendedEvent) {
+                suspends = suspends + 1;
+            } else if (ev instanceof UserVerifiedEvent) {
+                verifies = verifies + 1;
+            }
+        }
+
+        OceanOutput("  Created events:   " + creates);
+        OceanOutput("  Updated events:   " + updates);
+        OceanOutput("  Deleted events:   " + deletes);
+        OceanOutput("  Suspended events: " + suspends);
+        OceanOutput("  Verified events:  " + verifies);
+
+        // ---- Phase 6: Extension Method Validation ----
+        OceanOutput("\n[PHASE 6] Extension Method Verification...");
+
+        // String extension
+        String raw = "ocean programming language";
+        String snaked = raw.toUpperSnakeCase();
+        OceanOutput("toUpperSnakeCase: " + snaked);
+
+        // User extension
+        User? sampleUser = res1.getValue();
+        String logStr ="";
+        if (sampleUser!=null) logStr = sampleUser.toLogString();
+        OceanOutput("User toLogString: " + logStr);
+
+        // CompletableFuture<String> async extension
+        CompletableFuture<String> fut = CompletableFuture.completedFuture("  hello ocean  ");
+        variable trimFut = fut.awaitTrimmed();
+        String trimmed = await trimFut;
+        OceanOutput("awaitTrimmed result: '" + trimmed + "'");
+
+        // Result<User> async extension
+        User? unwrapped = await res3.awaitUnwrapped();
+        OceanOutput("Result.awaitUnwrapped: " + ( unwrapped?.getUsername()));
+
+        // ---- Phase 7: Reflection & Annotation Checks ----
+        OceanOutput("\n[PHASE 7] Annotation & Reflection Checks...");
+
+        trying {
+            Class repoClazz = engine.repo.getClass();
+            ClassLoader loader = repoClazz.getClassLoader();
+
+            variable repoAnnoClass = loader.loadClass("com.nightmare.Repository");
+            bool hasRepo = repoClazz.isAnnotationPresent(repoAnnoClass);
+            OceanOutput("UserRepository has @Repository: " + hasRepo);
+
+            if (hasRepo) {
+                Repository ra = (Repository) repoClazz.getAnnotation(repoAnnoClass);
+                OceanOutput("  name="  + ra.name() + " version=" + ra.version() + " cacheable=" + ra.cacheable());
+            }
+
+            variable txClazz = loader.loadClass("com.nightmare.UserTransformer");
+            variable transformAnnoClass = loader.loadClass("com.nightmare.Transform");
+            bool hasTransform = txClazz.isAnnotationPresent(transformAnnoClass);
+            OceanOutput("UserTransformer has @Transform: " + hasTransform);
+
+            variable domainEventClass = loader.loadClass("com.nightmare.DomainEvent");
+            bool isSealed = domainEventClass.isSealed();
+            OceanOutput("DomainEvent isSealed: " + isSealed);
+
+            variable permitted = domainEventClass.getPermittedSubclasses();
+            OceanOutput("DomainEvent permitted count: " + permitted.length);
+        } catch (Exception e) {
+            OceanOutput("Reflection error: " + e.getMessage());
+        }
+
+        // ---- Phase 8: Audit Log Summary ----
+        OceanOutput("\n[PHASE 8] Audit Log Summary...");
+        OceanOutput("Total audit entries: " + engine.auditLog.size());
+
+        int okEntries = 0;
+        int failEntries = 0;
+
+        for (int i from 0 to engine.auditLog.size() with increasing 1) {
+            String entry = engine.auditLog.get(i);
+            if (entry.startsWith("OK:")) {
+                okEntries = okEntries + 1;
+            } else if (entry.startsWith("FAIL:")) {
+                failEntries = failEntries + 1;
+            }
+        }
+
+        OceanOutput("  OK entries:   " + okEntries);
+        OceanOutput("  FAIL entries: " + failEntries);
+
+        // ---- Phase 9: Final Assertions ----
+        OceanOutput("\n[PHASE 9] Final Assertions...");
+
+        bool p1 = res1.isSuccess() && res2.isSuccess() && res3.isSuccess() && res4.isSuccess() && res5.isSuccess();
+        bool p2 = !res6.isSuccess() && !res7.isSuccess();
+        bool p3 = createdCount == 5;
+        bool? p4 = prof1.getValue()?.getDisplayName()?.equals("alice");
+        bool? p5 = prof3.getValue()?.getDisplayName()?.equals("[ADMIN] charlie");
+        bool p6 = !prof_miss.isSuccess();
+        bool p7 = suspend1 && suspend2 && !suspend_miss;
+        bool p8 = ver1 && !ver2 && ver3;
+        bool p9 = allProfiles.size() == 5;
+        bool p10 = snaked.equals("OCEAN_PROGRAMMING_LANGUAGE");
+        bool p11 = logStr.contains("u001") && logStr.contains("alice");
+        bool p12 = trimmed.equals("hello ocean");
+        bool p13 = unwrapped != null && unwrapped.getUsername().equals("charlie");
+        bool p14 = creates == 5;
+        bool p15 = suspends == 2;
+        bool p16 = verifies == 2;
+        bool p17 = okEntries >= 9 && failEntries >= 3;
+
+        OceanOutput("P01 valid_creates:    " + p1);
+        OceanOutput("P02 invalid_creates:  " + p2);
+        OceanOutput("P03 repo_count:       " + p3);
+        OceanOutput("P04 alice_profile:    " + p4);
+        OceanOutput("P05 admin_profile:    " + p5);
+        OceanOutput("P06 missing_profile:  " + p6);
+        OceanOutput("P07 suspensions:      " + p7);
+        OceanOutput("P08 verifications:    " + p8);
+        OceanOutput("P09 batch_transform:  " + p9);
+        OceanOutput("P10 snake_case_ext:   " + p10);
+        OceanOutput("P11 user_log_ext:     " + p11);
+        OceanOutput("P12 future_trim_ext:  " + p12);
+        OceanOutput("P13 result_unwrap:    " + p13);
+        OceanOutput("P14 create_events:    " + p14);
+        OceanOutput("P15 suspend_events:   " + p15);
+        OceanOutput("P16 verify_events:    " + p16);
+        OceanOutput("P17 audit_counts:     " + p17);
+
+        bool allPass = p1 && p2 && p3 && p4 && p5 && p6 && p7 && p8 &&
+                       p9 && p10 && p11 && p12 && p13 && p14 && p15 && p16 && p17;
+
+        OceanOutput("\n==========================================================");
+        if (allPass) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+        OceanOutput("==========================================================");
+    }
+
+    static main() {
+        variable f = execute();
+        f.join();
+    }
+}

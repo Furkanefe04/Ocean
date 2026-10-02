@@ -1,0 +1,107 @@
+package com.annotationtest;
+
+import java.lang.Class;
+import java.lang.reflect.Field;
+import java.lang.annotation.Annotation;
+
+// ORM Framework Annotations
+public annotation Entity {
+    String tableName();
+}
+
+public annotation Id {
+    bool autoIncrement() default true;
+}
+
+public annotation Column {
+    String name() default "";
+    bool nullable() default true;
+    int length() default 255;
+}
+
+// Entity Model
+@Entity(tableName = "app_users")
+public class FrameworkOrmAnnotationTest {
+
+    @Id(autoIncrement = true)
+    @Column(name = "user_id", nullable = false)
+    public int id;
+
+    @Column(name = "email_address", nullable = false, length = 100)
+    public String email;
+
+    @Column(name = "display_name", nullable = true, length = 50)
+    public String name;
+
+    static main() {
+        OceanOutput("=== FRAMEWORK ORM ANNOTATION TEST START ===");
+
+        bool schemaOk = false;
+
+        trying {
+            FrameworkOrmAnnotationTest entity = new FrameworkOrmAnnotationTest();
+            variable clazz = entity.getClass();
+            variable loader = clazz.getClassLoader();
+
+            variable entityAnnoClass = loader.loadClass("com.annotationtest.Entity");
+            variable idAnnoClass = loader.loadClass("com.annotationtest.Id");
+            variable colAnnoClass = loader.loadClass("com.annotationtest.Column");
+
+            Entity entityAnno = (Entity) clazz.getAnnotation(entityAnnoClass);
+            if (entityAnno != null) {
+                String tableName = entityAnno.tableName();
+                OceanOutput("Discovered Entity Table: " + tableName);
+
+                String sql = "CREATE TABLE " + tableName + " (";
+                Field[] fields = clazz.getFields();
+
+                variable i = 0;
+                while (i < fields.length) {
+                    Field f = fields[i];
+                    Column colAnno = (Column) f.getAnnotation(colAnnoClass);
+                    Id idAnno = (Id) f.getAnnotation(idAnnoClass);
+
+                    if (colAnno != null) {
+                        String colName = colAnno.name().isEmpty() ? f.getName() : colAnno.name();
+                        String typeStr = f.getType().getSimpleName().equals("int") ? "INT" : "VARCHAR(" + colAnno.length() + ")";
+                        
+                        sql = sql + colName + " " + typeStr;
+
+                        if (!colAnno.nullable()) {
+                            sql = sql + " NOT NULL";
+                        }
+                        if (idAnno != null) {
+                            sql = sql + " PRIMARY KEY";
+                            if (idAnno.autoIncrement()) {
+                                sql = sql + " AUTO_INCREMENT";
+                            }
+                        }
+
+                        if (i < fields.length - 1) {
+                            sql = sql + ", ";
+                        }
+                    }
+                    i = i + 1;
+                }
+                sql = sql + ");";
+
+                OceanOutput("Generated DDL: " + sql);
+
+                String expected = "CREATE TABLE app_users (user_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, email_address VARCHAR(100) NOT NULL, display_name VARCHAR(50));";
+                if (sql.equals(expected)) {
+                    schemaOk = true;
+                }
+            }
+        } catch (Exception e) {
+            OceanOutput("ORM Generator Exception: " + e.getMessage());
+        }
+
+        if (schemaOk) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+
+        OceanOutput("=== FRAMEWORK ORM ANNOTATION TEST COMPLETED ===");
+    }
+}

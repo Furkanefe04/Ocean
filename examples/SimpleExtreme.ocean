@@ -1,0 +1,28 @@
+package com.resources;
+    class SimpleExtreme {
+    main() {
+        OceanOutput("=== SIMPLE EXTREME START ===");
+
+        // 1. 3D Arrays
+        variable cube = new int[3][3][3];
+        cube[1][2][1] = 99;
+        OceanOutput("Cube[1][2][1]: " + cube[1][2][1]);
+
+        // 2. String Chain
+        variable s = "Result: " + 1 + " " + 2 + " " + 3 + " " + true;
+        OceanOutput(s);
+
+        // 3. DCE
+        trying {
+            OceanOutput("Trying...");
+        } finally {
+            OceanOutput("Finally.");
+            if (cube[1][2][1] == 99 && s == "Result: 1 2 3 true") {
+                OceanOutput("STATUS: PASSED");
+            } else {
+                OceanOutput("STATUS: FAILED");
+            }
+            //OceanOutput("FAIL: DCE failed");
+        }
+    }
+}

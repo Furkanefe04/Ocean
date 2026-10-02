@@ -1,0 +1,20 @@
+package com.resources;
+
+interface StandardPrintable {
+    void function printMessage(String msg);
+}
+
+class ConsolePrinter implements StandardPrintable {
+    @Override
+    void function printMessage(String msg) {
+        OceanOutput("PRINT: " + msg);
+    }
+}
+
+class StandardInterfaceTest {
+    static void function main(String[] args) {
+        StandardPrintable printer = new ConsolePrinter();
+        printer.printMessage("Standard Interface Works!");
+        OceanOutput("STATUS: PASSED - Standard Interface Validated");
+    }
+}

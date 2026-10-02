@@ -1,0 +1,10 @@
+package com.sealedtest;
+
+public sealed class SealedClassErrorTest1 restricts AllowedChild {
+}
+
+public final class AllowedChild extends SealedClassErrorTest1 {
+}
+
+public final class IllegalChild extends SealedClassErrorTest1 {
+}

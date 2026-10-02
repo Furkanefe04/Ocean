@@ -1,0 +1,21 @@
+package com.resources;
+
+// package fake.line.comment;
+// class FakeLineDependency
+
+class PackageCommentConflictTest {
+    /*
+     * package fake.block.comment;
+     * class FakeBlockDependency
+     */
+    static main() {
+        String fakePackageString = "package fake.string.literal;";
+        String fakeClassString = "class FakeStringDependency";
+        OceanOutput("PackageCommentConflictTest: SUCCESS");
+        if (fakePackageString == "package fake.string.literal;" && fakeClassString == "class FakeStringDependency") {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

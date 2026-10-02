@@ -1,0 +1,73 @@
+package com.resources;
+import java.lang.Runnable;
+import java.lang.Thread;
+
+class Animal {
+    int age;
+    
+    function Animal(int pAge) {
+        age = pAge;
+    }
+    
+    int function getAge() {
+        return age;
+    }
+    
+    void function sound() {
+        OceanOutput("Animal makes a sound.");
+    }
+}
+
+class Dog extends Animal implements Runnable {
+    String breed;
+    bool runFlag = false;
+    
+    function Dog(int age, String breed) {
+        super(age);
+        this.breed = breed;
+    }
+    
+    void function sound() {
+        super.sound(); // Should print "Animal makes a sound."
+        OceanOutput("Dog barks!");
+    }
+    
+    // Implement Runnable
+    void function run() {
+        OceanOutput("Dog is running in a separate thread!");
+        runFlag = true;
+    }
+}
+
+class InheritanceTest {
+    static main() {
+        OceanOutput("--- OOP Test ---");
+        
+        Dog myDog = new Dog(5, "Golden Retriever");
+        
+        OceanOutput("Dog Age from Parent: ");
+        int age = myDog.getAge(); // Inherited method
+        OceanOutput(age); // Expected 5
+        
+        OceanOutput("Dog Breed: ");
+        OceanOutput(myDog.breed); // Expected Golden Retriever
+        
+        myDog.sound(); // Expected: Animal sound followed by Bark
+        
+        // Test Interface Implementation by spinning up a thread
+        Thread t = new Thread(myDog);
+        t.start();
+        
+        trying {
+            t.join();
+        } catch (InterruptedException e) {
+            OceanOutput("Thread interrupted");
+        }
+
+        if (age == 5 && myDog.breed == "Golden Retriever" && myDog.runFlag == true) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

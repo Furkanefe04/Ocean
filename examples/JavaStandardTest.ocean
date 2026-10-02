@@ -1,0 +1,53 @@
+package com.resources;
+import java.util.ArrayList;
+import java.util.Collections;
+
+class Person {
+    variable name = "";
+    variable age = 0;
+
+    void function greet() {
+        OceanOutput("Merhaba, benim adim " + name);
+    }
+}
+
+class Student extends Person {
+    variable studentId = 0;
+
+
+    void function study() {
+        OceanOutput(name + " (" + studentId + ") ders calisiyor...");
+    }
+}
+
+class JavaStandardTest {
+    main() {
+        OceanOutput("--- Java Standartlari & Interop Testi ---");
+
+        variable s = new Student();
+        s.name = "Ali";
+        s.age = 20;
+        s.studentId = 12345;
+        
+        s.greet();
+        s.study();
+        OceanOutput("Yas: " + s.age);
+
+        OceanOutput("\n--- Liste Siralama ---");
+        variable list = new ArrayList();
+        list.add(45);
+        list.add(12);
+        list.add(78);
+        list.add(34);
+        
+        OceanOutput("Once: " + list);
+        Collections.sort(list);
+        OceanOutput("Sonra: " + list);
+
+        if (s.name == "Ali" && s.age == 20 && s.studentId == 12345 && list.size() == 4 && list.get(0) == 12 && list.get(3) == 78) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

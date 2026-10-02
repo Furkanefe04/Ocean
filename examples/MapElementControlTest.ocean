@@ -1,0 +1,30 @@
+import com.resources.denemeClass;
+
+class MapElementControlTest {
+
+    main(){
+        DenemeMap<Integer,String> denemeMap = new DenemeMap<>();
+        denemeMap.setKey(70);
+        denemeMap.setVal("a");
+        if (denemeMap.get()=="70 : a") {
+            OceanOutput("STATUS: PASSED");
+        }
+        else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}
+
+class DenemeMap<U , T <: CharSequence> {
+    U key;
+    T val;
+    void function setKey(U u){
+        key = u;
+    }
+    void function setVal(T t) {
+        val = t;
+    }
+    public String function get() {
+        return key.toString()+" : "+val.toString();
+    }
+}

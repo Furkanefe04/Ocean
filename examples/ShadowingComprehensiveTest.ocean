@@ -1,0 +1,301 @@
+class ShadowingComprehensiveTest {
+
+    int valuex= 100;
+    String name = "field";
+
+    // 1. Method parameter -> local shadow
+    void function parameterShadow(int valuex) {
+        // WARNING: local/parameter 'value' shadows field 'value'
+        OceanOutput("parameter value = " + valuex);
+
+    {
+        // WARNING: inner 'value' shadows parameter 'value'
+        int valuex = 20;
+        OceanOutput("inner value = " + valuex);
+
+    {
+        // WARNING: nested 'value' shadows previous inner 'value'
+        int valuex = 30;
+        OceanOutput("deep value = " + valuex);
+    }
+
+        // Still parameter/inner scope relationship
+        OceanOutput("after deep = " + valuex);
+    }
+
+        OceanOutput("after block = " + valuex);
+    }
+
+    // 2. Local shadowing field
+    void function localShadowsField() {
+        int valuex = 10;
+        // WARNING: local 'value' shadows field 'value'
+
+        OceanOutput(valuex);
+        OceanOutput(this.valuex);
+    }
+
+    // 3. Different names -> no warning
+    void function differentNames() {
+        int x = 10;
+
+    {
+        int y = 20;
+        // NO WARNING
+    }
+
+        OceanOutput(x);
+    }
+
+    // 4. Sibling scopes
+    void function siblingScopes() {
+
+    {
+        int x = 10;
+    }
+
+    {
+        int x = 20;
+        // NO WARNING
+        // First x belongs to sibling scope, not outer scope.
+    }
+    }
+
+    // 5. Nested shadowing
+    void function nestedScopes() {
+        int x = 1;
+
+    {
+        int x = 2;
+        // WARNING
+
+    {
+        int x = 3;
+        // WARNING
+
+    {
+        int x = 4;
+        // WARNING
+    }
+    }
+    }
+    }
+
+    // 6. Duplicate declaration in same scope
+    void function duplicateSameScope() {
+        int x = 10;
+        int x = 20;
+        // ERROR: already defined in this scope
+        // NO shadow warning for the second declaration
+    }
+
+    // 7. Duplicate inside inner scope
+    void function duplicateInnerScope() {
+        int x = 10;
+
+    {
+        int x = 20;
+        // WARNING: shadows outer x
+
+        int x = 30;
+        // ERROR: already defined in THIS scope
+        // NO second shadow warning
+    }
+    }
+
+    // 8. Parameter and local with same name
+    void function parameterDuplicate(int x) {
+        int x = 20;
+        // ERROR: already defined in this scope
+        // NOT a shadow warning
+    }
+
+    // 9. Parameter -> nested scope
+    void function parameterNested(int x) {
+
+    {
+        int x = 20;
+        // WARNING: shadows parameter
+    }
+
+    {
+        int x = 30;
+        // WARNING: shadows parameter
+    }
+    }
+
+    // 10. Multiple nested levels
+    void function deepShadowing(int x) {
+    {
+        int x = 1;
+        // WARNING
+
+    {
+        int x = 2;
+        // WARNING
+
+    {
+        int x = 3;
+        // WARNING
+
+    {
+        int x = 4;
+        // WARNING
+    }
+    }
+    }
+    }
+    }
+
+    // 11. Different type does NOT matter
+    void function differentType(int x) {
+
+    {
+        String x = "hello";
+        // WARNING: still shadowing
+        // Type does not make it a different variable.
+    }
+    }
+
+    // 12. Field + nested local
+    void function fieldNested() {
+
+    {
+        int valuex= 50;
+        // WARNING: shadows field 'value'
+
+    {
+        String valuex= "hello";
+        // WARNING: shadows outer local value
+    }
+    }
+    }
+
+    // 13. Multiple fields with local names
+    int age = 20;
+    String title = "Engineer";
+
+    void function multipleFieldShadow() {
+        int age = 30;
+        // WARNING
+
+    {
+        String title = "Developer";
+        // WARNING
+    }
+    }
+
+    // 14. Scope ends -> declaration disappears
+    void function scopeLifetime() {
+
+    {
+        int temporary = 10;
+    }
+
+    {
+        int temporary = 20;
+        // NO WARNING
+        // Previous temporary was in a sibling/finished scope.
+    }
+    }
+
+    // 15. Loop scope
+    void function loopShadow() {
+
+        int i = 100;
+
+        while (i > 0) {
+
+            int i = 10;
+            // WARNING: shadows outer i
+
+            stop;
+        }
+    }
+
+    // 16. If scope
+    void function ifShadow(bool condition) {
+
+        int x = 10;
+
+        if (condition) {
+            int x = 20;
+            // WARNING
+        }
+    }
+
+    // 17. Else sibling scope
+    void function ifElseShadow(bool condition) {
+
+        int x = 10;
+
+        if (condition) {
+            int x = 20;
+            // WARNING
+        } else {
+            int x = 30;
+            // WARNING
+            // Both shadow the same outer x.
+        }
+    }
+
+    // 18. Nested if
+    void function nestedIfShadow(bool a, bool b) {
+
+        int x = 0;
+
+        if (a) {
+
+            int x = 1;
+            // WARNING
+
+            if (b) {
+
+                int x = 2;
+                // WARNING
+            }
+        }
+    }
+
+    // 19. No false positives
+    void function noFalsePositive() {
+
+        int a = 10;
+        int b = 20;
+
+    {
+        int c = 30;
+
+    {
+        int d = 40;
+    }
+    }
+
+        // NO warnings expected.
+    }
+
+    // 20. Main
+    main() {
+        parameterShadow(5);
+        localShadowsField();
+        differentNames();
+        siblingScopes();
+        nestedScopes();
+        duplicateSameScope();
+        duplicateInnerScope();
+        parameterDuplicate(10);
+        parameterNested(10);
+        deepShadowing(10);
+        differentType(10);
+        fieldNested();
+        multipleFieldShadow();
+        scopeLifetime();
+        loopShadow();
+        ifShadow(true);
+        ifElseShadow(true);
+        nestedIfShadow(true, true);
+        noFalsePositive();
+
+        OceanOutput("Shadowing test completed");
+    }
+}

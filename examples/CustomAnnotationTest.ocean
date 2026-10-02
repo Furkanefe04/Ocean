@@ -1,0 +1,93 @@
+package com.annotationtest;
+
+import java.lang.Class;
+import java.lang.reflect.Method;
+import java.lang.reflect.Field;
+import java.lang.annotation.Annotation;
+
+// 1. Declare Custom Annotation (Option B - Ocean Style)
+public annotation ComponentInfo {
+    String name() default "defaultComponent";
+    int version() default 1;
+}
+
+// 2. Apply Custom Annotation to Class
+@ComponentInfo(name = "OrderManager", version = 42)
+public class CustomAnnotationTest {
+
+    // 3. Apply Custom Annotation to Field
+    @ComponentInfo(name = "fieldMember", version = 10)
+    public String status;
+
+    // 4. Apply Custom Annotation to Method
+    @ComponentInfo(name = "processOrder", version = 99)
+    public void function process() {
+        OceanOutput("Processing order...");
+    }
+
+    static main() {
+        OceanOutput("=== CUSTOM ANNOTATION TEST START ===");
+
+        bool classAnnoOk = false;
+        bool methodAnnoOk = false;
+        bool fieldAnnoOk = false;
+
+        trying {
+            CustomAnnotationTest instance = new CustomAnnotationTest();
+            variable clazz = instance.getClass();
+            variable annoType = clazz.getClassLoader().loadClass("com.annotationtest.ComponentInfo");
+
+            Annotation[] annos = clazz.getAnnotations();
+            OceanOutput("Class Annos count: " + annos.length);
+            for (variable a in annos) {
+                OceanOutput("Class Anno item: " + a.toString());
+            }
+            
+            ComponentInfo classAnno = (ComponentInfo) clazz.getAnnotation(annoType);
+
+            if (classAnno != null) {
+                OceanOutput("Class Anno Name: " + classAnno.name());
+                OceanOutput("Class Anno Version: " + classAnno.version());
+                if (classAnno.name().equals("OrderManager") && classAnno.version() == 42) {
+                    classAnnoOk = true;
+                }
+            } else {
+                OceanOutput("Class Anno is NULL");
+            }
+
+            // Test 2: Read Method Annotation via Java Reflection
+            Method method = clazz.getMethod("process");
+            ComponentInfo methodAnno = (ComponentInfo) method.getAnnotation(annoType);
+
+            if (methodAnno != null) {
+                OceanOutput("Method Anno Name: " + methodAnno.name());
+                OceanOutput("Method Anno Version: " + methodAnno.version());
+                if (methodAnno.name().equals("processOrder") && methodAnno.version() == 99) {
+                    methodAnnoOk = true;
+                }
+            }
+
+            // Test 3: Read Field Annotation via Java Reflection
+            Field field = clazz.getField("status");
+            ComponentInfo fieldAnno = (ComponentInfo) field.getAnnotation(annoType);
+
+            if (fieldAnno != null) {
+                OceanOutput("Field Anno Name: " + fieldAnno.name());
+                OceanOutput("Field Anno Version: " + fieldAnno.version());
+                if (fieldAnno.name().equals("fieldMember") && fieldAnno.version() == 10) {
+                    fieldAnnoOk = true;
+                }
+            }
+        } catch (Exception e) {
+            OceanOutput("Reflection Exception: " + e.getMessage());
+        }
+
+        if (classAnnoOk && methodAnnoOk && fieldAnnoOk) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+
+        OceanOutput("=== CUSTOM ANNOTATION TEST COMPLETED ===");
+    }
+}

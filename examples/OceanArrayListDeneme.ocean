@@ -1,0 +1,33 @@
+package resources;
+
+import java.util.Comparator;
+
+class OceanArrayListDeneme {
+
+    main(){
+        variable arr = [10,20,30,40,50,60,70];
+        variable arr2 =["deneme","deneme2" ];
+        variable arr3 = [[30,50,70],{"a":5,"b":7,"c":9}];
+        OceanOutput(((OceanList)(arr3.get(0))).isSorted());
+        arr.shuffle();
+        OceanOutput(arr);
+        arr.sort(new Comparator<Integer>() {
+            @Override
+            public int function compare(Integer o1, Integer o2) {
+                return o1.compareTo(o2);
+            }
+        });
+        OceanOutput("After sorting");
+        OceanOutput(arr);
+        OceanOutput(arr.isSorted());
+
+        bool check1 = (bool) ((OceanList) arr3.get(0)).isSorted();
+        bool check2 = (bool) arr.isSorted();
+        bool check3 = arr.size() == 7 && (int)arr.get(0) == 10 && (int)arr.get(6) == 70;
+        if (check1 && check2 && check3) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

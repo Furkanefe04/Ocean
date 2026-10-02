@@ -1,0 +1,377 @@
+package interoptest;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.util.concurrent.ThreadLocalRandom;
+
+class JavaNullSafetyInteropTest {
+    main() {
+        // System.getProperty returns a nullable String because it is an external Java call.
+        // Assigning it directly to a non-nullable String should cause a compilation error!
+        String valuex = System.getProperty("os.name");
+
+        OceanListx<String?> vals = new OceanListx<String?>(10);
+        vals.add("deneme");
+        vals.add(null);
+        vals.add("ocean");
+        vals.add("compiler");
+
+        String? s = vals.get(1);
+        OceanOutput("safeGet(1): " + s);
+        OceanOutput("List size: " + vals.size());
+        OceanOutput("Contains deneme: " + vals.contains("deneme"));
+        OceanOutput("Contains null: " + vals.contains(null));
+        OceanOutput("indexOf ocean: " + vals.indexOf("ocean"));
+
+        vals.add(1, "inserted");
+        OceanOutput("After insert at 1: " + vals.toString());
+
+        String? removed = vals.remove(1);
+        OceanOutput("Removed item: " + removed);
+
+        vals.set(0, "updated");
+        OceanOutput("get(0): " + vals.get(0));
+
+        OceanListx<String?>? sub = vals.slice(0, 2);
+        OceanOutput("Sublist slice(0, 2) size: " + sub?.size());
+        OceanOutput("Sublist slice(0, 2): " + sub?.toString());
+
+        OceanListx<int> numbers = new OceanListx();
+        numbers.add(10);
+        numbers.add(20);
+        numbers.add(30);
+        OceanOutput("Numbers isSorted: " + numbers.isSorted());
+        OceanOutput("Numbers first: " + numbers.first() + ", last: " + numbers.last());
+
+        numbers.reverse();
+        OceanOutput("Numbers after reverse: " + numbers.toString());
+
+        numbers.shuffle();
+        OceanOutput("Numbers after shuffle size: " + numbers.size());
+
+        numbers.clear();
+        OceanOutput("Numbers isEmpty after clear: " + numbers.isEmpty());
+        OceanOutput("STATUS: PASSED");
+    }
+}
+
+public class OceanListx<T> {
+
+    private static final long serialVersionUID = 1L;
+
+    private static final int DEFAULT_CAPACITY = 10;
+
+    Object[] elementData; // non-private to simplify nested class access
+
+    private int size;
+
+    public function OceanListx() {
+        elementData = new Object[DEFAULT_CAPACITY];
+        size = 0;
+    }
+
+    public function OceanListx(int initialCapacity) {
+        if (initialCapacity < 0) {
+            throw new IllegalArgumentException("Invalid capacity: " + initialCapacity);
+        }
+        int cap = initialCapacity > 0 ? initialCapacity : DEFAULT_CAPACITY;
+        elementData = new Object[cap];
+        size = 0;
+    }
+
+    private void function ensureCapacity(int minCapacity) {
+        if (elementData == null || elementData.length == 0) {
+            int cap = minCapacity > DEFAULT_CAPACITY ? minCapacity : DEFAULT_CAPACITY;
+            elementData = new Object[cap];
+            return;
+        }
+        if (minCapacity > elementData.length) {
+            int oldCapacity = elementData.length;
+            int newCapacity = oldCapacity + (oldCapacity >> 1);
+            if (newCapacity < minCapacity) {
+                newCapacity = minCapacity;
+            }
+            Object[] newArr = new Object[newCapacity];
+            if (size > 0) {
+                for (int i from 0 to size with increasing 1) {
+                    newArr[i] = elementData[i];
+                }
+            }
+            elementData = newArr;
+        }
+    }
+
+    private void function checkIndex(int index) {
+        if (index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
+        }
+    }
+
+    public int function size() {
+        return size;
+    }
+
+    public bool function isEmpty() {
+        return size == 0;
+    }
+
+    public void function add(T? val) {
+        ensureCapacity(size + 1);
+        elementData[size] = val;
+        size = size + 1;
+    }
+
+    public void function add(int index, T? val) {
+        if (index < 0 || index > size) {
+            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
+        }
+        ensureCapacity(size + 1);
+        if (size > index) {
+            for (int i from (size - 1) to (index - 1) with decreasing 1) {
+                elementData[i + 1] = elementData[i];
+            }
+        }
+        elementData[index] = val;
+        size = size + 1;
+    }
+
+    public void function addAll(OceanListx<T> other) {
+        if (other == null || other.isEmpty()) {
+            return;
+        }
+        int numNew = other.size();
+        ensureCapacity(size + numNew);
+        for (int i from 0 to numNew with increasing 1) {
+            add(other.get(i));
+        }
+    }
+
+    public void function addAll(int index, OceanListx<T> other) {
+        if (index < 0 || index > size) {
+            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
+        }
+        if (other == null || other.isEmpty()) {
+            return;
+        }
+        int numNew = other.size();
+        ensureCapacity(size + numNew);
+        int numMoved = size - index;
+        if (numMoved > 0) {
+            for (int i from (size - 1) to (index - 1) with decreasing 1) {
+                elementData[i + numNew] = elementData[i];
+            }
+        }
+        for (int i from 0 to numNew with increasing 1) {
+            elementData[index + i] = other.get(i);
+        }
+        size = size + numNew;
+    }
+
+    public T? function get(int index) {
+        checkIndex(index);
+        return elementData[index];
+    }
+
+    public T? function set(int index, T? val) {
+        checkIndex(index);
+        T oldVal = elementData[index];
+        elementData[index] = val;
+        return oldVal;
+    }
+
+    public T? function remove(int index) {
+        checkIndex(index);
+        T oldVal = elementData[index];
+        int numMoved = size - index - 1;
+        if (numMoved > 0) {
+            for (int i from index to (size - 1) with increasing 1) {
+                elementData[i] = elementData[i + 1];
+            }
+        }
+        elementData[size - 1] = null;
+        size = size - 1;
+        return oldVal;
+    }
+
+    public bool function removeElement(T? val) {
+        int idx = indexOf(val);
+        if (idx >= 0) {
+            remove(idx);
+            return true;
+        }
+        return false;
+    }
+
+    public void function clear() {
+        if (size > 0) {
+            for (int i from 0 to size with increasing 1) {
+                elementData[i] = null;
+            }
+        }
+        size = 0;
+    }
+
+    public bool function contains(T? val) {
+        return indexOf(val) >= 0;
+    }
+
+    public int function indexOf(T? val) {
+        if (val == null) {
+            if (size > 0) {
+                for (int i from 0 to size with increasing 1) {
+                    if (elementData[i] == null) {
+                        return i;
+                    }
+                }
+            }
+        } else {
+            if (size > 0) {
+                for (int i from 0 to size with increasing 1) {
+                    if (val.equals(elementData[i])) {
+                        return i;
+                    }
+                }
+            }
+        }
+        return -1;
+    }
+
+    public int function lastIndexOf(T? val) {
+        if (val == null) {
+            if (size > 0) {
+                for (int i from (size - 1) to -1 with decreasing 1) {
+                    if (elementData[i] == null) {
+                        return i;
+                    }
+                }
+            }
+        } else {
+            if (size > 0) {
+                for (int i from (size - 1) to -1 with decreasing 1) {
+                    if (val.equals(elementData[i])) {
+                        return i;
+                    }
+                }
+            }
+        }
+        return -1;
+    }
+
+    public T? function first() {
+        checkIndex(0);
+        return elementData[0];
+    }
+
+
+    public T? function last() {
+        checkIndex(size - 1);
+        return elementData[size - 1];
+    }
+
+
+    public void function swap(int i, int j) {
+        checkIndex(i);
+        checkIndex(j);
+        Object tmp = elementData[i];
+        elementData[i] = elementData[j];
+        elementData[j] = tmp;
+    }
+
+    public void function reverse() {
+        if (size <= 1) return;
+        int mid = size >> 1;
+        for (int i from 0 to mid with increasing 1) {
+            int j = size - 1 - i;
+            Object tmp = elementData[i];
+            elementData[i] = elementData[j];
+            elementData[j] = tmp;
+        }
+    }
+
+    public Object[] function toArray() {
+        Object[] arr = new Object[size];
+        if (size > 0) {
+            for (int i from 0 to size with increasing 1) {
+                arr[i] = elementData[i];
+            }
+        }
+        return arr;
+    }
+
+    public void function shuffle() {
+        ThreadLocalRandom rnd = ThreadLocalRandom.current();
+        int sz = size();
+        if (sz > 1) {
+            for (int i from (sz - 1) to 0 with decreasing 1) {
+                int j = rnd.nextInt(i + 1);
+                T? tmp = get(i);
+                set(i, get(j));
+                set(j, tmp);
+            }
+        }
+    }
+
+    public bool function isSorted() {
+        return isSorted(this);
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public static <T> bool function isSorted(OceanListx<T> list) {
+        if (list == null || list.size() <= 1) {
+            return true;
+        }
+        for (int i from 1 to list.size() with increasing 1) {
+            T? prev = list.get(i - 1);
+            T? curr = list.get(i);
+            if (prev == null || curr == null) skip;
+
+            if (prev instanceof Number && curr instanceof Number) {
+                if (((Number) prev).doubleValue() > ((Number) curr).doubleValue()) {
+                    return false;
+                }
+            } else if (prev instanceof Comparable && prev.getClass().isInstance(curr)) {
+                if (((Comparable) prev).compareTo(curr) > 0) {
+                    return false;
+                }
+            } else {
+                if (prev.toString().compareTo(curr.toString()) > 0) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public OceanListx<T>? function slice(int fromIndex, int toIndex) {
+        if (fromIndex < 0 || toIndex > size || fromIndex > toIndex) {
+            throw new IndexOutOfBoundsException("fromIndex: " + fromIndex + ", toIndex: " + toIndex + ", size: " + size);
+        }
+        OceanListx<T> sub = new OceanListx(toIndex - fromIndex);
+        if (toIndex > fromIndex) {
+            for (int i from fromIndex to toIndex with increasing 1) {
+                sub.add(get(i));
+            }
+        }
+        return sub;
+    }
+
+    @NotNull
+    public OceanListx<T> function subList(int fromIndex, int toIndex) {
+        return slice(fromIndex, toIndex);
+    }
+
+    public String function toString() {
+        if (size == 0) {
+            return "[]";
+        }
+        String res = "[";
+        for (int i from 0 to size with increasing 1) {
+            Object item = elementData[i];
+            res = res + (item == null ? "null" : item.toString());
+            if (i < size - 1) {
+                res = res + ", ";
+            }
+        }
+        return res + "]";
+    }
+}

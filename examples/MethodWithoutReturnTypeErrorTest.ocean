@@ -1,0 +1,9 @@
+class MethodWithoutReturnTypeErrorTest {
+    static function deneme(){
+        OceanOutput("deneme");
+    }
+
+    main(){
+        deneme();
+    }
+}

@@ -1,0 +1,102 @@
+package com.resources;
+
+// Scenario 1: Multi-level Interface Inheritance
+public interface RootInterface {
+    public String function getRootName();
+}
+
+public interface DerivedInterface extends RootInterface {
+    public int function getVersion();
+}
+
+// Scenario 2: Generic Interface Inheritance
+public interface DataMapper<K, V> {
+    public V function findOne(K key);
+    public OceanList<V> function findBatch(OceanList<K> keys);
+}
+
+// Scenario 3: Abstract Class Hierarchy
+public abstract class BaseService {
+    public abstract String function executeService(String payload);
+    public String function getServiceName() {
+        return "BaseService";
+    }
+}
+
+// Concrete Implementation testing all @Override cases simultaneously
+public class ComplexOverrideStressTest extends BaseService implements DerivedInterface, DataMapper<String, String> {
+
+    // Overriding RootInterface method via DerivedInterface
+    @Override
+    public String function getRootName() {
+        return "RootImpl";
+    }
+
+    // Overriding DerivedInterface method
+    @Override
+    public int function getVersion() {
+        return 42;
+    }
+
+    // Overriding Abstract BaseService method
+    @Override
+    public String function executeService(String payload) {
+        return "Processed: " + payload;
+    }
+
+    // Overriding Concrete BaseService method (Covariant return type)
+    @Override
+    public String function getServiceName() {
+        return "ComplexOverrideStressTestService";
+    }
+
+    // Overriding Generic DataMapper method 1
+    @Override
+    public String function findOne(String key) {
+        return "FoundValueFor_" + key;
+    }
+
+    // Overriding Generic DataMapper method 2 (Generic List parameter & return)
+    @Override
+    public OceanList<String> function findBatch(OceanList<String> keys) {
+        OceanList<String> res = new OceanList<String>();
+        for (int i from 0 to keys.size() with increasing 1) {
+            res.add("BatchVal_" + keys.get(i));
+        }
+        return res;
+    }
+
+    static main() {
+        ComplexOverrideStressTest test = new ComplexOverrideStressTest();
+        
+        String rootName = test.getRootName();
+        int version = test.getVersion();
+        String exec = test.executeService("TestData");
+        String serviceName = test.getServiceName();
+        String one = test.findOne("Key1");
+        
+        OceanList<String> inputKeys = new OceanList<String>();
+        inputKeys.add("K1");
+        inputKeys.add("K2");
+        OceanList<String> batch = test.findBatch(inputKeys);
+
+        OceanOutput("rootName=" + rootName);
+        OceanOutput("version=" + version);
+        OceanOutput("exec=" + exec);
+        OceanOutput("serviceName=" + serviceName);
+        OceanOutput("one=" + one);
+        OceanOutput("batchSize=" + batch.size() + ", b0=" + batch.get(0) + ", b1=" + batch.get(1));
+        if (rootName.equals("RootImpl") &&
+            version == 42 &&
+            exec.equals("Processed: TestData") &&
+            serviceName.equals("ComplexOverrideStressTestService") &&
+            one.equals("FoundValueFor_Key1") &&
+            batch.size() == 2 &&
+            batch.get(0).equals("BatchVal_K1") &&
+            batch.get(1).equals("BatchVal_K2")) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

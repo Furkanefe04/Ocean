@@ -1,0 +1,16 @@
+class ErrorTest {
+    static main() {
+        // 1. Tanımsız değişken hatası
+        variable x = tanimsizDegisken;
+
+        // 2. Olmayan metod çağrısı
+        olmayanMetod();
+
+        // 3. Statik bağlam hatası (Statik metoddan instance metod çağırma)
+        instanceMetod();
+    }
+
+    void function instanceMetod() {
+        OceanOutput("Bu bir instance metodudur.");
+    }
+}

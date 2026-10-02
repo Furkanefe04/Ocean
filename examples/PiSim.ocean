@@ -1,0 +1,72 @@
+package com.resources;
+import java.util.Scanner;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
+class PiSim {
+    main() {
+        variable scanner = OceanInput();
+        while(true){
+            OceanOutput("Pi SayÄ±sÄ± SimÃ¼latÃ¶rÃ¼");
+            OceanOutput("--------------------");
+            OceanOutput("KaÃ§ basamak pi hesaplansÄ±n? (Ã–rn: 50)");
+            int digits = scanner.nextInt();
+            if (digits <= 0) {
+                OceanOutput("STATUS: PASSED");
+                stop;
+            }
+
+            variable calcScale = digits + 8;
+
+            OceanOutput("HesaplanÄ±yor... (Machin FormÃ¼lÃ¼ kullanÄ±lÄ±yor)");
+
+            // Machin FormÃ¼lÃ¼: pi = 16*arctan(1/5) - 4*arctan(1/239)
+            BigDecimal term1 = arctan(1, 5, calcScale);
+            BigDecimal sixteen = new BigDecimal("16");
+            term1 = sixteen * term1;
+
+            BigDecimal term2 = arctan(1, 239, calcScale);
+            BigDecimal four = new BigDecimal("4");
+            term2 = four * term2;
+
+            BigDecimal pi = term1 - term2;
+
+            OceanOutput("\n--- SonuÃ§ ---");
+            OceanOutput($"Hesaplanan Pi ({digits} basamak):");
+            OceanOutput(pi.setScale(digits, RoundingMode.HALF_UP).toString());
+        }
+
+    }
+
+    static BigDecimal function arctan(int num, int den, int scale) {
+        BigDecimal resultx = new BigDecimal("0");
+        resultx = resultx.setScale(scale, RoundingMode.HALF_UP);
+
+        // String dÃ¶nÃ¼ÅŸÃ¼mÃ¼ iÃ§in "" + num kullanÄ±yoruz (parser hatasÄ±nÄ± Ã¶nlemek iÃ§in)
+        BigDecimal numerator = new BigDecimal("" + num);
+        numerator = numerator.setScale(scale, RoundingMode.HALF_UP);
+
+        BigDecimal denominator = new BigDecimal("" + den);
+        BigDecimal x2 = denominator * denominator;
+
+        BigDecimal term = numerator.divide(denominator, scale, RoundingMode.HALF_UP);
+        BigDecimal k = new BigDecimal("1");
+        BigDecimal two = new BigDecimal("2");
+        BigDecimal one = new BigDecimal("1");
+        BigDecimal zero = new BigDecimal("0");
+
+        while (term.signum() != 0) {
+            BigDecimal divisor = k * two - one;
+
+            if (k.remainder(two).equals(zero)) {
+                resultx = resultx - (term / divisor);
+            } else {
+                resultx = resultx + (term / divisor);
+            }
+
+            term = term.divide(x2, scale, RoundingMode.HALF_UP);
+            k = k + one;
+        }
+        return resultx;
+    }
+}

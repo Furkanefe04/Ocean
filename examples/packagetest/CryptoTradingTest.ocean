@@ -1,0 +1,123 @@
+package com.trading.main;
+
+import com.trading.core.TradeEntity;
+import com.trading.core.Pair;
+import com.trading.core.OrderListWrapper;
+import com.trading.model.LimitOrder;
+import com.trading.model.MatchResult;
+import com.trading.model.ExecutionReport;
+import com.trading.model.TradeInfo;
+import com.trading.wallet.AccountProfile;
+import com.trading.wallet.AssetBalance;
+import com.trading.wallet.Wallet;
+import com.trading.wallet.Ledger;
+import com.trading.engine.PriceLevel;
+import com.trading.engine.OrderBook;
+import com.trading.engine.TransactionFeeCalculator;
+import com.trading.engine.ClearingHouse;
+import com.trading.engine.MatchingProcessor;
+import com.trading.network.MarketPriceUpdate;
+import com.trading.network.FeedSubscriber;
+import com.trading.network.MarketSpread;
+import com.trading.network.ArbitrageBot;
+import com.trading.network.BroadcastThread;
+import com.trading.analytics.TradingAnalytics;
+import com.trading.analytics.SystemStatus;
+public class CryptoTradingTest {
+    main() {
+        OceanOutput("==============================================");
+        OceanOutput("  HIGH-FREQUENCY CRYPTO TRADING SIM (25 CLASSES)");
+        OceanOutput("==============================================");
+
+        // 1. Setup Wallets & Accounts
+        AccountProfile aliceProfile = AccountProfile.create("alice", "VIP");
+        AccountProfile bobProfile = AccountProfile.create("bob", "STANDARD");
+
+        AssetBalance[] aliceBalances = new AssetBalance[2];
+        aliceBalances[0] = AssetBalance.create("USD", 100000.0);
+        aliceBalances[1] = AssetBalance.create("BTC", 0.0);
+
+        AssetBalance[] bobBalances = new AssetBalance[2];
+        bobBalances[0] = AssetBalance.create("USD", 0.0);
+        bobBalances[1] = AssetBalance.create("BTC", 2.0);
+
+        Wallet aliceWallet = Wallet.create("ACC-ALICE", aliceBalances);
+        Wallet bobWallet = Wallet.create("ACC-BOB", bobBalances);
+
+        // 2. Setup Market Spread & Arbitrage Bot Checks
+        MarketSpread spread = MarketSpread.create(59950.0, 60050.0);
+        ArbitrageBot arbBot = ArbitrageBot.create("ARB-BOT-01");
+
+        OceanOutput("Bid-Ask Spread: $" + spread.getSpread());
+        if(arbBot.evaluateSpread(spread)) {
+            OceanOutput("Arbitrage Bot Alert: Highly profitable price disparity identified!");
+        } else {
+            OceanOutput("Arbitrage Bot: Spread within stable thresholds.");
+        }
+
+        // 3. Setup Order Book & Processors
+        OrderBook btcBook = OrderBook.create("BTC");
+        Ledger ledger = Ledger.create();
+        MatchingProcessor processor = MatchingProcessor.create(btcBook, ledger);
+        OrderListWrapper < MatchResult > completedMatches = OrderListWrapper.create();
+
+        // 4. Submit Limit Orders
+        OceanOutput("\n--- Executing Order Matches ---");
+
+        // Transaction A: Alice buys 1.5 BTC at $60,000
+        LimitOrder aliceOrder = LimitOrder.create("ORD-001", "ACC-ALICE", "BTC", "BUY", 60000.0, 1.5);
+        MatchResult res1 = processor.submitOrder(aliceOrder, aliceWallet, bobWallet, aliceProfile.tier);
+        OceanOutput("Alice Order Status: " + res1.message);
+        completedMatches.add(res1);
+
+        // Transaction B: Bob sells 1.5 BTC at $60,000 (Matches Alice)
+        LimitOrder bobOrder = LimitOrder.create("ORD-002", "ACC-BOB", "BTC", "SELL", 60000.0, 1.5);
+        MatchResult res2 = processor.submitOrder(bobOrder, aliceWallet, bobWallet, bobProfile.tier);
+        OceanOutput("Bob Order Status: " + res2.message);
+        completedMatches.add(res2);
+
+        // 5. Asynchronous Price Update Feed Streamer (java.lang.Thread subclass)
+        OceanOutput("\n--- Launching Asynchronous Price Update Feed ---");
+        FeedSubscriber userFeed = FeedSubscriber.create("Retail-Alice");
+        MarketPriceUpdate tickerUpdate = MarketPriceUpdate.create("BTC", 60120.0, 150.8);
+
+        BroadcastThread dispatcher = BroadcastThread.create(tickerUpdate, userFeed);
+        dispatcher.start();
+        trying {
+            dispatcher.join();
+        }
+        catch (InterruptedException e) {
+
+        }
+         // await thread loop execution
+
+        if(userFeed.receivedUpdates.size() > 0) {
+            OceanOutput(userFeed.receivedUpdates.get(0));
+        }
+
+        // 6. Aggregate Analytics
+        OceanOutput("\n--- Aggregating Clearing & Financial Reports ---");
+        double volume = TradingAnalytics.calculateCumulativeVolume(completedMatches);
+        double feeIncome = TradingAnalytics.calculateTotalFeesCollected(completedMatches);
+
+        OceanOutput("Alice Wallet USD: $" + aliceWallet.getBalance("USD") + " | BTC: " + aliceWallet.getBalance("BTC"));
+        OceanOutput("Bob Wallet USD: $" + bobWallet.getBalance("USD") + " | BTC: " + bobWallet.getBalance("BTC"));
+        OceanOutput("Cumulative Matched Trade Volume: $" + volume);
+        OceanOutput("Exchange Platform Fee Income: $" + feeIncome);
+
+        // System Health Checks
+        SystemStatus health = SystemStatus.create(1, ledger.auditLogs.size());
+        OceanOutput(health.getStatusSummary());
+
+        // 7. Verify Assertions
+        if(aliceWallet.getBalance("BTC") == 1.5 && volume == 90000.0) {
+            OceanOutput("\n==============================================");
+            OceanOutput("  CRYPTO TRADING TEST SUCCESSFUL (25 CLASSES passed!)");
+            OceanOutput("==============================================");
+        } else {
+            OceanOutput("\n==============================================");
+            OceanOutput("  CRYPTO TRADING TEST FAILED!");
+            OceanOutput("==============================================");
+        }
+    }
+}

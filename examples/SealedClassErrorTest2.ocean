@@ -1,0 +1,8 @@
+package com.sealedtest;
+
+public sealed class SealedClassErrorTest2 restricts MissingModifierChild {
+}
+
+// Missing final/sealed/non-sealed modifier
+public class MissingModifierChild extends SealedClassErrorTest2 {
+}

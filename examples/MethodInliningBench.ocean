@@ -1,0 +1,28 @@
+package com.resources;
+
+class MethodInliningBench {
+    private int function helperMath(int x, int y) {
+        return (x * 3 + y * 7) % 1000;
+    }
+
+    static main() {
+        long start = System.currentTimeMillis();
+        int sum = 0;
+        int iterations = 200000000;
+        MethodInliningBench bench = new MethodInliningBench();
+        
+        for (int i from 0 to iterations with increasing 1) {
+            sum = sum + bench.helperMath(i, i + 1);
+        }
+        
+        long end = System.currentTimeMillis();
+        long duration = end - start;
+        OceanOutput("MethodInliningBench Duration: " + duration + " ms (sum=" + sum + ")");
+        bool passed = true;
+        if (passed) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

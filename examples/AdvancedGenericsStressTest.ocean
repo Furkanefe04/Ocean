@@ -1,0 +1,56 @@
+package com.resources;
+import java.util.ArrayList;
+import java.util.List;
+
+interface PairHolder<K, V> {
+    K function getKey();
+    V function getValue();
+}
+
+class DataPair<K, V> implements PairHolder<K, V> {
+    K key;
+    V valuex;
+
+    function DataPair(K k, V v) {
+        key = k;
+        valuex = v;
+    }
+
+    K function getKey() {
+        return key;
+    }
+
+    V function getValue() {
+        return valuex;
+    }
+}
+
+class GenericMath {
+    static <T <: Number> double function addAsDouble(T a, T b) {
+        return a.doubleValue() + b.doubleValue();
+    }
+}
+
+class AdvancedGenericsStressTest {
+    main() {
+        OceanOutput("===== ADVANCED GENERICS STRESS TEST START =====");
+
+        // 1. Generic class instantiation & method call
+        DataPair<String, Integer> pair = new DataPair<String, Integer>("Age", 30);
+        OceanOutput(pair.getKey() + ": " + pair.getValue());
+
+        // 2. Generic method invocation with bounded types
+        double sum = GenericMath.addAsDouble(15.5, 24.5);
+        OceanOutput("Sum: " + sum);
+
+        // 3. Interface polymorphism with specialized generics
+        PairHolder<String, Integer> holder = pair;
+        OceanOutput("Holder Key: " + holder.getKey());
+
+        if (pair.getKey().equals("Age") && pair.getValue() == 30 && sum == 40.0 && holder.getKey().equals("Age")) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS FAILED");
+        }
+    }
+}

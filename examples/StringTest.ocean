@@ -1,0 +1,18 @@
+package com.resources;
+import java.util.ArrayList;
+class StringTest {
+    main() {
+        String test = "{\"name\":\"Ocean\"}";
+        OceanOutput("Test String: " + test);
+        
+        int idx = test.indexOf("\"name\":\"");
+        OceanOutput("Index of quote-name-quote-colon-quote: " + idx);
+        ArrayList a = new ArrayList();
+        if (idx == 1 && test == "{\"name\":\"Ocean\"}") {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+    InterpolationTest.main();
+}

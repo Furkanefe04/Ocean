@@ -1,0 +1,8 @@
+package tests;
+
+class CircularDependencyErrorTest extends CyclicClass {
+    main() {}
+}
+
+class CyclicClass extends CircularDependencyErrorTest {
+}

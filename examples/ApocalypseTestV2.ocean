@@ -1,0 +1,237 @@
+package resources;
+
+class A {
+    int valuex = 1;
+
+    int function compute(int x){
+        return x + valuex;
+    }
+}
+
+class B extends A {
+    int valuex = 2;
+
+    int function compute(int x){
+        return super.compute(x) + valuex;
+    }
+}
+
+class C extends B {
+    int valuex = 3;
+
+    int function compute(int x){
+        return super.compute(x) * valuex;
+    }
+}
+
+
+//--------------------------------------
+// OVERLOAD RESOLUTION
+//--------------------------------------
+
+class OverloadMax {
+
+    void function test(int x){
+        OceanOutput("int");
+    }
+
+    void function test(long x){
+        OceanOutput("long");
+    }
+
+    void function test(double x){
+        OceanOutput("double");
+    }
+
+    void function test(Object... x){
+        OceanOutput("varargs");
+    }
+}
+
+
+//--------------------------------------
+// SYNC BOX (THREAD SAFE STATE)
+//--------------------------------------
+
+class SyncBox {
+
+    sync int valuex = 0;
+
+    sync void function inc(){
+        valuex = valuex + 1;
+    }
+
+    sync int function get(){
+        return valuex;
+    }
+}
+
+
+//--------------------------------------
+// RECURSION ENGINE
+//--------------------------------------
+
+public class Fib {
+    int[] memo;
+    function Fib(int x){
+        memo = new int[x];
+    }
+
+    int function f(int n){
+        if(n <= 1){
+            return n;
+        }
+
+        if(memo[n] != 0){
+            return memo[n];
+        }
+
+        memo[n] = f(n - 1) + f(n - 2);
+
+        return memo[n];
+    }
+}
+
+
+//--------------------------------------
+// MAIN APOCALYPSE TEST
+//--------------------------------------
+
+class ApocalypseTestV2 {
+
+    main(){
+
+        OceanOutput("===== APOCALYPSE V2 CLEAN START =====");
+
+
+        //--------------------------------------
+        // 1. POLYMORPHISM STACK
+        //--------------------------------------
+
+        A obj = new C();
+
+        OceanOutput(obj.compute(5));
+
+
+        //--------------------------------------
+        // 2. BITWISE + CAST CHAOS (GRAMMAR SAFE)
+        //--------------------------------------
+
+        variable expr =
+        (byte)((short)((int)((long)5 + 3 * 2)))
+        ^ 15 & 7 | (100 >> 2);
+
+        OceanOutput(expr);
+
+
+        //--------------------------------------
+        // 3. LOOP + CONTROL FLOW STRESS
+        //--------------------------------------
+
+        variable sum = 0;
+
+        for (variable i from 0 to 20 with increasing 1){
+
+            if(i == 5){
+                skip;
+            }
+
+            if(i == 15){
+                stop;
+            }
+
+            sum = sum + i;
+        }
+
+        OceanOutput(sum);
+
+
+        //--------------------------------------
+        // 4. THREAD + SYNC TEST
+        //--------------------------------------
+
+        SyncBox shared = new SyncBox();
+
+        variable t1 = new Thread((Runnable) () -> {
+            for (variable i from 0 to 3000 with increasing 1){
+                shared.inc();
+            }
+        });
+
+        variable t2 = new Thread((Runnable) () -> {
+            for (variable i from 0 to 3000 with increasing 1){
+                shared.inc();
+            }
+        });
+
+        variable t3 = new Thread((Runnable) () -> {
+            for (variable i from 0 to 3000 with increasing 1){
+                shared.inc();
+            }
+        });
+
+        t1.start();
+        t2.start();
+        t3.start();
+        trying{
+            t1.join();
+            t2.join();
+            t3.join();
+        }
+        catch(InterruptedException e){
+            OceanOutput("InterruptedException error");
+        }
+        finally{
+            OceanOutput("Join Complated");
+        }
+
+
+        OceanOutput(shared.get());
+
+
+        //--------------------------------------
+        // 5. OVERLOAD TEST
+        //--------------------------------------
+
+        OverloadMax ov = new OverloadMax();
+
+        ov.test(5);
+        ov.test(5L);
+        ov.test(5.0);
+        ov.test(1,2,3,4,5);
+
+
+        //--------------------------------------
+        // 6. RECURSION TEST
+        //--------------------------------------
+
+        Fib f = new Fib(10);
+
+        OceanOutput(f.f(9));
+
+
+        //--------------------------------------
+        // 7. COLLECTION STRUCTURE TEST
+        //--------------------------------------
+
+        variable datax = [{"id": 1, "values": {1,2,3,4}, "meta": {"flags": #{1,2,3}, "nested": [{"x":10}, {"x":20}]}}];
+        OceanOutput(datax);
+
+
+        //--------------------------------------
+        // 8. FINAL ASSERTION
+        //--------------------------------------
+
+        variable resultx = shared.get() + sum;
+
+        if(resultx > 0 && expr != 0 && f.f(9) == 34){
+            OceanOutput("STATUS: PASSED");
+        }
+        else{
+            OceanOutput("STATUS: FAILED");
+        }
+
+
+        OceanOutput("===== APOCALYPSE V2 CLEAN END =====");
+    }
+}

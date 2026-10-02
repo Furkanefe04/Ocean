@@ -1,0 +1,18 @@
+package com.pkg4;
+
+import com.pkg5.FinalizerClass;
+
+public class FormatterClass {
+    main() {
+        OceanOutput("--- FORMATTER CLASS ---");
+        String val = args[0]; //sıkıntı çıkarabiliyor
+        String origin = args[1];
+        OceanOutput("FormatterClass formatting: " + val + " formatted by: " + origin);
+
+        String[] newArgs = new String[2];
+        newArgs[0] = val + " -> Formatted";
+        newArgs[1] = "Formatter";
+
+        FinalizerClass.main(newArgs);
+    }
+}

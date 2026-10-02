@@ -1,0 +1,35 @@
+package pkg_test;
+
+class PatternMatchingTest {
+    main() {
+        OceanOutput("--- PatternMatchingTest ---");
+        Object obj = "Hello Ocean Pattern Matching";
+        
+        bool test1 = false;
+        if (obj instanceof String s) {
+            OceanOutput(s);
+            int len = s.length();
+            OceanOutput("Length: " + len);
+            if (len == 28) {
+                test1 = true;
+            }
+        } else {
+            OceanOutput("Not a String");
+        }
+        
+        Object num = 123;
+        bool test2 = false;
+        if (num instanceof Integer i) {
+            OceanOutput(i);
+            test2 = true;
+        }
+        
+        OceanOutput("--- PatternMatchingTest Done ---");
+
+        if (test1 && test2) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

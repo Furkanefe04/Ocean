@@ -1,0 +1,23 @@
+class ArrayUnary {
+    main(){
+        variable arr = {5};
+        variable arr2 = {10};
+        variable arr3 = {{20}};
+
+        arr[0]++;//6
+        arr2[0]--;//9
+        arr[0]*=arr2[0];//54
+        arr2[0]/=(arr[0]/6);//1
+        arr3[0][0]++;//21
+        arr3[0][0]--;//20
+        arr3[0][0]*=arr[0];//1080
+        arr3[0][0]/=6;//180
+
+        if (arr[0] == 54 && arr2[0] == 1 && arr3[0][0] == 180) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("Values : " + arr[0] + " " + arr2[0] + " " + arr3[0][0]);
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

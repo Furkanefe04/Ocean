@@ -1,0 +1,11 @@
+import java.util.ArrayList;
+
+
+class WithoutCastAssignErrorTest {
+    main(){
+        ArrayList arr = new ArrayList();
+        OceanList ol = arr;//must cast
+        Object o = new Object();
+        String s = o;
+    }
+}

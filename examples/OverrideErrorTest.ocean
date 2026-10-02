@@ -1,0 +1,18 @@
+import java.util.Date;
+
+abstract class Base {
+    abstract Date function get();
+}
+
+class Derived extends Base {
+    String function get() {
+        return "Wrong Type";
+    }
+}
+
+class OverrideErrorTest {
+    main() {
+        Base b = new Derived();
+        Output("Result: " + b.get().toString());
+    }
+}

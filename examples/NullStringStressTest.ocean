@@ -1,0 +1,76 @@
+package com.resources;
+import java.util.ArrayList;
+
+class NullStringStressTest {
+     main() {
+        Output("--- OCEAN NULL STRING STRESS TEST ---");
+
+        // 1. Basit Null Tanımlama ve Karşılaştırma
+        variable s1 = (String?) null;
+        if (s1 == null) {
+            Output("Test 1: s1 null olarak başarıyla algılandı.");
+        }
+
+        // 2. Safe Member Call (?.) ve Null Coalescing (??) Komboları
+        Output("\nTest 2: Safe Dot ve Null Coalesce Zinciri");
+        variable s2 = (String) null;
+        variable result1 = s2 ?. trim() ?. length() ?? -1;
+        Output("Result 1 (null?.trim()?.length() ?? -1): " + result1);
+        if (result1 == -1) { Output("Result 1: DOĞRU"); }
+
+        variable s3 = "  Ocean  ";
+        variable result2 = s3 ?. trim() ?. length() ?? -1;
+        Output("Result 2 ('  Ocean  '?.trim()?.length() ?? -1): " + result2);
+        if (result2 == 5) { Output("Result 2: DOĞRU"); }
+
+        // 3. String Concatenation ve Null
+        Output("\nTest 3: String Birleştirme");
+        variable s4 = (String) null;
+        variable concat1 = "Value is: " + s4;
+        Output("Concat 1 ('Value is: ' + null): " + concat1);
+
+        variable concat2 = s4 + " is the value";
+        Output("Concat 2 (null + ' is the value'): " + concat2);
+
+        // 4. Karmaşık Tip Karışımları (String/Object/Null)
+        Output("\nTest 4: Karmaşık Tip Karışımları");
+        variable list = new ArrayList();
+        list.add(null);
+        list.add("Not Null");
+        
+        variable first = (String) list.get(0);
+        variable second = (String) list.get(1);
+        
+        Output("List[0] ?. length() ?? 0: " + (first ?. length() ?? 0));
+        Output("List[1] ?. length() ?? 0: " + (second ?. length() ?? 0));
+
+        // 5. Nested Null Coalesce
+        Output("\nTest 5: Nested Null Coalesce");
+        variable n1 = (String) null;
+        variable n2 = (String) null;
+        variable n3 = "Target";
+        variable finalRes = n1 ?? n2 ?? n3;
+        Output("Nested Coalesce (null ?? null ?? 'Target'): " + finalRes);
+
+        // 6. Safe Method Call on standard Java methods returning String
+        Output("\nTest 6: Java Metotları ile Safe Call");
+        variable obj = (Object) null;
+        variable strRes = obj ?. toString() ?? "Obj was null";
+        Output("obj?.toString() ?? fallback: " + strRes);
+
+        bool success = (s1 == null) &&
+                          (result1 == -1) &&
+                          (result2 == 5) &&
+                          "Value is: null".equals(concat1) &&
+                          "null is the value".equals(concat2) &&
+                          ((first ?. length() ?? 0) == 0) &&
+                          ((second ?. length() ?? 0) == 8) &&
+                          "Target".equals(finalRes) &&
+                          "Obj was null".equals(strRes);
+        if (success) {
+            Output("STATUS: PASSED");
+        } else {
+            Output("STATUS: FAILED");
+        }
+    }
+}

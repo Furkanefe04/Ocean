@@ -1,0 +1,31 @@
+class Calculator {
+    public int function compute(int a, int b) {
+        return a + b;
+    }
+
+    public double function compute(double a, double b) {
+        return a * b;
+    }
+
+    public String function compute(String a, String b) {
+        return a + " " + b;
+    }
+}
+
+class OverloadResolutionAmbiguityCheckTest {
+    static void function main() {
+        Calculator calc = new Calculator();
+        int intRes = calc.compute(10, 20);
+        double doubleRes = calc.compute(2.5, 4.0);
+        String stringRes = calc.compute("Hello", "World");
+
+        OceanOutput("Int result: " + intRes);
+        OceanOutput("Double result: " + doubleRes);
+        OceanOutput("String result: " + stringRes);
+        if (intRes == 30 && doubleRes == 10.0 && stringRes.equals("Hello World")) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

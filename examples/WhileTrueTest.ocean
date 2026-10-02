@@ -1,0 +1,22 @@
+package com.resources;
+
+class WhileTrueTest {
+    int function test() {
+        while (true) {
+            OceanOutput("Looping");
+        }
+    }
+    
+    static main() {
+        int count = 0;
+        for (int i from 0 to 5 with increasing 1) {
+            count = count + 1;
+        }
+        OceanOutput("WhileTrueTest compiled!");
+        if (count == 5) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

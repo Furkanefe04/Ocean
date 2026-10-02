@@ -1,0 +1,109 @@
+package com.resources;
+
+// ---- 1. DIAMOND INTERFACE HIERARCHY ----
+public interface DiamondBase {
+    public int function computeBaseScore(int factor);
+}
+
+public interface DiamondLeft extends DiamondBase {
+    public String function leftInfo();
+}
+
+public interface DiamondRight extends DiamondBase {
+    public String function rightInfo();
+}
+
+// ---- 2. BOUNDED GENERIC CLASS HIERARCHY ----
+public abstract class NumberProcessor<N> {
+    public abstract N function processNumber(N val);
+    public abstract OceanList<N> function processList(OceanList<N> list);
+}
+
+public class DoubleProcessor extends NumberProcessor<Double> {
+    @Override
+    public Double function processNumber(Double val) {
+        return val * 2.5;
+    }
+
+    @Override
+    public OceanList<Double> function processList(OceanList<Double> list) {
+        OceanList<Double> res = new OceanList<Double>();
+        for (int i from 0 to list.size() with increasing 1) {
+            Double item = list.get(i);
+            res.add(item + 1.0);
+        }
+        return res;
+    }
+}
+
+// ---- 3. SUPER CALL IN OVERRIDDEN METHOD ----
+public class SuperBase {
+    public int function step(int count) {
+        return count * 2;
+    }
+}
+
+public class SuperChild extends SuperBase {
+    @Override
+    public int function step(int count) {
+        int baseVal = super.step(count);
+        return baseVal + 10;
+    }
+}
+
+// ---- 4. MULTI-INTERFACE COMBINATION CLASS ----
+public class AdvancedOverrideDiamondStressTest implements DiamondLeft, DiamondRight {
+
+    // Overriding DiamondBase method inherited via BOTH DiamondLeft and DiamondRight (Diamond Problem)
+    @Override
+    public int function computeBaseScore(int factor) {
+        return factor * 100;
+    }
+
+    // Overriding DiamondLeft method
+    @Override
+    public String function leftInfo() {
+        return "LEFT_BRANCH";
+    }
+
+    // Overriding DiamondRight method
+    @Override
+    public String function rightInfo() {
+        return "RIGHT_BRANCH";
+    }
+
+    static main() {
+        // Test Diamond Interface Override
+        AdvancedOverrideDiamondStressTest diamond = new AdvancedOverrideDiamondStressTest();
+        int score = diamond.computeBaseScore(5);
+        String left = diamond.leftInfo();
+        String right = diamond.rightInfo();
+
+        // Test Generic Class Override
+        DoubleProcessor dp = new DoubleProcessor();
+        Double dRes = dp.processNumber(4.0);
+        
+        OceanList<Double> dList = new OceanList<Double>();
+        dList.add(10.0);
+        dList.add(20.0);
+        OceanList<Double> listRes = dp.processList(dList);
+
+        // Test Super Call in Override
+        SuperChild sc = new SuperChild();
+        int stepRes = sc.step(7); // (7 * 2) + 10 = 24
+
+        OceanOutput("score=" + score + ", left=" + left + ", right=" + right);
+        OceanOutput("dRes=" + dRes + ", listRes[0]=" + listRes.get(0) + ", listRes[1]=" + listRes.get(1));
+        OceanOutput("stepRes=" + stepRes);
+
+        bool diamondOk = (score == 500) && left.equals("LEFT_BRANCH") && right.equals("RIGHT_BRANCH");
+        bool genericOk = (dRes == 10.0) && (listRes.get(0) == 11.0) && (listRes.get(1) == 21.0);
+        bool superOk = (stepRes == 24);
+
+        if (diamondOk && genericOk && superOk) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

@@ -1,0 +1,18 @@
+package com.resources;
+
+interface DefInterface {
+    void function draw() {
+        OceanOutput("Default draw");
+    }
+}
+
+class DefShape implements DefInterface {
+}
+
+class InterfaceBodyTest {
+    static main() {
+        DefShape s = new DefShape();
+        s.draw();
+        OceanOutput("STATUS: PASSED");
+    }
+}

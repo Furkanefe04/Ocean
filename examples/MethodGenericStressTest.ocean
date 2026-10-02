@@ -1,0 +1,49 @@
+package com.methodgeneric;
+
+import java.util.*;
+
+
+class MethodGenericStressTest {
+    // 1. Method with method-level generic parameter and bound returning List<T>
+    public <T <: Number> List<T> function getList(T val) {
+        List<T> list = new ArrayList<T>();
+        list.add(val);
+        return list;
+    }
+
+    // 2. Method with multiple method-level generic parameters returning a generic Map
+    public <K, V> Map<K, V> function createMap(K key, V val) {
+        Map<K, V> map = new HashMap<K, V>();
+        map.put(key, val);
+        return map;
+    }
+
+    main() {
+        OceanOutput("=== METHOD GENERIC STRESS TEST START ===");
+
+        variable tester = new MethodGenericStressTest();
+
+        // Test 1: getList with Integer
+        List<Integer> intList = tester.getList(Integer.valueOf(100));
+        Integer firstInt = intList.get(0);
+        OceanOutput("int_list_val: " + firstInt); // Expected: 100
+
+        // Test 2: getList with Double
+        List<Double> doubleList = tester.getList(Double.valueOf(200.5));
+        Double firstDouble = doubleList.get(0);
+        OceanOutput("double_list_val: " + firstDouble); // Expected: 200.5
+
+        // Test 3: createMap with String, Integer
+        Map<String, Integer> map = tester.createMap("key1", Integer.valueOf(500));
+        Integer mapVal = map.get("key1");
+        OceanOutput("map_val: " + mapVal); // Expected: 500
+
+        if (firstInt.intValue() == 100 && firstDouble.doubleValue() == 200.5 && mapVal.intValue() == 500) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+
+        OceanOutput("=== METHOD GENERIC STRESS TEST COMPLETED ===");
+    }
+}

@@ -1,0 +1,11 @@
+package com.resources;
+
+class StringRelationalErrorTest {
+    main() {
+        String a = "hello";
+        String b = "world";
+        if (a < b) {
+            OceanOutput("Should fail at compile time!");
+        }
+    }
+}

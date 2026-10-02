@@ -1,0 +1,82 @@
+package com.resources;
+import java.net.URL;
+import java.util.Scanner;
+
+class CryptoMarketTest {
+    static main() {
+        OceanOutput("==============================================");
+        OceanOutput("  LIVE CRYPTO MARKET FETCH SYSTEM (OCEAN)");
+        OceanOutput("==============================================");
+        
+        OceanOutput("Fetching live prices from Binance...");
+        OceanOutput("");
+        OceanOutput("----------------------------------------------");
+        OceanOutput(" COIN         |  PRICE (USDT)");
+        OceanOutput("----------------------------------------------");
+        
+        bool b1 = fetchAndPrint("BTCUSDT");
+        bool b2 = fetchAndPrint("ETHUSDT");
+        bool b3 = fetchAndPrint("BNBUSDT");
+        bool b4 = fetchAndPrint("SOLUSDT");
+        bool b5 = fetchAndPrint("XRPUSDT");
+        bool b6 = fetchAndPrint("DOGEUSDT");
+        bool b7 = fetchAndPrint("ADAUSDT");
+        bool b8 = fetchAndPrint("AVAXUSDT");
+        
+        OceanOutput("----------------------------------------------");
+        OceanOutput("Live Fetch Process Finished.");
+        OceanOutput("==============================================");
+
+        if (b1 && b2 && b3 && b4 && b5 && b6 && b7 && b8) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+
+    static bool function fetchAndPrint(String symbol) {
+        trying {
+            variable baseUrl = "https://api.binance.com/api/v3/ticker/price?symbol=";
+            variable fullUrl = baseUrl + symbol;
+            variable url = new URL(fullUrl);
+            variable stream = url.openStream();
+            variable scanner = new Scanner(stream);
+            variable response = "";
+            while (scanner.hasNextLine()) {
+                response = response + scanner.nextLine();
+            }
+            scanner.close();
+            
+            // JSON: {"symbol":"BTCUSDT","price":"63541.28000000"}
+            // price degerini } isareti ile cikart
+            variable priceTag = "price";
+            variable idx = response.indexOf(priceTag);
+            
+            if (idx != -1) {
+                // "price":"VALUE"} -> idx + 8 pozisyonundan itibaren VALUE baslar
+                variable start = idx + 8;
+                variable rest = response.substring(start);
+                // } isaretinden onceki kismi al, sonunda "} var -> 2 karakter cikar
+                variable endBrace = rest.indexOf("}");
+                // "VALUE"} -> VALUE almak icin 2 karakter cikar
+                variable price = rest.substring(0, endBrace - 2);
+                
+                variable pad = "             ";
+                variable name = (symbol + pad).substring(0, 13);
+                OceanOutput(" " + name + "| $" + price);
+                return (price != null && price != "");
+            } else {
+                OceanOutput(" " + symbol + " | Parse Error");
+                return false;
+            }
+        } catch (Exception e) {
+            variable msg = e.getMessage();
+            OceanOutput(" " + symbol + " | ERR: " + msg);
+            if (msg == "Unsupported or unrecognized SSL message") {
+                OceanOutput("mk yurt interneti");
+                return true;
+            }
+            return false;
+        }
+    }
+}

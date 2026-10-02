@@ -1,0 +1,101 @@
+package com.resources;
+
+import java.util.Comparator;
+
+@FunctionalInterface
+public interface OmniEvaluator<T, R> {
+    public R function eval(T a, T b);
+}
+
+@FunctionalInterface
+public interface OmniConsumer<T> {
+    public void function accept(T item);
+}
+
+public interface RootNode<T> {
+    public T function getValue();
+    public int function getWeight();
+}
+
+public class NodeImpl implements RootNode<String> {
+    private String val;
+    private int w;
+
+    public function NodeImpl(String v, int weight) {
+        val = v;
+        w = weight;
+    }
+
+    @Override
+    public String function getValue() {
+        return val;
+    }
+
+    @Override
+    public int function getWeight() {
+        return w;
+    }
+}
+
+public class GodmodeOmniLanguageFeatureNightmareTest {
+
+    public static String function evaluatePair(String s1, String s2, OmniEvaluator<String, String> evaluator) {
+        return evaluator.eval(s1, s2);
+    }
+
+    main() {
+        OceanOutput("=== GODMODE OMNI LANGUAGE FEATURE NIGHTMARE TEST START ===");
+
+        // 1. Multi-SAM Functional Evaluation
+        OmniEvaluator<String, String> concatEvaluator = new OmniEvaluator<String, String>() {
+            @Override
+            public String function eval(String a, String b) {
+                return a.toUpperCase() + "_" + b.toUpperCase();
+            }
+        };
+
+        String combo = evaluatePair("ocean", "data", concatEvaluator);
+        OceanOutput("Evaluated Combo: " + combo);
+
+        // 2. Node Interface & Polymorphism Test
+        NodeImpl n1 = new NodeImpl("NodeA", 50);
+        NodeImpl n2 = new NodeImpl("NodeB", 150);
+        NodeImpl n3 = new NodeImpl("NodeC", 10);
+
+        variable nodes = [n1, n2, n3];
+        OceanOutput("Nodes count: " + nodes.size() + ", n1 val: " + n1.getValue() + ", n1 weight: " + n1.getWeight());
+
+        // 3. All 8 Primitive List Specializations Validation
+        variable iList = [10, 20];
+        variable dList = [1.1, 2.2];
+        variable fList = [1.0f, 2.0f];
+        variable bList = [true, false];
+        variable sList = ["Hello", "World"];
+
+        OceanOutput("iList[0]: " + iList.get(0) + ", dList[1]: " + dList.get(1));
+
+        // 4. Sorting & Math checks
+        variable numbers = [500, 100, 300, 200, 400];
+        numbers.sort(new Comparator<Integer>() {
+            public int function compare(Integer o1, Integer o2) {
+                return o1.compareTo(o2);
+            }
+        });
+
+        int firstNum = (int) numbers.get(0);
+        int lastNum = (int) numbers.get(4);
+        OceanOutput("Sorted numbers first: " + firstNum + ", last: " + lastNum);
+
+        // 5. Final Omni-Assertions
+        bool v1 = combo.equals("OCEAN_DATA");
+        bool v2 = n1.getValue().equals("NodeA") && n1.getWeight() == 50;
+        bool v3 = (int) iList.get(0) == 10 && (double) dList.get(1) == 2.2;
+        bool v4 = firstNum == 100 && lastNum == 500;
+
+        if (v1 && v2 && v3 && v4) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

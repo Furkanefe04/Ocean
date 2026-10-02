@@ -1,0 +1,44 @@
+package com.resources;
+
+import java.util.function.Function;
+
+class FieldHolder {
+    static int globalCount = 100;
+    int instanceVal = 50;
+
+    int function computeSum(int paramVal) {
+        // Block 1 variable
+        variable blockVal = 10;
+        variable sum1 = instanceVal + paramVal + blockVal + globalCount;
+
+        // Block 2 variable in inner scope
+        {
+            variable innerVal = 20;
+            sum1 = sum1 + innerVal;
+        }
+
+        return sum1;
+    }
+}
+
+class VariableResolutionStressTest {
+    main() {
+        OceanOutput("=== VARIABLE RESOLUTION STRESS TEST START ===");
+
+        variable holder = new FieldHolder();
+        int total = holder.computeSum(5);
+        OceanOutput("Computed Total: " + total); // Expected: 50 + 5 + 10 + 100 + 20 = 185
+
+        // Verify lambda capture of efffectively final variable
+        int factor = 2;
+        variable fn = (Function) (int x) -> x * factor;
+        int lambdaResult = fn(15);
+        OceanOutput("Lambda Capture Result: " + lambdaResult); // Expected: 30
+
+        if (total == 185 && lambdaResult == 30) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

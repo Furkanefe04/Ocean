@@ -1,0 +1,27 @@
+package com.resources;
+
+interface ConstructorRefPointFactory {
+    ConstructorRefPoint function create(int x, int y);
+}
+
+class ConstructorRefPoint {
+    int x;
+    int y;
+    
+    function ConstructorRefPoint(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+}
+
+class ConstructorRefTest {
+    main() {
+        variable f = (ConstructorRefPointFactory) ConstructorRefPoint::new;
+        variable p = f.create(10, 20);
+        if (p.x == 10 && p.y == 20) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

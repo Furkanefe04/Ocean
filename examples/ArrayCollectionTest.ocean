@@ -1,0 +1,42 @@
+package com.resources;
+
+class ArrayCollectionTest {
+    static main() {
+        OceanOutput("ARRAY/COLECTIONS TEST");
+        //int[] Array
+        int[] arr = {10, 20, 30};
+        OceanOutput("Array length: " + arr.length);
+        OceanOutput("Array element 0: " + arr[0]);
+        OceanOutput("Array element 1: " + arr[1]);
+        //String[] Array
+        String[] strs = {"Ocean", "Java", "Kotlin"};
+        OceanOutput("String array length: " + strs.length);
+        OceanOutput("String array element 0: " + strs[0]);
+        OceanOutput("String array element 1: " + strs[1]);
+        // List<T>
+        variable arrList = [10,20,30];
+        arrList.add(40);
+        OceanOutput(arrList);
+        // List<List<T>>
+        variable arrList2 = [[3,5,7],[1,2,3],[9,8,7]];
+        OceanOutput("3x3 Matris : "+arrList2);
+        // Set Class
+        variable set = #{1,2,3,5,6,5,6,2,3,3};
+        OceanOutput(set);
+        // HashMap<T> class
+        variable map = {"apple": 1, "banana": 2, "cherry": 3};
+        OceanOutput(map.get("apple"));
+        if (arr.length == 3 && arr[0] == 10 && arr[1] == 20 &&
+            strs.length == 3 && strs[0] == "Ocean" && strs[1] == "Java" &&
+            arrList.size() == 4 && arrList.get(3)==(40) &&
+            arrList2.size() == 3 &&map.get("apple")==1) {
+            // nihai sorun OceanMap classında
+            // (Integer) castı ile veya karşı tarafta Object castı ile karşılaştırma yapılabiliniyor
+            // map.get() methodu Object olarak geliyor bu da Object == Integer karşılaştırmasında sorun çıkarıyor
+            // OceanList,OceanSet ve diğer classlar bu testte problemsiz çalışmaktadır
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

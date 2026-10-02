@@ -1,0 +1,21 @@
+package com.resources;
+
+class SuperClass {
+    String function getInfo() {
+        return "Info";
+    }
+}
+
+class SubClass extends SuperClass {
+    // Incompatible return type: Object cannot override String (contravariant/unrelated)
+    // Modified comment to force dirty compilation
+    Object function getInfo() {
+        return new Object();
+    }
+}
+
+class CovariantReturnFailureTest {
+    static main() {
+        SubClass s = new SubClass();
+    }
+}

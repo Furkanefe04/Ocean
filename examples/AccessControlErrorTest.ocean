@@ -1,0 +1,40 @@
+﻿package com.resources;
+
+class SecretVault {
+    private String secretKey = "TOP_SECRET";
+    private int secretCode = 42;
+
+    private function SecretVault() {
+        secretKey = "SECRET_INIT";
+    }
+
+    public function SecretVault(String key) {
+        secretKey = key;
+    }
+
+    private void function performHiddenOperation() {
+        OceanOutput("Hidden operation running");
+    }
+
+    public void function publicOperation() {
+        OceanOutput("Public operation running");
+    }
+}
+
+class AccessControlErrorTest {
+    static main() {
+        SecretVault vault = new SecretVault("my_key");
+
+        // 1. Error: Accessing private field from outside
+        String key = vault.secretKey;
+
+        // 2. Error: Accessing another private field from outside
+        int code = vault.secretCode;
+
+        // 3. Error: Calling private method from outside
+        vault.performHiddenOperation();
+
+        // 4. Error: Calling private constructor from outside
+        SecretVault badVault = new SecretVault();
+    }
+}

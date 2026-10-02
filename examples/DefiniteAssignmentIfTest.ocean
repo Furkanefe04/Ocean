@@ -1,0 +1,12 @@
+package tests;
+
+class DefiniteAssignmentIfTest {
+    main() {
+        variable x;
+        variable cond = true;
+        if (cond) {
+            x = 10;
+        }
+        OceanOutput(x); // x is not definitely assigned here!
+    }
+}

@@ -1,0 +1,126 @@
+package com.reflectiontest;
+
+import java.lang.Class;
+import java.lang.reflect.Method;
+import java.lang.reflect.Field;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Modifier;
+
+// Target class to be reflected upon
+public class ReflectionTarget {
+    public String secretCode;
+    public int accessCounter;
+
+    public function ReflectionTarget(String secretCode, int accessCounter) {
+        this.secretCode = secretCode;
+        this.accessCounter = accessCounter;
+    }
+
+    public String function computeHash(String prefix) {
+        accessCounter = accessCounter + 1;
+        return prefix + ":" + secretCode + ":" + accessCounter;
+    }
+
+    public int function getAccessCounter() {
+        return accessCounter;
+    }
+}
+
+public class FullReflectionStressTest {
+
+    public static main() {
+        OceanOutput("==========================================================");
+        OceanOutput("===      OCEAN FULL REFLECTION API STRESS TEST        ===");
+        OceanOutput("==========================================================");
+
+        trying {
+            // 1. Dynamic Class Loading
+            OceanOutput("\n[1] Testing Dynamic Class Loading...");
+            Class targetClass = Class.forName("com.reflectiontest.ReflectionTarget");
+            OceanOutput("Loaded class name: " + targetClass.getName());
+
+            // 2. Dynamic Constructor Lookup & Instance Creation
+            OceanOutput("\n[2] Testing Dynamic Constructor & Instance Creation...");
+            Class[] ctorArgTypes = new Class[2];
+            ctorArgTypes[0] = Class.forName("java.lang.String");
+            ctorArgTypes[1] = Integer.TYPE;
+
+            Constructor ctor = targetClass.getDeclaredConstructor(ctorArgTypes);
+            Object[] ctorArgs = new Object[2];
+            ctorArgs[0] = "ALPHA_77";
+            ctorArgs[1] = 100;
+
+            Object targetInstance = ctor.newInstance(ctorArgs);
+            OceanOutput("Instance created via reflection successfully.");
+
+            // 3. Dynamic Field Access (Get & Set)
+            OceanOutput("\n[3] Testing Dynamic Field Read & Write...");
+            Field codeField = targetClass.getDeclaredField("secretCode");
+            Field counterField = targetClass.getDeclaredField("accessCounter");
+
+            String initialCode = (String) codeField.get(targetInstance);
+            int initialCounter = (int) counterField.get(targetInstance);
+            OceanOutput("Initial secretCode field value: " + initialCode);
+            OceanOutput("Initial accessCounter field value: " + initialCounter);
+
+            // Mutate field reflectively
+            codeField.set(targetInstance, "BETA_99");
+            counterField.set(targetInstance, 500);
+
+            String mutatedCode = (String) codeField.get(targetInstance);
+            int mutatedCounter = (int) counterField.get(targetInstance);
+            OceanOutput("Mutated secretCode field value: " + mutatedCode);
+            OceanOutput("Mutated accessCounter field value: " + mutatedCounter);
+
+            // 4. Dynamic Method Invocation
+            OceanOutput("\n[4] Testing Dynamic Method Invocation...");
+            Class[] methodParamTypes = new Class[1];
+            methodParamTypes[0] = Class.forName("java.lang.String");
+
+            Method computeMethod = targetClass.getDeclaredMethod("computeHash", methodParamTypes);
+            Object[] methodArgs = new Object[1];
+            methodArgs[0] = "HASH_PREFIX";
+
+            String resultx = (String) computeMethod.invoke(targetInstance, methodArgs);
+            OceanOutput("computeHash invoke result: " + resultx);
+
+            int finalCounter = (int) counterField.get(targetInstance);
+            OceanOutput("Final accessCounter after method invocation: " + finalCounter);
+
+            // 5. Metadata & Modifier Inspection
+            OceanOutput("\n[5] Testing Metadata & Modifier Inspection...");
+            int methodModifiers = computeMethod.getModifiers();
+            bool isPublicMethod = Modifier.isPublic(methodModifiers);
+            Class retType = computeMethod.getReturnType();
+            OceanOutput("computeHash isPublic: " + isPublicMethod);
+            OceanOutput("computeHash returnType: " + retType.getName());
+
+            // 6. Assertions
+            bool checkClass = targetClass.getName().equals("com.reflectiontest.ReflectionTarget");
+            bool checkInitial = initialCode.equals("ALPHA_77") && initialCounter == 100;
+            bool checkMutated = mutatedCode.equals("BETA_99") && mutatedCounter == 500;
+            bool checkInvoke = resultx.equals("HASH_PREFIX:BETA_99:501");
+            bool checkFinalCounter = finalCounter == 501;
+            bool checkMetadata = isPublicMethod && retType.getName().equals("java.lang.String");
+
+            OceanOutput("\n--------------------------------------------------");
+            OceanOutput("P1 Dynamic Class Loading: " + checkClass);
+            OceanOutput("P2 Initial Reflection Values: " + checkInitial);
+            OceanOutput("P3 Mutated Reflection Values: " + checkMutated);
+            OceanOutput("P4 Reflective Method Invoke: " + checkInvoke);
+            OceanOutput("P5 Final Field Value: " + checkFinalCounter);
+            OceanOutput("P6 Method Metadata Inspection: " + checkMetadata);
+
+            if (checkClass && checkInitial && checkMutated && checkInvoke && checkFinalCounter && checkMetadata) {
+                OceanOutput("STATUS: PASSED");
+            } else {
+                OceanOutput("STATUS: FAILED");
+            }
+
+        } catch (Exception e) {
+            OceanOutput("Reflection Test Error: " + e.getMessage());
+            e.printStackTrace();
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

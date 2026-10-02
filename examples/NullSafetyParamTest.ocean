@@ -1,0 +1,11 @@
+package com.resources;
+
+class NullSafetyParamTest {
+    static void function printStr(String s) {
+        OceanOutput("Length: " + s.length());
+    }
+
+    main() {
+        printStr(null); // Invalid: passing null to non-nullable parameter
+    }
+}

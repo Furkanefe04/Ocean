@@ -1,0 +1,21 @@
+class CastTest2 {
+    main(){
+        int seed = 123;
+
+        variable c1 = (seed & 127);
+        variable c2 = (byte)c1;
+        variable c3 = (short)c2;
+        variable c4 = (long)c3;
+        variable c5 = (double)c4;
+        variable c6 = (int)c5;
+
+        OceanOutput(c6);
+        c6++;
+        if(c6 == 124){
+            OceanOutput("STATUS: PASSED");
+        }
+        else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

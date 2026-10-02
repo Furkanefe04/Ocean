@@ -1,0 +1,21 @@
+package com.resources;
+
+class PrimitiveBoundsErrorTest {
+    static main() {
+        // 1. Byte overflow (200 > 127)
+        byte b1 = 200;
+
+        // 2. Byte underflow (-150 < -128)
+        byte b2 = -150;
+
+        // 3. Short overflow (50000 > 32767)
+        short s1 = 50000;
+
+        // 4. Char underflow (-1 < 0)
+        char c1 = -1;
+
+        // 5. Boolean increment (b++)
+        bool boolVal = true;
+        boolVal++;
+    }
+}

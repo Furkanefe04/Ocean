@@ -1,0 +1,86 @@
+package com.resources;
+
+class ComplexMultilineStringComprehensiveTest {
+    static main() {
+        OceanOutput("=== COMPLEX MULTILINE STRING COMPREHENSIVE TEST ===");
+
+        // 1. Indent stripping on SQL query
+        String sql = """
+            SELECT u.id, u.username, u.email
+            FROM users u
+            WHERE u.is_active = true
+            ORDER BY u.created_at DESC
+            """;
+
+        String expectedSql = "SELECT u.id, u.username, u.email\nFROM users u\nWHERE u.is_active = true\nORDER BY u.created_at DESC";
+        bool isSqlOk = sql.equals(expectedSql);
+        OceanOutput("SQL Strip OK: " + isSqlOk);
+
+        // 2. Line continuation with backslash \
+        String wrappedParagraph = """
+            Ocean Compiler is designed with high performance, \
+            zero runtime overhead, and \
+            modern language features.
+            """;
+
+        String expectedParagraph = "Ocean Compiler is designed with high performance, zero runtime overhead, and modern language features.";
+        bool isParagraphOk = wrappedParagraph.equals(expectedParagraph);
+        OceanOutput("Line Continuation OK: " + isParagraphOk);
+
+        // 3. Space preservation \s
+        String spacedText = """
+            Item 1:\s\s
+            Item 2:\s
+            """;
+
+        String expectedSpaced = "Item 1:  \nItem 2: ";
+        bool isSpacedOk = spacedText.equals(expectedSpaced);
+        OceanOutput("Space Preservation OK: " + isSpacedOk);
+
+        // 4. Multiline String Interpolation ($"""...""")
+        String appName = "Ocean";
+        int versionMajor = 3;
+        int versionMinor = 2;
+        double speedupFactor = 15.5;
+
+        String report = $"""
+            Application: {appName}
+            Version: {versionMajor}.{versionMinor}
+            Performance Gain: {speedupFactor}x
+            """;
+
+        String expectedReport = "Application: Ocean\nVersion: 3.2\nPerformance Gain: 15.5x";
+        bool isReportOk = report.equals(expectedReport);
+        OceanOutput("Multiline Interpolation OK: " + isReportOk);
+
+        // 5. Mixed multiline interpolation with calculations and methods
+        int a = 100;
+        int b = 250;
+        int total = a + b;
+        String status = calculateStatus(total);
+        String calcSummary = $"""
+            Input A: {a}
+            Input B: {b}
+            Sum: {total}
+            Status: {status}
+            """;
+
+        String expectedCalc = "Input A: 100\nInput B: 250\nSum: 350\nStatus: VALID_RANGE";
+        bool isCalcOk = calcSummary.equals(expectedCalc);
+        OceanOutput("Calculation Summary OK: " + isCalcOk);
+
+        if (isSqlOk && isParagraphOk && isSpacedOk && isReportOk && isCalcOk) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+
+    private static String function calculateStatus(int sum) {
+        if (sum > 300) {
+            return "VALID_RANGE";
+        }
+        return "LOW_RANGE";
+    }
+}
+

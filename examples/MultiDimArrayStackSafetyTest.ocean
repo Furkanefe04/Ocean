@@ -1,0 +1,143 @@
+package com.resources;
+
+public class MultiDimArrayStackSafetyTest {
+
+    public static void function main(String[] args) {
+        // ==========================================
+        // 1. 2D INT ARRAYS (Compound & Unary & Side-Effects)
+        // ==========================================
+        int[][] matrix2D = new int[3][3];
+        matrix2D[0][0] = 10;
+        matrix2D[0][1] = 20;
+        matrix2D[1][0] = 30;
+        matrix2D[1][1] = 40;
+
+        matrix2D[0][0] += 5;
+        matrix2D[0][1] -= 3;
+        matrix2D[1][0] *= 2;
+        matrix2D[1][1] /= 4;
+
+        if (matrix2D[0][0] != 15 || matrix2D[0][1] != 17 || matrix2D[1][0] != 60 || matrix2D[1][1] != 10) {
+            OceanOutput("FAILED: 2D int compound assignments");
+            return;
+        }
+
+        int postInc2D = matrix2D[0][0]++;
+        int preInc2D = ++matrix2D[0][0];
+        int postDec2D = matrix2D[0][1]--;
+        int preDec2D = --matrix2D[0][1];
+
+        if (postInc2D != 15 || preInc2D != 17 || matrix2D[0][0] != 17) {
+            OceanOutput("FAILED: 2D int increment");
+            return;
+        }
+        if (postDec2D != 17 || preDec2D != 15 || matrix2D[0][1] != 15) {
+            OceanOutput("FAILED: 2D int decrement");
+            return;
+        }
+
+        // Side-effect index test: arr[r++][c++] += 10
+        int r = 0;
+        int c = 0;
+        matrix2D[r++][c++] += 10; // should access [0][0] which is 17 -> 27, and r=1, c=1
+        if (matrix2D[0][0] != 27 || r != 1 || c != 1) {
+            OceanOutput("FAILED: 2D int side-effect index on compound assignment, matrix[0][0]=" + matrix2D[0][0] + ", r=" + r + ", c=" + c);
+            return;
+        }
+
+        // ==========================================
+        // 2. 3D INT ARRAYS (Cube)
+        // ==========================================
+        int[][][] cube3D = new int[2][2][2];
+        cube3D[0][0][0] = 100;
+        cube3D[1][1][1] = 200;
+
+        cube3D[0][0][0] += 50;
+        cube3D[1][1][1] *= 3;
+
+        if (cube3D[0][0][0] != 150 || cube3D[1][1][1] != 600) {
+            OceanOutput("FAILED: 3D int compound assignment");
+            return;
+        }
+
+        int postCube = cube3D[0][0][0]++;
+        int preCube = ++cube3D[1][1][1];
+        if (postCube != 150 || cube3D[0][0][0] != 151 || preCube != 601 || cube3D[1][1][1] != 601) {
+            OceanOutput("FAILED: 3D int pre/post increment");
+            return;
+        }
+
+        // ==========================================
+        // 3. 2D LONG ARRAYS (64-bit 2-slot operations)
+        // ==========================================
+        long[][] long2D = new long[2][2];
+        long2D[0][0] = 1000L;
+        long2D[0][1] = 500L;
+
+        long2D[0][0] += 250L;
+        long2D[0][1] *= 2L;
+
+        if (long2D[0][0] != 1250L || long2D[0][1] != 1000L) {
+            OceanOutput("FAILED: 2D long compound assignment");
+            return;
+        }
+
+        long postLong = long2D[0][0]++;
+        long preLong = ++long2D[0][0];
+        if (postLong != 1250L || preLong != 1252L || long2D[0][0] != 1252L) {
+            OceanOutput("FAILED: 2D long increment");
+            return;
+        }
+
+        // ==========================================
+        // 4. 2D DOUBLE ARRAYS (64-bit 2-slot operations)
+        // ==========================================
+        double[][] double2D = new double[2][2];
+        double2D[0][0] = 10.5;
+        double2D[0][1] = 4.0;
+
+        double2D[0][0] += 1.5;
+        double2D[0][1] *= 2.5;
+
+        if (double2D[0][0] != 12.0 || double2D[0][1] != 10.0) {
+            OceanOutput("FAILED: 2D double compound assignment");
+            return;
+        }
+
+        double postDouble = double2D[0][0]++;
+        double preDouble = ++double2D[0][0];
+        if (postDouble != 12.0 || preDouble != 14.0 || double2D[0][0] != 14.0) {
+            OceanOutput("FAILED: 2D double increment");
+            return;
+        }
+
+        // ==========================================
+        // 5. 2D STRING ARRAYS (String Concat Compound)
+        // ==========================================
+        String[][] str2D = new String[2][2];
+        str2D[0][0] = "Ocean";
+        str2D[0][1] = "Language";
+
+        str2D[0][0] += "Lang";
+        str2D[0][1] += 3;
+
+        if (!str2D[0][0].equals("OceanLang") || !str2D[0][1].equals("Language3")) {
+            OceanOutput("FAILED: 2D String compound concat, got str2D[0][0]=" + str2D[0][0] + ", str2D[0][1]=" + str2D[0][1]);
+            return;
+        }
+
+        // ==========================================
+        // 6. 2D BOOLEAN ARRAYS
+        // ==========================================
+        bool[][] bool2D = new bool[2][2];
+        bool2D[0][0] = true;
+        bool2D[0][1] = false;
+
+        if (!bool2D[0][0] || bool2D[0][1]) {
+            OceanOutput("FAILED: 2D boolean array");
+            return;
+        }
+
+        OceanOutput("STATUS: PASSED");
+    }
+}

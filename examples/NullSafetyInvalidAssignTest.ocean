@@ -1,0 +1,7 @@
+package com.resources;
+
+class NullSafetyInvalidAssignTest {
+    static main() {
+        String nonNullVar = null; // SHOULD FAIL COMPILATION
+    }
+}

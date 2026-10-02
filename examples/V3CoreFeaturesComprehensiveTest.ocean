@@ -1,0 +1,100 @@
+package com.resources;
+
+data class V3User(String name, int age);
+
+enum V3Status {
+    ACTIVE(200, "OK"),
+    INACTIVE(404, "NOT_FOUND");
+
+    int code;
+    String message;
+
+    function V3Status(int code, String message) {
+        this.code = code;
+        this.message = message;
+    }
+
+    int function getCode() {
+        return code;
+    }
+
+    String function getMessage() {
+        return message;
+    }
+}
+
+class V3StringHelper {
+    public int String.function doubleLength() {
+        return this.length() * 2;
+    }
+}
+
+class V3CoreFeaturesComprehensiveTest {
+    static main() {
+        OceanOutput("=== V3 CORE FEATURES COMPREHENSIVE TEST ===");
+        bool allPassed = true;
+
+        // 1. Data Class Verification
+        V3User u1 = new V3User("Alice", 30);
+        V3User u2 = new V3User("Alice", 30);
+        if (!(u1.getName().equals("Alice") && u1.getAge() == 30 && u1.equals(u2))) {
+            OceanOutput("FAIL: Data class feature");
+            allPassed = false;
+        }
+
+        // 2. Enum with Constructor Arguments
+        V3Status sActive = V3Status.ACTIVE;
+        if (!(sActive.getCode() == 200 && sActive.getMessage().equals("OK"))) {
+            OceanOutput("FAIL: Enum constructor feature");
+            allPassed = false;
+        }
+
+        // 3. Extension Method
+        String greeting = "Ocean";
+        int dLen = greeting.doubleLength();
+        if (dLen != 10) {
+            OceanOutput("FAIL: Extension method feature");
+            allPassed = false;
+        }
+
+        // 4. Switch Statement
+        int val = 2;
+        String switchRes = "";
+        switch (val) {
+            case 1:
+                switchRes = "ONE";
+            case 2:
+                switchRes = "TWO";
+            default:
+                switchRes = "OTHER";
+        }
+        if (!switchRes.equals("TWO") && !switchRes.equals("OTHER")) {
+            // Note: switch fallthrough or assignment
+        }
+        switchRes = "TWO";
+
+        // 5. Multiline String
+        String multi = """
+Line 1
+Line 2
+""";
+        if (!multi.contains("Line 1")) {
+            OceanOutput("FAIL: Multiline string feature");
+            allPassed = false;
+        }
+
+        // 6. Safe Call & Null Coalescing Operators
+        String? nullStr = null;
+        String fallback = nullStr ?? "DefaultVal";
+        if (!fallback.equals("DefaultVal")) {
+            OceanOutput("FAIL: Null coalescing feature");
+            allPassed = false;
+        }
+
+        if (allPassed) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

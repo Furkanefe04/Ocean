@@ -1,0 +1,9 @@
+package com.packagea;
+
+public class ConflictClassA {}
+
+public class ConflictClass {
+    public void function doA() {
+        OceanOutput("Action in Package A");
+    }
+}

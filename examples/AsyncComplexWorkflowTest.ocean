@@ -1,0 +1,285 @@
+package com.complexasync;
+
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.ArrayList;
+import java.util.List;
+import java.lang.Thread;
+import java.lang.Exception;
+
+// ==========================================
+// 1. CUSTOM ANNOTATIONS
+// ==========================================
+public annotation Trace {
+    String level() default "INFO";
+}
+
+public annotation PerformanceMetric {
+    String category();
+    bool logSlowCallsOnly() default false;
+}
+
+// ==========================================
+// 2. SEALED CLASS HIERARCHY FOR WORKFLOW EVENTS
+// ==========================================
+public sealed interface WorkflowEvent restricts JobStartedEvent, JobProcessedEvent, JobCompletedEvent {
+    public String function getEventId();
+    public long function getTimestamp();
+}
+
+public final class JobStartedEvent implements WorkflowEvent {
+    public String id;
+    public long time;
+    public int jobId;
+
+    public function JobStartedEvent(String id, long time, int jobId) {
+        this.id = id;
+        this.time = time;
+        this.jobId = jobId;
+    }
+
+    public String function getEventId() { return id; }
+    public long function getTimestamp() { return time; }
+}
+
+public final class JobProcessedEvent implements WorkflowEvent {
+    public String id;
+    public long time;
+    public int jobId;
+    public String stage;
+
+    public function JobProcessedEvent(String id, long time, int jobId, String stage) {
+        this.id = id;
+        this.time = time;
+        this.jobId = jobId;
+        this.stage = stage;
+    }
+
+    public String function getEventId() { return id; }
+    public long function getTimestamp() { return time; }
+}
+
+public final class JobCompletedEvent implements WorkflowEvent {
+    public String id;
+    public long time;
+    public int jobId;
+    public bool success;
+
+    public function JobCompletedEvent(String id, long time, int jobId, bool success) {
+        this.id = id;
+        this.time = time;
+        this.jobId = jobId;
+        this.success = success;
+    }
+
+    public String function getEventId() { return id; }
+    public long function getTimestamp() { return time; }
+}
+
+// ==========================================
+// 3. DATA CLASSES
+// ==========================================
+data class JobData(int id, String payload, double value);
+data class ProcessResult(int jobId, bool isSuccess, String remarks, double finalScore);
+
+// ==========================================
+// 4. COMPLEX ASYNC PROCESSING SYSTEM
+// ==========================================
+public class AsyncWorkflowEngine {
+
+    public variable eventLog = new CopyOnWriteArrayList();
+    public variable results = new ConcurrentHashMap();
+
+    @Trace(level = "DEBUG")
+    private async void function logEvent(WorkflowEvent event) {
+        eventLog.add(event);
+        OceanOutput("[EVENT-LOG] ID: " + event.getEventId() + " | Time: " + event.getTimestamp() + " | Type: " + event.getClass().getSimpleName());
+    }
+
+    // Stage 1: Asenkron Veri Hazırlama (Simulated IO latency)
+    @PerformanceMetric(category = "Ingestion")
+    public async JobData function ingestJob(int id, String payload, double value) {
+        WorkflowEvent startEvent = new JobStartedEvent("EV-START-" + id, System.currentTimeMillis(), id);
+        await logEvent(startEvent);
+
+        trying {
+            Thread.sleep(100);
+        } catch (Exception e) {
+            // ignore
+        }
+
+        return new JobData(id, payload, value);
+    }
+
+    // Stage 2: Asenkron Analiz ve Validasyon
+    public async bool function validatePayload(JobData job) {
+        WorkflowEvent procEvent = new JobProcessedEvent("EV-VAL-" + job.getId(), System.currentTimeMillis(), job.getId(), "Validation");
+        await logEvent(procEvent);
+
+        trying {
+            Thread.sleep(50);
+        } catch (Exception e) {}
+
+        if (job.getPayload() == null) {
+            return false;
+        }
+        return job.getPayload().length() > 0;
+    }
+
+    // Stage 3: Asenkron Hesaplama ve Transformasyon
+    public async double function performCalculation(JobData job) {
+        WorkflowEvent procEvent = new JobProcessedEvent("EV-CALC-" + job.getId(), System.currentTimeMillis(), job.getId(), "Calculation");
+        await logEvent(procEvent);
+
+        trying {
+            Thread.sleep(80);
+        } catch (Exception e) {}
+
+        double multiplier = 1.18;
+        return job.getValue() * multiplier;
+    }
+
+    // Stage 4: Veritabanı Kayıt Aşaması (Void Async / Fire and Forget)
+    public async void function saveToDatabase(ProcessResult res) {
+        trying {
+            Thread.sleep(60);
+        } catch (Exception e) {}
+        results.put(res.getJobId(), res);
+        OceanOutput("[DB-SAVE] Job " + res.getJobId() + " saved successfully.");
+    }
+
+    // Birleşik Senaryo: Pipeline (Kanal) Tasarımı
+    @Trace(level = "INFO")
+    public async ProcessResult function executePipeline(int jobId, String payload, double baseValue) {
+        // 1. Ingestion
+        JobData job = await ingestJob(jobId, payload, baseValue);
+
+        // 2. Validation
+        bool isValid = await validatePayload(job);
+        if (!isValid) {
+            ProcessResult failResult = new ProcessResult(jobId, false, "Validation Failed", 0.0);
+            await saveToDatabase(failResult);
+            WorkflowEvent compEvent = new JobCompletedEvent("EV-COMP-" + jobId, System.currentTimeMillis(), jobId, false);
+            await logEvent(compEvent);
+            return failResult;
+        }
+
+        // 3. Calculation
+        double score = await performCalculation(job);
+
+        // 4. Create Result
+        ProcessResult successResult = new ProcessResult(jobId, true, "Success", score);
+
+        // 5. Database Save (Async)
+        await saveToDatabase(successResult);
+
+        // 6. Complete
+        WorkflowEvent compEvent = new JobCompletedEvent("EV-COMP-" + jobId, System.currentTimeMillis(), jobId, true);
+        await logEvent(compEvent);
+
+        return successResult;
+    }
+}
+
+// ==========================================
+// 5. MAIN VERIFICATION & RUNNER
+// ==========================================
+public class AsyncComplexWorkflowTest {
+
+    public static async void function runWorkflow() {
+        AsyncWorkflowEngine engine = new AsyncWorkflowEngine();
+        variable futures = new ArrayList();
+
+        OceanOutput("[SYSTEM] Launching 5 concurrent jobs asynchronously...");
+
+        // 5 adet işi paralel/asenkron olarak başlatıyoruz
+        futures.add(engine.executePipeline(101, "Siparis verisi", 100.0));
+        futures.add(engine.executePipeline(102, "Kullanici kayit", 250.0));
+        futures.add(engine.executePipeline(103, "", 50.0)); // Gecersiz veri (validation fail)
+        futures.add(engine.executePipeline(104, "Kargo guncelleme", 400.0));
+        futures.add(engine.executePipeline(105, "Odeme basarili", 1000.0));
+
+        OceanOutput("[SYSTEM] All jobs initiated. Awaiting results concurrently...");
+
+        // Tüm işlerin sonuçlarını bekleyip topluyoruz
+        variable resultsList = new ArrayList();
+        for (variable f in futures) {
+            ProcessResult res = (ProcessResult) await (CompletableFuture) f;
+            resultsList.add(res);
+        }
+
+        OceanOutput("[SYSTEM] All jobs finished execution. Commencing verification...");
+        OceanOutput("---------------------------------------------------------");
+
+        bool pass1 = false;
+        bool pass2 = false;
+        bool pass3 = false;
+        bool pass4 = false;
+
+        // Doğrulama 1: Toplam tamamlanan iş adedi
+        int totalResults = resultsList.size();
+        OceanOutput("[VERIFY] Total results: " + totalResults);
+        if (totalResults == 5) {
+            pass1 = true;
+        }
+
+        // Doğrulama 2: Başarılı ve başarısız işlerin dağılımı
+        int successCount = 0;
+        int failCount = 0;
+        double sumValue = 0.0;
+
+        for (variable item in resultsList) {
+            ProcessResult r = (ProcessResult) item;
+            if (r.getIsSuccess()) {
+                successCount = successCount + 1;
+                sumValue = sumValue + r.getFinalScore();
+            } else {
+                failCount = failCount + 1;
+            }
+        }
+
+        OceanOutput("[VERIFY] Successful jobs count: " + successCount);
+        OceanOutput("[VERIFY] Failed jobs count: " + failCount);
+        if (successCount == 4 && failCount == 1) {
+            pass2 = true;
+        }
+
+        // Doğrulama 3: Toplam hesaplanan tutarların doğruluğu
+        // 101: 100.0 * 1.18 = 118.0
+        // 102: 250.0 * 1.18 = 295.0
+        // 104: 400.0 * 1.18 = 472.0
+        // 105: 1000.0 * 1.18 = 1180.0
+        // Toplam = 2065.0
+        OceanOutput("[VERIFY] Sum of processed values: " + sumValue);
+        if (sumValue == 2065.0) {
+            pass3 = true;
+        }
+
+        // Doğrulama 4: Sealed Event log kontrolü
+        int totalEvents = engine.eventLog.size();
+        OceanOutput("[VERIFY] Total logged events: " + totalEvents);
+        if (totalEvents == 19) {
+            pass4 = true;
+        }
+
+        OceanOutput("---------------------------------------------------------");
+        if (pass1 && pass2 && pass3 && pass4) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+            OceanOutput("Details -> T1=" + pass1 + " T2=" + pass2 + " T3=" + pass3 + " T4=" + pass4);
+        }
+    }
+
+    static main() {
+        OceanOutput("=========================================================");
+        OceanOutput("===          OCEAN COMPLEX ASYNC WORKFLOW TEST        ===");
+        OceanOutput("=========================================================");
+
+        variable future = runWorkflow();
+        future.join();
+
+        OceanOutput("=========================================================");
+    }
+}

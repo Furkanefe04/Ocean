@@ -1,0 +1,39 @@
+package tests;
+
+class TryWithResourcesMyResource implements java.lang.AutoCloseable {
+    String name;
+    static int closeCount = 0;
+    
+    function TryWithResourcesMyResource(String name) {
+        this.name = name;
+        OceanOutput("Opened: " + name);
+    }
+
+    @Override
+    public void function close() {
+        OceanOutput("Closed: " + name);
+        closeCount = closeCount + 1;
+    }
+}
+
+class TryWithResourcesTest {
+    static main() {
+        OceanOutput("=== Try-With-Resources Test Start ===");
+        
+        trying (TryWithResourcesMyResource r1 = new TryWithResourcesMyResource("Resource 1"); TryWithResourcesMyResource r2 = new TryWithResourcesMyResource("Resource 2")) {
+            OceanOutput("Inside try block");
+        } catch (Exception e) {
+            OceanOutput("Caught: " + e.getMessage());
+        } finally {
+            OceanOutput("Finally block");
+        }
+        
+        OceanOutput("=== Try-With-Resources Test End ===");
+
+        if (TryWithResourcesMyResource.closeCount == 2) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

@@ -1,0 +1,7 @@
+package Test;
+
+data class CISCData(String command,int lenght) extends Data {
+    function CISCData(String command, int length){
+        super(command, length);
+    }
+}

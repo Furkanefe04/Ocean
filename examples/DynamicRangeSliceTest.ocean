@@ -1,0 +1,58 @@
+
+class CustomSequence {
+    String prefix;
+
+    function CustomSequence(String p) {
+        prefix = p;
+    }
+
+    public String function slice(int start, int end) {
+        return prefix + ":" + start + ".." + end;
+    }
+
+    public String function get(int index) {
+        return prefix + "[" + index + "]";
+    }
+}
+
+class DynamicRangeSliceTest {
+     main() {
+        OceanOutput("=== DYNAMIC RANGE SLICE & INDEX TEST ===");
+
+        // 1. Custom Class Range Slicing (Dynamic slice(II) resolution)
+        CustomSequence seq = new CustomSequence("SEQ");
+        String slicedCustom = seq[1..5];
+        OceanOutput("Custom slice: " + slicedCustom);
+
+        // 2. Custom Class Single Indexing (Dynamic get(I) resolution)
+        String indexedCustom = seq[3];
+        OceanOutput("Custom index: " + indexedCustom);
+
+        // 3. String Range Slicing (Dynamic substring(II) resolution)
+        String text = "OceanCompiler";
+        String subStr = text[0..4];
+        OceanOutput("String slice: " + subStr);
+
+        // 4. OceanList Range Slicing (Dynamic subList(II) resolution)
+        variable list = [10, 20, 30, 40, 50];
+        variable subList = list[1..3];
+        OceanOutput("SubList size: " + subList.size());
+
+        // Assertions
+        bool c1 = slicedCustom.equals("SEQ:1..6");
+        bool c2 = indexedCustom.equals("SEQ[3]");
+        bool c3 = subStr.equals("Ocean");
+        bool c4 = subList.size() == 3;
+
+        OceanOutput("Custom Slice Dynamic: " + c1);
+        OceanOutput("Custom Index Dynamic: " + c2);
+        OceanOutput("String Slice Dynamic: " + c3);
+        OceanOutput("OceanList Slice Dynamic: " + c4);
+
+        if (c1 && c2 && c3 && c4) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

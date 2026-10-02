@@ -1,0 +1,36 @@
+package compiler.tests;
+
+import java.util.List;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
+
+class StreamProbeTest {
+    public static void function main(String[] args) {
+        List<String> list = new ArrayList<String>();
+        list.add("apple");
+        list.add("banana");
+        list.add("cherry");
+
+        variable count = list.stream().filter((s) -> s.startsWith("b")).count();
+        System.out.println("COUNT: " + count);
+
+        variable upperList = list.stream().map((s) -> s.toUpperCase()).toList();
+        System.out.println("FIRST: " + upperList.get(0));
+        bool checkCount = count == 1;
+        bool checkList = true;
+        for (String s in upperList) {
+            variable arr = s.toCharArray();
+            for (char c in arr){
+                if(!(c >=65 && c <= 96)){
+                    checkList = false;
+                    stop;
+                }
+                if (!checkList) stop;
+            }
+        }
+        bool check = checkList&&checkCount;
+        if (check) OceanOutput("STATUS: PASSED");
+        else OceanOutput("STATUS: FAILED");
+
+    }
+}

@@ -1,0 +1,32 @@
+package com.resources;
+    class SwitchLoopTest {
+    main() {
+        bool running = true;
+        int x = 0;
+        int count = 0;
+        while(running) {
+            switch(x) {
+                case 0:
+                OceanOutput("deneme");
+                count = count + 1;
+                x = 1;
+                stop;
+                case 1:
+                OceanOutput("deneme");
+                count = count + 1;
+                x = 2;
+                stop;
+                case 2:
+                OceanOutput("deneme");
+                count = count + 1;
+                running = false;
+                stop;
+            }
+        }
+        if (x == 2 && !running && count == 3) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

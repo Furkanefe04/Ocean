@@ -1,0 +1,98 @@
+package com.resources;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Date;
+import java.math.BigDecimal;
+import java.util.Comparator;
+
+
+class OceanGodModeTest {
+
+    static int function fibonacci(int n) {
+        if (n <= 1) return n;
+        return fibonacci(n - 1) + fibonacci(n - 2);
+    }
+
+    main() {
+        Output("=============================================");
+        Output("   OCEAN GOD MODE: FULL+FULL STRESS TEST     ");
+        Output("=============================================");
+
+        // 1. Java Interop & Complex Math
+        variable d = new Date();
+        variable val1 = new BigDecimal("1000.50");
+        variable val2 = new BigDecimal("20.25");
+        variable total = val1.add(val2).multiply(new BigDecimal("1.18"));
+        Output("Date: " + d.toString());
+        Output("Math Result: " + total.toString());
+
+        // 2. Collections & Loops
+        variable list = new ArrayList();
+        list.add("First");
+        list.add("Second");
+        list.add("Third");
+        Output("List size: " + list.size());
+
+        // 3. Null Safety (The Ultimate Test)
+        variable? nVar = null;
+        variable res = nVar?.toString()?.length() ?? 42;
+        Output("Null Safety Result: " + res);
+
+        // 4. Lambdas (Single Arg / No Arg)
+        variable capturedMsg = "I am captured!";
+        variable r = (Runnable) () -> {
+            OceanOutput("Lambda says: " + capturedMsg);
+        };
+        r();
+        variable abc =(FuncInterface) (a,b) ->  {
+            int x = (int) a;
+            int y = (int) b;
+            if  (x > y) return x;
+            else return y;
+        };
+        OceanOutput(abc(5,8));
+        variable deneme = (FuncInterface) (x,y) -> {
+            OceanOutput(x + " and "+y);
+        };
+        deneme("abc","def");
+        // 5. Lambdas (Two Args - Inferred Types)
+        variable comp = (Comparator) (a,b) -> {
+            // Compare lengths
+            int len1 = a.toString().length();
+            int len2 = b.toString().length();
+            if (len1 > len2) return 1;
+            if (len1 < len2) return -1;
+            return 0;
+        };
+        Output("Comparator Test (short vs verylong): " + comp("short", "verylong"));
+
+        // 6. Method References (Perfect match: void -> void)
+        variable r2 = (Runnable) list::clear;
+        r2();
+        Output("Method Reference (list::clear) executed. New list size: " + list.size());
+
+        // 7. Bitwise & Logic
+        variable x = 15; // 1111
+        variable y = 7;  // 0111
+        variable bitwise = (x & y) ^ (x | y);
+        Output("Bitwise Logic: " + bitwise);
+
+        // 8. Recursion
+        int fib12 = fibonacci(12);
+        Output("Fibonacci(12): " + fib12);
+
+        Output("=============================================");
+        Output("   GOD MODE TEST COMPLETED SUCCESSFULLY!     ");
+        Output("=============================================");
+
+        bool success = "1204.4850".equals(total.toString()) &&
+                      res == 42 &&
+                      ((int) comp.compare("short", "verylong")) == -1 &&
+                      list.size() == 0 &&
+                      bitwise == 8 &&
+                      fib12 == 144;
+        if (success) Output("STATUS: PASSED");
+        else Output("STATUS: FAILED");
+
+    }
+}

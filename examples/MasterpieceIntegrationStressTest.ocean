@@ -1,0 +1,176 @@
+package com.masterpiece;
+
+import java.util.*;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import com.google.gson.Gson;
+import com.google.common.collect.Lists;
+
+// 1. Multi-parameter generic interface and implementation requiring bridge methods
+interface Processor<T, U, R> {
+    R function process(T first, U second);
+}
+
+interface Sanitizer<T> {
+    T function sanitize(T? input);
+}
+
+class AdvancedDataProcessor implements Processor<String, Double, String>, Sanitizer<String> {
+    @Override
+    String function process(String first, Double second) {
+        String clean = sanitize(first);
+        double val = second.doubleValue();
+        int repeatCount = (int) val;
+        return StringUtils.repeat(clean, "_", repeatCount);
+    }
+
+    @Override
+    String function sanitize(String? input) {
+        if (input == null) {
+            return "DEFAULT";
+        }
+        return StringUtils.trimToEmpty(input).toUpperCase();
+    }
+}
+
+// 2. Synchronized recursive mathematical calculations
+class RecursiveLockCalculator {
+    private variable lockObj = new Object();
+    variable totalComputation = 0;
+
+    int function computeFactorial(int n) {
+        lock(lockObj) {
+            totalComputation = totalComputation + 1;
+            if (n <= 1) {
+                return 1;
+            }
+            return n * computeFactorial(n - 1);
+        }
+    }
+}
+
+// 3. Deep Generic hierarchy with bounds
+class NodeContainer<T> {
+    T valuex;
+    NodeContainer<T> nextNode;
+
+    function NodeContainer(T val) {
+        valuex = val;
+    }
+
+    T function getValue() {
+        return valuex;
+    }
+
+    void function setNext(NodeContainer<T> next) {
+        nextNode = next;
+    }
+
+    NodeContainer<T> function getNext() {
+        return nextNode;
+    }
+}
+
+class MasterpieceIntegrationStressTest {
+    main() {
+        OceanOutput("=== MASTERPIECE INTEGRATION STRESS TEST START ===");
+
+        // --- 1. Generics & Multi-Interface Bridge Methods ---
+        Processor<String, Double, String> processor = new AdvancedDataProcessor();
+        variable doubleVal = 3.0;
+        String processResult = processor.process("  ocean  ", doubleVal);
+        OceanOutput("processor_result: " + processResult); // Expected: OCEAN_OCEAN_OCEAN
+
+        Sanitizer<String> sanitizer = (Sanitizer<String>) processor;
+        String sanitizedResult = sanitizer.sanitize(null);
+        OceanOutput("sanitizer_null_result: " + sanitizedResult); // Expected: DEFAULT
+
+        // --- 2. Synchronized Recursive Calculator ---
+        variable calc = new RecursiveLockCalculator();
+        int factorial = calc.computeFactorial(5);
+        OceanOutput("factorial_5: " + factorial); // Expected: 120
+        OceanOutput("computation_steps: " + calc.totalComputation); // Expected: 5
+
+        // --- 3. Deep Generic Container Traversing ---
+        variable head = new NodeContainer<String>("Node1");
+        variable second = new NodeContainer<String>("Node2");
+        variable third = new NodeContainer<String>("Node3");
+        head.setNext(second);
+        second.setNext(third);
+
+        String traversal = (String) head.getValue() + "->" + (String) head.getNext().getValue() + "->" + (String) head.getNext().getNext().getValue();
+        OceanOutput("traversal_result: " + traversal); // Expected: Node1->Node2->Node3
+
+        // --- 4. Deep Lexical Scope Shadowing & Exception Flow ---
+        /*int shadowVal = 10;
+        trying {
+            int shadowVal = 20;
+            for (int i from 1 to 2 with increasing 1) {
+                int shadowVal = 30;
+                if (i == 1) {
+                    int shadowVal = 40;
+                    OceanOutput("shadow_loop_inner: " + shadowVal); // Expected: 40
+                }
+            }
+            throw new RuntimeException("shadow_trigger");
+        } catch (Exception ex) {
+            int shadowVal = 50;
+            OceanOutput("shadow_catch: " + shadowVal); // Expected: 50
+        } finally {
+            int shadowVal = 60;
+            OceanOutput("shadow_finally: " + shadowVal); // Expected: 60
+        }
+        OceanOutput("shadow_outer: " + shadowVal); // Expected: 10*/
+
+        // --- 5. Nested Exceptions Stack Cleaning Flow ---
+        int cleanupStatus = 0;
+        trying {
+            trying {
+                cleanupStatus = 1;
+                throw new Exception("e1");
+            } catch (Exception innerEx) {
+                cleanupStatus = 2;
+                throw new Exception("e2"); // Throwing from catch
+            } finally {
+                cleanupStatus = 3; // Executing finally and cleaning stack
+            }
+        } catch (Exception outerEx) {
+            cleanupStatus = 4;
+        }
+        OceanOutput("cleanup_status_flow: " + cleanupStatus); // Expected: 4
+
+        // --- 6. Interop with Gson, Guava and Joda-Time ---
+        variable gson = new Gson();
+        variable jsonInput = "[{\"date\":\"2026-07-01\",\"valuex\":42.5},{\"date\":\"2026-07-02\",\"valuex\":100.0}]";
+        variable rawList = (List) gson.fromJson(jsonInput, new ArrayList().getClass());
+        
+        // Guava lists reversing
+        variable reversedList = Lists.reverse(rawList);
+        variable firstMap = (Map) reversedList.get(0);
+        String dateStr = (String) firstMap.get("date");
+        Double valDouble = (Double) firstMap.get("valuex");
+
+        DateTime dt = DateTime.parse(dateStr, DateTimeFormat.forPattern("yyyy-MM-dd"));
+        String formattedDate = dt.plusYears(1).toString("yyyy/MM/dd");
+        OceanOutput("joda_plus_year: " + formattedDate); // Expected: 2027/07/02
+        OceanOutput("deserialized_value: " + valDouble); // Expected: 100.0
+
+        // Final verification check
+        if (processResult.equals("OCEAN_OCEAN_OCEAN") &&
+            sanitizedResult.equals("DEFAULT") &&
+            factorial == 120 &&
+            calc.totalComputation == 5 &&
+            traversal.equals("Node1->Node2->Node3") &&
+            cleanupStatus == 4 &&
+            formattedDate.equals("2027/07/02") &&
+            valDouble.doubleValue() == 100.0) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+
+        OceanOutput("=== MASTERPIECE INTEGRATION STRESS TEST COMPLETED ===");
+    }
+}

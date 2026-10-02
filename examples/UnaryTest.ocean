@@ -1,0 +1,25 @@
+class UnaryTest {
+    main(){
+        byte val = 127;
+        val++;
+        ++val;
+        val--;
+        --val;
+        val*=10;
+        val/=5;
+
+        short val2 = 32767;
+        val2++;
+        val2++;
+
+        int val3 = Integer.MAX_VALUE;
+        val3++;
+        OceanOutput(++val3);
+        if (val == -2 && val2 == -32767 && val3 == -2147483647) {
+            OceanOutput("STATUS: PASSED");
+        }
+        else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

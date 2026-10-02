@@ -1,0 +1,7 @@
+package examples;
+
+class Hello {
+    main() {
+        OceanOutput("Hello, Ocean!");
+    }
+}

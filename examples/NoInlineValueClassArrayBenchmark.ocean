@@ -1,0 +1,47 @@
+package com.resources;
+
+import java.util.Objects;
+
+// Standard Heap Class WITHOUT @Inline
+class StandardUserId {
+    public int id;
+    function StandardUserId(int id) {
+        this.id = id;
+    }
+}
+
+class NoInlineValueClassArrayBenchmark {
+
+    static main() {
+        OceanOutput("=== NO-INLINE STANDARD HEAP CLASS ARRAY BENCHMARK START ===");
+        long start = System.nanoTime();
+
+        int size = 5000000; // 5 Milyon Elemanlı Dizi
+        StandardUserId[] userArray = new StandardUserId[size];
+
+        // 1. Fill Array with 5 Million Heap Objects (Massive Allocation & GC Pressure)
+        int i = 0;
+        while (i < size) {
+            userArray[i] = new StandardUserId(i);
+            i = i + 1;
+        }
+
+        // 2. Iterate and Sum Array Elements (Pointer Dereferencing & Cache Misses)
+        long sum = 0;
+        int j = 0;
+        while (j < size) {
+            sum = sum + userArray[j].id;
+            j = j + 1;
+        }
+
+        long durationMs = (System.nanoTime() - start) / 1000000;
+        OceanOutput("Duration (No @Inline Standard Heap Array): " + durationMs + " ms");
+        OceanOutput("Sum: " + sum);
+
+        if (sum > 0) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

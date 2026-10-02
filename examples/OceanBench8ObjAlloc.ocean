@@ -1,0 +1,26 @@
+package com.resources;
+
+class ObjPoint8 {
+    int x;
+    int y;
+    int z;
+    function ObjPoint8(int x, int y, int z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+}
+
+class OceanBench8ObjAlloc {
+    static main() {
+        int n = 2000000;
+        long start = System.nanoTime();
+        long sum = 0L;
+        for (int i from 0 to n - 1 with increasing 1) {
+            ObjPoint8 p = new ObjPoint8(i, i + 1, i + 2);
+            sum = sum + p.x + p.y + p.z;
+        }
+        long end = System.nanoTime();
+        OceanOutput("sum=" + sum + " | time_ms=" + ((end - start) / 1000000));
+    }
+}

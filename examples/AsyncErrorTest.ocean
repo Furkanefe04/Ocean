@@ -1,0 +1,25 @@
+package com.asynctest;
+
+public class AsyncErrorTest {
+
+    // Error 1: Async constructor
+    public async function AsyncErrorTest() {
+        OceanOutput("Hata olmali");
+    }
+
+    // A valid async method
+    public static async String function fetchString() {
+        return "ok";
+    }
+
+    // Error 2: await outside async method
+    public static void function syncMethod() {
+        variable x = await fetchString();
+    }
+
+    // Error 3: await on non-CompletableFuture
+    public static async void function invalidAwait() {
+        int notFuture = 123;
+        variable res = await notFuture;
+    }
+}

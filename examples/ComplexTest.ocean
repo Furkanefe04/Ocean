@@ -1,0 +1,37 @@
+package tests;
+
+interface ComplexGreetable {
+    void function greet(String name);
+}
+
+abstract class ComplexBaseGreeter implements ComplexGreetable {
+    String prefix = "Hello, ";
+    
+    void function greet(String name) {
+        OceanOutput(prefix + name + "!");
+    }
+}
+
+class ComplexTest extends ComplexBaseGreeter {
+    static int greetCount = 0;
+    
+    @Override
+    void function greet(String name) {
+        prefix = "Good morning, ";
+        super.greet(name);
+        greetCount = greetCount + 1;
+    }
+    
+    static main() {
+        ComplexTest greeter = new ComplexTest();
+        greeter.greet("Ocean User");
+        greeter.greet("Developer");
+        OceanOutput("Total greets: " + ComplexTest.greetCount);
+
+        if (ComplexTest.greetCount == 2 && greeter.prefix.equals("Good morning, ")) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

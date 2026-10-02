@@ -1,0 +1,137 @@
+package com.resources;
+
+import java.util.function.Function;
+
+interface Task {
+    public void function execute();
+}
+
+enum LogLevel {
+    INFO, WARNING, ERROR
+}
+
+class Logger {
+    private LogLevel level;
+    
+    public function Logger(LogLevel lvl) {
+        level = lvl;
+    }
+    
+    public void function log(String msg) {
+        OceanOutput($"[{level}] {msg}");
+    }
+}
+
+class BaseEntity {
+    protected int id;
+    public function BaseEntity(int id) {
+        this.id = id;
+    }
+}
+
+class Worker<T <: Number> extends BaseEntity implements Task {
+    private T salary;
+    private Logger logger;
+    
+    public function Worker(int id, T salary) {
+        super(id);
+        this.salary = salary;
+        logger = new Logger(LogLevel.INFO);
+    }
+    
+    @Override
+    public void function execute() {
+        logger.log($"Worker {id} executing with salary: {salary}");
+    }
+    
+    public double function calculateBonus(double multiplier) {
+        return salary.doubleValue() * multiplier;
+    }
+}
+
+class UltimateTest {
+     main() {
+        OceanOutput("--- OCEAN COMPILER ULTIMATE STRESS TEST ---");
+
+        // 1. Multi-dimensional Arrays & Type Inference
+        variable datax = [[10, 20], [30, 40, 50], [60]];
+        int total = 0;
+
+        // 2. Labeled Loops & Control Flow
+        for (variable row in datax) {
+            for (int val in row) {
+                if (val == 50) {
+                    OceanOutput("Found 50, skipping outer increment");
+                    skip;
+                }
+                if (val > 55) {
+                    OceanOutput("Val > 55, breaking outer");
+                    stop;
+                }
+                total = total + val;
+            }
+        }
+        OceanOutput($"Calculated Total: {total}");
+
+        // 3. Generics with Bounds & Inheritance & Interfaces
+        variable emp = new Worker<Double>(1001, 5000.50);
+        emp.execute();
+        double bonus = emp.calculateBonus(0.1);
+        OceanOutput($"Bonus: {bonus}");
+
+        // 4. Safe Member Call & Null Coalescing
+        Worker<Integer>? nullWorker = null;
+        variable safeBonus = nullWorker?.calculateBonus(1.0) ?? -1.0;
+        OceanOutput($"Safe Bonus for null: {safeBonus}");
+
+        // 5. Try-Catch-Finally & Exception Propagation
+        trying {
+            OceanOutput("Starting risk operation...");
+            riskyFunc(true);
+        } catch (Exception e) {
+            OceanOutput($"Expected Catch: {e.getMessage()}");
+        } finally {
+            OceanOutput("Final cleanup logic executed");
+        }
+
+        // 6. Lock Synchronization
+        variable syncObj = new Object();
+        lock (syncObj) {
+            OceanOutput("Object locked successfully");
+            lock (syncObj) {
+                OceanOutput("Recursive lock verified");
+            }
+        }
+        OceanOutput("Object unlocked");
+
+        // 7. Lambdas & Functional Interop
+        value baseFactor = 2;
+        variable calc = (Function) (int n) -> {
+            // baseFactor is effectively final
+            return n * baseFactor;
+        };
+        // Auto-inferred to Function
+        OceanOutput($"Lambda Result (10 * 2): {calc(10)}");
+
+        // 8. Enum Switch
+        LogLevel currentLvl = LogLevel.WARNING;
+        switch (currentLvl) {
+            case LogLevel.INFO: { OceanOutput("Level is INFO"); }
+            case LogLevel.WARNING: { OceanOutput("Level is WARNING"); }
+            default: { OceanOutput("Level is OTHER"); }
+        }
+
+        bool success = (total == 100) && (bonus == 500.05) && (safeBonus == -1.0) && (calc(10) == 20);
+        if (success) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+    
+    static void function riskyFunc(bool shouldThrow) {
+        if (shouldThrow) {
+            throw new RuntimeException("Intentional Failure");
+        }
+    }
+}

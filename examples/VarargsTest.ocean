@@ -1,0 +1,49 @@
+package tests;
+
+class VarargsTest {
+    public static int function sum(int... values) {
+        variable s = 0;
+        variable i = 0;
+        while (i < values.length) {
+            s = s + values[i];
+            i = i + 1;
+        }
+        return s;
+    }
+
+    public static String function concat(String sep, String... words) {
+        variable result = "";
+        variable i = 0;
+        while (i < words.length) {
+            if (i > 0) {
+                result = result + sep;
+            }
+            result = result + words[i];
+            i = i + 1;
+        }
+        return result;
+    }
+
+    static main() {
+        variable res1 = VarargsTest.sum();
+        OceanOutput("sum(): " + res1);
+
+        variable res2 = VarargsTest.sum(10);
+        OceanOutput("sum(10): " + res2);
+
+        variable res3 = VarargsTest.sum(10, 20, 30);
+        OceanOutput("sum(10, 20, 30): " + res3);
+
+        variable res4 = VarargsTest.concat("-", "one", "two", "three");
+        OceanOutput("concat('-', 'one', 'two', 'three'): " + res4);
+
+        variable res5 = VarargsTest.concat("-");
+        OceanOutput("concat('-'): " + res5);
+
+        if (res1 == 0 && res2 == 10 && res3 == 60 && res4.equals("one-two-three") && res5.equals("")) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

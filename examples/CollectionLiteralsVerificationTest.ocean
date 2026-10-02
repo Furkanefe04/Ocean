@@ -1,0 +1,52 @@
+package com.resources;
+
+import java.util.HashMap;
+
+class CollectionLiteralsVerificationTest {
+    static main() {
+        OceanOutput("=== COLLECTION LITERALS VERIFICATION ===");
+
+        // 1. List Literal
+        variable list = [10, 20, 30];
+        OceanOutput("List size: " + list.size());
+        OceanOutput("List index 1: " + list[1]);
+        list[1] = 99;
+        OceanOutput("List index 1 after edit: " + list[1]);
+        
+        OceanOutput("List elements:");
+        for (int item in list) {
+            OceanOutput(" - " + item);
+        }
+
+        // 2. Set Literal
+        variable set = #{100, 200, 300, 100};
+        OceanOutput("Set size (should be 3): " + set.size());
+        OceanOutput("Set contains 200: " + set.contains(200));
+        OceanOutput("Set contains 400: " + set.contains(400));
+        
+        OceanOutput("Set elements:");
+        for (int item in set) {
+            OceanOutput(" - " + item);
+        }
+
+        // 3. Map Literal
+        variable map = {"apple": 1, "banana": 2, "cherry": 3};
+        OceanOutput("Map size: " + map.size());
+        OceanOutput("Map contains apple: " + map.containsKey("apple"));
+        OceanOutput("Map get banana: " + map.get("banana"));
+        variable map2 = new HashMap();
+        map2.put("x",1);
+        map2.put("y",2);
+        // Let's modify a value
+        map.put("banana", 20);
+        OceanOutput("Map get banana after edit: " + map.get("banana"));
+
+        if (list.size() == 3 && list[0] == 10 && list[1] == 99 && list[2] == 30 &&
+            set.size() == 3 && set.contains(200) == true && set.contains(400) == false &&
+            map.size() == 3 && map.containsKey("apple") == true &&map.get("banana") == 20) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

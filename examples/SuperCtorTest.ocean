@@ -1,0 +1,22 @@
+package com.resources;
+
+class Parent {
+    int x;
+    function Parent(int a) {
+        x = a;
+    }
+}
+
+class Child extends Parent {
+    function Child() {
+        // Parent has no Parent() constructor, only Parent(int)
+        // This should fail to compile!
+    }
+}
+
+class SuperCtorTest {
+    main() {
+        variable c = new Child();
+        OceanOutput("Child created successfully!");
+    }
+}

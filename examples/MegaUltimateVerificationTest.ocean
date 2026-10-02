@@ -1,0 +1,236 @@
+package com.resources;
+
+import java.util.concurrent.atomic.AtomicInteger;
+import java.math.BigDecimal; // Import BigDecimal
+import org.apache.commons.lang3.StringUtils; // 3rd party class from Gradle dependency
+import com.external.ExternalHelper; // Sibling in external package
+
+
+interface TaskProcessor<T> {
+    T function process(T input);
+}
+
+class DataHolder<T> implements TaskProcessor<T> {
+    T val;
+
+    function DataHolder(T val) {
+        this.val = val;
+    }
+
+    T function getVal() {
+        return val;
+    }
+
+    @Override
+    T function process(T input) {
+        return input;
+    }
+}
+
+data class ResultData(int code, String message);
+
+class OuterCalculator {
+    int multiplier;
+    function OuterCalculator(int m) {
+        multiplier = m;
+    }
+
+    class Middle {
+        int offset;
+        function Middle(int o) {
+            offset = o;
+        }
+
+        class Inner {
+            int baseValue;
+            function Inner(int b) {
+                baseValue = b;
+            }
+
+            int function heavyPrimeSum(int limit) {
+                variable sum = 0;
+                variable num = 2;
+                while (num < limit) {
+                    variable isPrime = true;
+                    variable i = 2;
+                    while (i * i <= num) {
+                        if (num % i == 0) {
+                            isPrime = false;
+                        }
+                        i++;
+                    }
+                    if (isPrime) {
+                        sum = sum + num;
+                    }
+                    num++;
+                }
+                return sum;
+            }
+        }
+    }
+}
+
+class ConcurrencyEngine {
+    sync int transactionCount = 0; // Volatile field
+
+    sync void function increment() {
+        // Synchronized method
+        transactionCount = transactionCount + 1;
+    }
+
+    int function executeLockedJob(Object lockObj, OuterCalculator.Middle.Inner worker, int limit) {
+        lock(lockObj) {
+            // Synchronized block
+            variable sum = worker.heavyPrimeSum(limit);
+            increment();
+            return sum;
+        }
+    }
+
+    int function divideAndCalculate(int a, int b) {
+        trying {
+            trying {
+                if (b == 0) {
+                    throw new ArithmeticException("Division by zero");
+                }
+                return a / b;
+            } catch (ArithmeticException e) {
+                return -1;
+            }
+        } finally {
+            // finally block side effect
+            increment();
+        }
+    }
+}
+
+class WorkerThread extends Thread {
+    int limit;
+    Object lockObj;
+    ConcurrencyEngine engine;
+    OuterCalculator.Middle.Inner worker;
+    int resultSum;
+
+    static WorkerThread function create(ConcurrencyEngine eng, Object lockVal, OuterCalculator.Middle.Inner wrk, int lim) {
+        WorkerThread t = new WorkerThread();
+        t.engine = eng;
+        t.lockObj = lockVal;
+        t.worker = wrk;
+        t.limit = lim;
+        t.resultSum = 0;
+        return t;
+    }
+
+    void function run() {
+        resultSum = engine.executeLockedJob(lockObj, worker, limit);
+    }
+}
+
+class MegaUltimateVerificationTest {
+    main() {
+        OceanOutput("=== MEGA ULTIMATE VERIFICATION TEST START ===");
+
+        // 1. Double nested class instantiation and calculation
+        variable outer = new OuterCalculator(10);
+        variable middle = new OuterCalculator.Middle(20);
+        variable worker = new OuterCalculator.Middle.Inner(5);
+        variable primeSum = worker.heavyPrimeSum(50);
+        OceanOutput("Double Nested Prime Sum: " + primeSum); // Expected: 328
+
+        // 2. Multithreaded execution using ConcurrencyEngine
+        variable engine = new ConcurrencyEngine();
+        variable lockObj = new Object();
+
+        variable thread1 = WorkerThread.create(engine, lockObj, worker, 50);
+        variable thread2 = WorkerThread.create(engine, lockObj, worker, 50);
+
+        thread1.start();
+        thread2.start();
+
+        thread1.join();
+        thread2.join();
+
+        OceanOutput("Thread 1 Result: " + thread1.resultSum);
+        OceanOutput("Thread 2 Result: " + thread2.resultSum);
+        OceanOutput("Volatile Transaction Count: " + engine.transactionCount); // Expected: 2
+
+        // 3. Generics and Interfaces usage
+        variable genericHolder = new DataHolder<String>("Hello Generics");
+        String holderValue = genericHolder.getVal();
+        String processedValue = genericHolder.process("Processed Value");
+        OceanOutput("Generic Holder Value: " + holderValue);
+        OceanOutput("Interface Processed: " + processedValue);
+
+        // 4. Try-catch-finally with return paths
+        variable divResult1 = engine.divideAndCalculate(100, 4);
+        variable divResult2 = engine.divideAndCalculate(100, 0);
+        OceanOutput("Try-Finally Div (100 / 4): " + divResult1); // Expected: 25
+        OceanOutput("Try-Finally Div (100 / 0): " + divResult2); // Expected: -1
+        OceanOutput("Transaction Count after Divs: " + engine.transactionCount); // Expected: 4
+
+        // 5. Switch Expression
+        variable switchVal = switch (divResult1) {
+            case 25 -> "QUARTER"
+            case 50 -> "HALF"
+            default -> "UNKNOWN"
+        };
+        OceanOutput("Switch Expression Value: " + switchVal); // Expected: QUARTER
+
+        // 6. Data Class
+        variable r1 = new ResultData(200, "OK");
+        variable r2 = r1.copy(500, "Internal Error");
+        OceanOutput("Data Class toString: " + r1.toString()); // Expected: ResultData(code=200, message=OK)
+        OceanOutput("Data Class Copied toString: " + r2.toString());
+        // 7. Collection Literals
+        variable listVal = [10, 20, 30];
+        variable setVal = #{100, 200, 100};
+        variable mapVal = {"key1": 1000, "key2": 2000};
+        OceanOutput("List length: " +listVal.size());
+        OceanOutput("Set size: " + setVal.size());
+        OceanOutput("Map get key1: " + mapVal.get("key1"));
+
+        // 8. 3rd party class (Apache Commons StringUtils)
+        String original = "OceanCompiler";
+        String reversed = StringUtils.reverse(original);
+        OceanOutput("3rd Party Reverse: " + reversed);
+
+        // 9. Sibling in external package
+        variable extResult = ExternalHelper.multiply(6, 7);
+        OceanOutput("External Package Multiplier: " + extResult);
+
+        // 10. Lambda expression capturing local variable
+        variable localStr = "Captured Local";
+        variable r = (Runnable) () -> {
+            OceanOutput("Lambda Captured: " + localStr);
+        };
+        r();
+
+        // 11. Gradual type promotion (int -> long -> BigDecimal) and (float -> double -> BigDecimal)
+        int intVal = 10;
+        long longVal = 20L;
+        BigDecimal bdVal = new BigDecimal("30.5");
+        BigDecimal res1 = intVal + longVal + bdVal;
+        OceanOutput("Gradual Promotion 1 (10 + 20L + 30.5): " + res1.toString()); // Expected: 60.5
+
+        float floatVal = 1.5f;
+        double doubleVal = 2.5;
+        BigDecimal bdVal2 = new BigDecimal("10.0");
+        BigDecimal res2 = floatVal * doubleVal - bdVal2;
+        OceanOutput("Gradual Promotion 2 (1.5f * 2.5 - 10.0): " + res2.toString()); // Expected: -6.25
+
+        // 12. Extremely large literals automatic promotion to BigDecimal
+        variable bigPromote1 = 10 + 10000000000000000000;
+        OceanOutput("bigPromote1 (10 + 10^19): " + bigPromote1.toString()); // Expected: 10000000000000000010
+
+        variable bigPromote2 = new BigDecimal("10");
+        bigPromote2 = bigPromote2 * 999999999999999999999999999999;
+        OceanOutput("bigPromote2 (10 * 999...): " + bigPromote2.toString()); // Expected: 9999999999999999999999999999990
+
+        // Verification checks
+        if (primeSum == 328 && thread1.resultSum == 328 && thread2.resultSum == 328 && engine.transactionCount == 4 && holderValue.equals("Hello Generics") && processedValue.equals("Processed Value") && divResult1 == 25 && divResult2 == -1 && switchVal.equals("QUARTER") && r1.getCode() == 200 && r2.getCode() == 500 && listVal.size() == 3 && setVal.size() == 2 && mapVal.get("key1") == 1000 && reversed.equals("relipmoCnaecO") && extResult == 42 && res1.compareTo(new BigDecimal("60.5")) == 0 && res2.compareTo(new BigDecimal("-6.25")) == 0 && bigPromote1.compareTo(new BigDecimal("10000000000000000010")) == 0 && bigPromote2.compareTo(new BigDecimal("9999999999999999999999999999990")) == 0) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

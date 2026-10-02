@@ -1,0 +1,33 @@
+package com.resources;
+
+import java.util.Locale;
+import java.util.function.Function;
+
+class DenemeTest {
+    main(String[] args) {
+        variable x = "deneme yazı";
+        variable y = x.length();
+        OceanOutput(x.length()>11);
+        OceanOutput(y>11);
+        variable lambda = (Function) (String s) -> {
+            return (s.length() > 4);
+        };
+        if (lambda("deneme değer")){
+            OceanOutput("true");
+        }
+        variable lambda2 = (FuncInterface) (a,b) -> {
+            return (int) a +(int)b;
+        };
+        variable lambdaOut = lambda2(y,y);
+        OceanOutput(lambdaOut);
+        OceanOutput("deneme".toUpperCase(Locale.ENGLISH));
+        if (y == x.length() && y == 11){
+            OceanOutput("STATUS: PASSED");
+        }
+        else{
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}
+
+

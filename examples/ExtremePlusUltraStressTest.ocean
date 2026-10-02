@@ -1,0 +1,942 @@
+package stress.extreme;
+
+import java.util.List;
+import java.util.Map;
+import java.util.ArrayList;
+import java.util.concurrent.CompletableFuture;
+import java.io.*;
+
+import static java.lang.Math.PI;
+
+
+// ============================================================
+// 1. GENERIC HIERARCHY + VARIANCE + BOUNDS
+// ============================================================
+
+public abstract class Node<T> {
+    protected T value;
+
+    public function Node(T value) {
+        this.value = value;
+    }
+
+    public T function get() {
+        return this.value;
+    }
+
+    public void function set(T value) {
+        this.value = value;
+    }
+}
+
+
+public class NumberNode<T <: Number> extends Node<T> {
+    public function NumberNode(T value) {
+        super(value);
+    }
+
+    public double function doubleValue() {
+        return this.value.doubleValue();
+    }
+}
+
+
+public class Producer<+T> {
+    private T value;
+
+    public function Producer(T value) {
+        this.value = value;
+    }
+
+    public T function produce() {
+        return this.value;
+    }
+}
+
+
+public class Consumer<-T> {
+    public void function consume(T value) {
+        OceanOutput($"Consumed: {value}");
+    }
+}
+
+
+public class Pipeline<-In, +OutType <: CharSequence> {
+    private OutType output;
+
+    public function Pipeline(OutType output) {
+        this.output = output;
+    }
+
+    public OutType function execute(In input) {
+        OceanOutput($"Input: {input}");
+        return this.output;
+    }
+}
+
+
+// ============================================================
+// 2. DATA CLASS + SEALED HIERARCHY + PATTERN MATCHING
+// ============================================================
+
+public data class User(int id, String name, int? score);
+
+
+public data class Admin(int id, String name, int? score, String permission);
+
+
+public abstract sealed class Result restricts Success, Failure, Empty {
+    public abstract String function describe();
+}
+
+
+public final class Success extends Result {
+
+    String message;
+
+    public function Success(String message){
+        this.message = message;
+    }
+
+    @Override
+    public String function describe() {
+        return $"SUCCESS: {message}";
+    }
+}
+
+
+public final class Failure extends Result {
+
+    String message;
+
+    public function Failure(String message){
+        this.message = message;
+    }
+
+    @Override
+    public String function describe() {
+        return $"FAILURE: {message}";
+    }
+}
+
+
+public final class Empty() extends Result {
+
+    @Override
+    public String function describe() {
+        return "EMPTY";
+    }
+}
+
+
+// ============================================================
+// 3. NESTED / INNER CLASSES
+// ============================================================
+
+public class Engine {
+
+    private int state = 10;
+
+    public int function runWorker(int x) {
+        Worker w = new Worker();
+        return w.calculate(x);
+    }
+
+    public int function runDeep(int x) {
+        Worker w = new Worker();
+        return w.runDeep(x);
+    }
+
+    public class Worker {
+
+        private int local = 20;
+
+        public int function calculate(int x) {
+            return x + state;
+        }
+
+        public int function runDeep(int x) {
+            DeepWorker dw = new DeepWorker();
+            return dw.calculateDeep(x);
+        }
+
+        public class DeepWorker {
+            public int function calculateDeep(int x) {
+                return x + state+ local;
+            }
+        }
+    }
+
+    public static int function runStatic(int x) {
+        return StaticWorker.calculate(x);
+    }
+
+    public static class StaticWorker {
+
+        public static int function calculate(int x) {
+            return x * 2;
+        }
+    }
+}
+
+
+// ============================================================
+// 4. EXTENSION METHODS
+// ============================================================
+
+public class Extensions {
+
+    public int int.function twice() {
+        return this * 2;
+    }
+
+    public String String.function surround(String left, String right) {
+        return $"{left}{this}{right}";
+    }
+
+    public String User.function identity() {
+        return $"USER:{this.id}:{this.name}";
+    }
+
+    public int? int.function nullableTwice() {
+        return this * 2;
+    }
+}
+
+
+// ============================================================
+// 5. GENERIC METHOD
+// ============================================================
+
+public class GenericOperations {
+
+    public static <E> void function printArray(E[] values) {
+
+        for (E val in values) {
+            OceanOutput($"ARRAY={val}");
+        }
+    }
+
+    public static <E> E? function first(E[] values) {
+
+        if (values.length == 0) {
+            return null;
+        }
+
+        return values[0];
+    }
+}
+
+
+// ============================================================
+// 6. FUNCTIONAL INTERFACES
+// ============================================================
+
+public interface Transformer<T, R> {
+    R function transform(T value);
+}
+
+
+public interface Predicate<T> {
+    bool function test(T value);
+}
+
+
+public interface ConsumerAction<T> {
+    void function accept(T value);
+}
+
+
+// ============================================================
+// 7. MAIN STRESS TEST
+// ============================================================
+
+public class ExtremePlusUltraStressTest {
+
+    private static int globalCounter = 0;
+
+    private List<User> users;
+    private Map<String, int> scores;
+
+    public function ExtremePlusUltraStressTest() {
+
+        this.users = [
+            new User(1, "Furkan", 100),
+            new User(2, "Ocean", null),
+            new User(3, "Compiler", 90)
+        ];
+
+        this.scores = {
+            "Furkan": 100,
+            "Ocean": 0,
+            "Compiler": 90
+        };
+    }
+
+
+    // ========================================================
+    // NULLABILITY + GENERICS + COLLECTIONS
+    // ========================================================
+
+    public String? function findUserName(int id) {
+
+        for (User user in this.users) {
+
+            if (user.id == id) {
+                return user.name;
+            }
+        }
+
+        return null;
+    }
+
+
+    public int function calculateScore(User user) {
+
+        int? score = user.score;
+
+        return score ?? 0;
+    }
+
+
+    public String function describeUser(User? user) {
+
+        String name = user?.name ?? "UNKNOWN";
+
+        int score = user?.score ?? -1;
+
+        return $"User={name}, Score={score}";
+    }
+
+
+    // ========================================================
+    // DEEPLY NESTED EXPRESSIONS
+    // ========================================================
+
+    public int function arithmeticStress(int x) {
+
+        return
+            (((x + 5) * 3) - (x % 7))
+            + (((x << 2) >> 1) & 255)
+            ^ ((x | 16) & (~x));
+    }
+
+
+    // ========================================================
+    // TERNARY TYPE PRESSURE
+    // ========================================================
+
+    public String function ternaryStress(
+        bool condition,
+        User? user
+    ) {
+
+        return condition
+            ? (user?.name ?? "NO_USER")
+            : $"ID={(user?.id ?? -1)}";
+    }
+
+
+    // ========================================================
+    // SWITCH EXPRESSION + BLOCK RESULT
+    // ========================================================
+
+    public String function switchStress(int value) {
+
+        return switch (value) {
+
+            case 0 -> "ZERO"
+
+            case 1 -> {
+                variable x = "ONE";
+                result x.surround("[", "]");
+            }
+
+            case 2 -> {
+                variable a = 10;
+                variable b = 20;
+
+                result $"TWO:{a + b}";
+            }
+
+            case 3 -> "THREE"
+
+            default -> {
+                variable msg = $"OTHER:{value}";
+                result msg;
+            }
+        };
+    }
+
+
+    // ========================================================
+    // PATTERN MATCHING + NULL + SEALED TYPES
+    // ========================================================
+
+    public String function inspect(Object value) {
+
+        if (value instanceof User user) {
+
+            return
+                $"USER:{user.id}:{user.name}:{user.score ?? -1}";
+        }
+
+        if (value instanceof Success success) {
+
+            return success.describe();
+        }
+
+        if (value instanceof Failure failure) {
+
+            return failure.describe();
+        }
+
+        if (value instanceof Empty empty) {
+
+            return empty.describe();
+        }
+
+        return "UNKNOWN";
+    }
+
+
+    // ========================================================
+    // LABELED LOOP + NESTED CONDITIONS
+    // ========================================================
+
+    public int function loopStress(int limit) {
+
+        variable total = 0;
+
+        outer:
+        for (int i from 0 to limit with increasing 1) {
+
+            if (i % 2 == 0) {
+                skip;
+            }
+
+            inner:
+            for (int j from 10 to 0 with decreasing 1) {
+
+                if (j == 7) {
+                    skip inner;
+                }
+
+                if (i * j > 100) {
+                    stop outer;
+                }
+
+                total += i * j;
+            }
+        }
+
+        return total;
+    }
+
+
+    // ========================================================
+    // WHILE + DO WHILE + COMPOUND ASSIGNMENTS
+    // ========================================================
+
+    public int function counterStress(int start) {
+
+        variable x = start;
+
+        while (x > 0) {
+
+            if (x % 3 == 0) {
+                x /= 2;
+                skip;
+            }
+
+            x--;
+        }
+
+        do {
+            x++;
+        } while (x < 10);
+
+        return x;
+    }
+
+
+    // ========================================================
+    // GENERIC VARIANCE STRESS
+    // ========================================================
+
+    public void function varianceStress() {
+
+        Producer<String> stringProducer = new Producer<String>("Ocean");
+
+        Producer<Object> objectProducer = stringProducer;
+
+        Consumer<Object> objectConsumer = new Consumer<Object>();
+
+        Consumer<String> stringConsumer = objectConsumer;
+
+
+        Pipeline<String, String> pipeline = new Pipeline<String, String>("RESULT");
+
+        String res = pipeline.execute("INPUT");
+
+        OceanOutput(res);
+    }
+
+
+    // ========================================================
+    // GENERIC ARRAY + METHOD REFERENCE + LAMBDA
+    // ========================================================
+
+    public void function functionalStress() {
+
+        Transformer<String, String> upper =
+            String::toUpperCase;
+
+        Transformer<int, int> doubleValue =
+            (x) -> x * 2;
+
+        Predicate<int> positive =
+            (int x) -> {
+                return x > 0;
+            };
+
+        ConsumerAction<String> printer =
+            (String value) -> {
+                OceanOutput($"PRINT:{value}");
+            };
+
+
+        String a = upper.transform("ocean");
+
+        int b = doubleValue.transform(21);
+
+        bool c = positive.test(b);
+
+        printer.accept($"A={a}, B={b}, C={c}");
+    }
+
+
+    // ========================================================
+    // VARARGS + DEFAULT + NAMED ARGUMENT
+    // ========================================================
+
+    public int function aggregate(
+        int base = 10,
+        int multiplier = 2,
+        int... values
+    ) {
+
+        variable res= base;
+
+        for (int val in values) {
+            res += val * multiplier;
+        }
+
+        return res;
+    }
+
+
+    public void function parameterStress() {
+
+        int a = aggregate(
+            multiplier = 3,
+            base = 5,
+            1,
+            2,
+            3,
+            4
+        );
+
+        OceanOutput($"Aggregate={a}");
+    }
+
+
+    // ========================================================
+    // TRY / MULTI CATCH / FINALLY
+    // ========================================================
+
+    public void function exceptionStress() {
+
+        trying {
+
+            variable x = 10;
+
+            if (x > 5) {
+                throw new IllegalArgumentException(
+                    "Stress exception"
+                );
+            }
+
+        } catch (
+            IllegalArgumentException |
+            NullPointerException e
+        ) {
+
+            OceanOutput(
+                $"EXPECTED:{e.getMessage()}"
+            );
+
+        } catch (Exception e) {
+
+            OceanOutput(
+                $"GENERAL:{e.getMessage()}"
+            );
+
+        } finally {
+
+            globalCounter++;
+        }
+    }
+
+
+    // ========================================================
+    // TRY WITH RESOURCES
+    // ========================================================
+
+    public void function resourceStress() {
+
+        trying (
+            FileInputStream fis =
+                new FileInputStream("test.bin");
+
+            ByteArrayOutputStream bos =
+                new ByteArrayOutputStream()
+        ) {
+
+            int value = fis.read();
+
+            if (value >= 0) {
+                bos.write(value);
+            }
+
+        } catch (IOException e) {
+
+            OceanOutput(
+                $"IO:{e.getMessage()}"
+            );
+        }
+    }
+
+
+    // ========================================================
+    // SYNCHRONIZATION
+    // ========================================================
+
+    private Object lockObject = new Object();
+
+    public sync void function synchronizedIncrement() {
+
+        globalCounter++;
+
+        lock (this.lockObject) {
+
+            globalCounter += 10;
+
+            if (globalCounter > 100) {
+                globalCounter %= 17;
+            }
+        }
+    }
+
+
+    // ========================================================
+    // ASYNC / AWAIT
+    // ========================================================
+
+    public static async String function asyncTransform(String input) {
+
+        variable normalized = input.toUpperCase();
+        return $"ASYNC:{normalized}";
+    }
+
+
+    public static async void function asyncStress() {
+
+        CompletableFuture<String> first = asyncTransform("ocean");
+
+        String a = await first;
+
+        CompletableFuture<String> second = asyncTransform(a);
+
+        String b = await second;
+
+        OceanOutput(
+            $"FINAL={b}"
+        );
+    }
+
+
+    // ========================================================
+    // DEEPLY NESTED NULLABLE CHAIN
+    // ========================================================
+
+    public String function nullableStress(List<User>? list, int index) {
+        String? name = list?.get(index)?.getName();
+        OceanOutput(name);
+        String x = ""+name;
+        return x.surround("<", ">") ?? $"USER_{index}";
+    }
+
+
+    // ========================================================
+    // SLICING + COLLECTIONS + LOOP
+    // ========================================================
+
+    public int function collectionStress() {
+
+        int[] numbers = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+
+        int[] slice = numbers[2..7];
+
+        List<int> values = [10, 20, 30, 40, 50];
+
+        List<int> partial = values[1..4];
+
+        variable sum = 0;
+
+        for (int x in slice) {
+            sum += x;
+        }
+
+        for (int x in partial) {
+            sum += x;
+        }
+
+        return sum;
+    }
+
+
+    // ========================================================
+    // COMBINED EVERYTHING
+    // ========================================================
+
+    public String function ultimateStress(Object input, User? user, int[] numbers) {
+
+        variable inspected = inspect(input);
+
+        variable name = user?.name ?? "Anonymous";
+
+        variable score = user?.score ?? 0;
+
+        variable calculation = arithmeticStress(score);
+
+        variable slice = numbers[0..numbers.length];
+
+        String res =
+            switch (calculation % 4) {
+
+                case 0 -> inspected
+
+                case 1 -> {
+                    result $"A:{name}:{calculation}";
+                }
+
+                case 2 -> {
+                    variable local = $"B:{name}:{score}";
+                    result local;
+                }
+
+                default -> {
+                    result $"C:{slice.length}:{calculation}";
+                }
+            };
+
+        return res.surround("[[", "]]");
+    }
+
+
+    // ========================================================
+    // ENTRY POINT
+    // ========================================================
+
+    static main() {
+
+        variable test = new ExtremePlusUltraStressTest();
+        bool allPassed = true;
+
+        // 1. Basic Arithmetic
+        int arithRes = test.arithmeticStress(12345);
+        OceanOutput(arithRes);
+        if (arithRes != 37160) {
+            OceanOutput($"FAILED: arithmeticStress expected 37160 but got {arithRes}");
+            allPassed = false;
+        } else {
+            OceanOutput("[PASS] arithmeticStress == 37160");
+        }
+
+        // 2. Null safety & ternary
+        String descNull = test.describeUser(null);
+        OceanOutput(descNull);
+        if (!descNull.equals("User=UNKNOWN, Score=-1")) {
+            OceanOutput($"FAILED: describeUser(null) expected 'User=UNKNOWN, Score=-1' but got '{descNull}'");
+            allPassed = false;
+        } else {
+            OceanOutput("[PASS] describeUser(null)");
+        }
+        String descUser = test.describeUser(new User(1, "Alice", 100));
+        if (!descUser.equals("User=Alice, Score=100")) {
+            OceanOutput($"FAILED: describeUser(user) expected 'User=Alice, Score=100' but got '{descUser}'");
+            allPassed = false;
+        } else {
+            OceanOutput("[PASS] describeUser(user)");
+        }
+
+        // 3. Switch expressions & result statements
+        if (!test.switchStress(0).equals("ZERO") ||
+            !test.switchStress(1).equals("[ONE]") ||
+            !test.switchStress(2).equals("TWO:30") ||
+            !test.switchStress(3).equals("THREE")) {
+            OceanOutput("FAILED: switchStress branch evaluation");
+            allPassed = false;
+        } else {
+            OceanOutput("[PASS] switchStress standard cases");
+        }
+        String swOther = test.switchStress(40);
+        OceanOutput(swOther);
+        if (!swOther.equals("OTHER:40")) {
+            OceanOutput($"FAILED: switchStress default expected 'OTHER:40' but got '{swOther}'");
+            allPassed = false;
+        } else {
+            OceanOutput("[PASS] switchStress result statement with variable");
+        }
+
+        // 4. Loops & control flow
+        int loopRes = test.loopStress(20);
+        OceanOutput(loopRes);
+        if (loopRes != 1200) {
+            OceanOutput($"FAILED: loopStress expected 1200 but got {loopRes}");
+            allPassed = false;
+        } else {
+            OceanOutput("[PASS] loopStress == 1200");
+        }
+
+        // 5. Generic / variance
+        test.varianceStress();
+        OceanOutput("[PASS] varianceStress");
+
+        // 6. Lambdas & method references
+        test.functionalStress();
+        OceanOutput("[PASS] functionalStress");
+
+        // 7. Parameters & varargs
+        test.parameterStress();
+        OceanOutput("[PASS] parameterStress");
+
+        // 8. Exceptions
+        test.exceptionStress();
+        OceanOutput("[PASS] exceptionStress");
+
+        // 9. Synchronization
+        test.synchronizedIncrement();
+        OceanOutput("[PASS] synchronizedIncrement");
+
+        // 10. Collections & Slices
+        int collRes = test.collectionStress();
+        OceanOutput(collRes);
+        if (collRes != 173) {
+            OceanOutput($"FAILED: collectionStress expected 173 but got {collRes}");
+            allPassed = false;
+        } else {
+            OceanOutput("[PASS] collectionStress == 173");
+        }
+
+        // 11. Pattern matching & sealed hierarchy
+        String patUser = test.inspect(new User(99, "StressUser", null));
+        OceanOutput(patUser);
+        if (!patUser.equals("USER:99:StressUser:-1")) {
+            OceanOutput($"FAILED: inspect(User) expected 'USER:99:StressUser:-1' but got '{patUser}'");
+            allPassed = false;
+        } else {
+            OceanOutput("[PASS] inspect(User)");
+        }
+        if (!test.inspect(new Success("OK")).equals("SUCCESS: OK")) {
+            OceanOutput("FAILED: inspect(Success)");
+            allPassed = false;
+        } else {
+            OceanOutput("[PASS] inspect(Success)");
+        }
+        if (!test.inspect(new Failure("ERR")).equals("FAILURE: ERR")) {
+            OceanOutput("FAILED: inspect(Failure)");
+            allPassed = false;
+        } else {
+            OceanOutput("[PASS] inspect(Failure)");
+        }
+        if (!test.inspect(new Empty()).equals("EMPTY")) {
+            OceanOutput("FAILED: inspect(Empty)");
+            allPassed = false;
+        } else {
+            OceanOutput("[PASS] inspect(Empty)");
+        }
+
+        // 12. Ultimate combined switch expression
+        int[] nums = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+        String ultRes = test.ultimateStress(new Success("OK"), new User(7, "Ocean", 95), nums);
+        OceanOutput(ultRes);
+        if (!ultRes.equals("[[B:Ocean:95]]")) {
+            OceanOutput($"FAILED: ultimateStress expected '[[B:Ocean:95]]' but got '{ultRes}'");
+            allPassed = false;
+        } else {
+            OceanOutput("[PASS] ultimateStress == [[B:Ocean:95]]");
+        }
+
+        // 13. Async & virtual concurrency
+        ExtremePlusUltraStressTest.asyncStress();
+        OceanOutput("[PASS] asyncStress");
+
+        // 14. Nested inner classes with private member access
+        Engine engine = new Engine();
+        int workerCalc = engine.runWorker(5);
+        if (workerCalc != 15) {
+            OceanOutput($"FAILED: runWorker expected 15 but got {workerCalc}");
+            allPassed = false;
+        } else {
+            OceanOutput("[PASS] Engine.Worker private state access == 15");
+        }
+        int deepCalc = engine.runDeep(5);
+        if (deepCalc != 35) {
+            OceanOutput($"FAILED: runDeep expected 35 but got {deepCalc}");
+            allPassed = false;
+        } else {
+            OceanOutput("[PASS] Engine.Worker.DeepWorker private state and local access == 35");
+        }
+        int staticCalc = Engine.runStatic(5);
+        if (staticCalc != 10) {
+            OceanOutput($"FAILED: Engine.runStatic expected 10 but got {staticCalc}");
+            allPassed = false;
+        } else {
+            OceanOutput("[PASS] Engine.StaticWorker.calculate == 10");
+        }
+
+        // 15. Collections generic type (Map<String, int> without cast)
+        if (test.scores.get("Furkan") != 100 || test.scores.get("Ocean") != 0 || test.scores.get("Compiler") != 90) {
+            OceanOutput("FAILED: scores map lookup");
+            allPassed = false;
+        } else {
+            OceanOutput("[PASS] Map<String, int> literal resolution without cast");
+        }
+
+        // 16. Identical variable check (user.id == id)
+        if (!"Furkan".equals(test.findUserName(1)) || test.findUserName(999) != null) {
+            OceanOutput("FAILED: findUserName lookup");
+            allPassed = false;
+        } else {
+            OceanOutput("[PASS] user.id == id check without false positive warning");
+        }
+
+        // 17. Global concurrency counter
+        OceanOutput($"GLOBAL={globalCounter}");
+        if (globalCounter != 12) {
+            OceanOutput($"FAILED: globalCounter expected 12 but got {globalCounter}");
+            allPassed = false;
+        } else {
+            OceanOutput("[PASS] globalCounter == 12");
+        }
+
+        if (allPassed) {
+            OceanOutput("=== ALL STRESS VERIFICATION CHECKS PASSED ===");
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

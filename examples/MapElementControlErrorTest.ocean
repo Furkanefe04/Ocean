@@ -1,0 +1,27 @@
+package com.resources;
+
+class MapElementControlErrorTest {
+    main(){
+        DenemeMap<Integer,String> denemeMap = new DenemeMap<>();
+        denemeMap.setKey(10);
+        denemeMap.setVal("gnl");
+        OceanOutput(denemeMap.get());
+    }
+
+
+}
+
+class DenemeMap<U <: Number, T <: U> {
+    U key;
+    T val;
+    void function setKey(U u){
+        key = u;
+    }
+    void function setVal(T t) {
+        val = t;
+    }
+    public String function get() {
+        return key.toString()+" : "+val.toString();
+    }
+
+}

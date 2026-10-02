@@ -1,0 +1,16 @@
+package Test;
+
+data class Data (String command,int commandLenght) {
+    static Data function build(String command, int length) throws DataTypeException {
+        if(length==6){
+            return new CISCData(command, length);
+        }
+        else if(length==2){
+            return new RISCData(command,length);
+        }
+        else{
+            throw new DataTypeException("Cannot build data");
+        }
+    }
+
+}

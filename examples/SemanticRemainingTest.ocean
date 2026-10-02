@@ -1,0 +1,82 @@
+class SemanticRemainingTest {
+
+    main() {
+
+        // ============================================================
+        // 1. UNARY NEGATIVE - NUMERIC TYPES
+        // ============================================================
+
+        int a = -10;          // OK
+        long b = -100L;       // OK
+        double c = -3.14;     // OK
+
+        // ============================================================
+        // 2. UNARY NEGATIVE - INVALID TYPES
+        // ============================================================
+
+        String s = "hello";
+        bool flag = true;
+
+        -s;                   // ERROR: String unary '-' invalid
+        -flag;                // ERROR: bool unary '-' invalid
+
+
+        // ============================================================
+        // 3. NULL -> NON NULLABLE REFERENCE
+        // ============================================================
+
+        String normalString = null;
+        // ERROR: null cannot be assigned to non-nullable String
+
+
+        // ============================================================
+        // 4. NULL -> NULLABLE REFERENCE
+        // ============================================================
+
+        String? nullableString = null;
+        // OK
+
+
+        // ============================================================
+        // 5. NULLABLE -> NON NULLABLE
+        // ============================================================
+
+        String? nullableValue = "hello";
+        String normalValue = nullableValue;
+        // ERROR: nullable String? cannot be assigned to String
+
+
+        // ============================================================
+        // 6. NON NULLABLE -> NULLABLE
+        // ============================================================
+
+        String normalValue2 = "hello";
+        String? nullableValue2 = normalValue2;
+        // OK
+
+
+        // ============================================================
+        // 7. NULLABLE PRIMITIVE
+        // ============================================================
+
+        int? nullableInt = null;
+        // OK
+
+        int? nullableInt2 = 10;
+        // OK
+
+
+        // ============================================================
+        // 8. NULL -> NON NULLABLE PRIMITIVE
+        // ============================================================
+
+        int primitiveInt = null;
+        // ERROR
+
+        bool primitiveBool = null;
+        // ERROR
+
+
+        OceanOutput("Remaining semantic test finished");
+    }
+}

@@ -1,0 +1,21 @@
+package com.resources;
+
+class ClassA {
+}
+
+class ClassB {
+}
+
+class CastTest {
+    static main() {
+        // Primitive incompatible casts
+        bool b = true;
+        int i = (int) b; // Can we cast boolean to int?
+        
+        // Unrelated reference casts
+        ClassA a = new ClassA();
+        ClassB cb = (ClassB) a; // Unrelated classes!
+        
+        OceanOutput("CastTest compiled!");
+    }
+}

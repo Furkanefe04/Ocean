@@ -1,0 +1,28 @@
+package pkg_test;
+
+class StaticBlockTest {
+    static int x;
+    static String msg;
+
+    static {
+        x = 42;
+        msg = "Hello from static block";
+    }
+
+    static {
+        x = x * 2;
+    }
+
+    main() {
+        OceanOutput("--- StaticBlockTest ---");
+        OceanOutput("x: " + x);
+        OceanOutput(msg);
+        OceanOutput("--- StaticBlockTest Done ---");
+
+        if (x == 84 && msg.equals("Hello from static block")) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

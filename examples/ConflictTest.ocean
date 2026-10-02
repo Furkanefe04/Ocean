@@ -1,0 +1,13 @@
+package com.resources;
+import java.sql.Date;
+class ConflictTest {
+    main() {
+        Date d = new Date(1000);
+        Output("Date class: " + d.getClass().getName());
+        if (d != null && d.getClass().getName() == "java.sql.Date") {
+            Output("STATUS: PASSED");
+        } else {
+            Output("STATUS: FAILED");
+        }
+    }
+}

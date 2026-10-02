@@ -1,0 +1,18 @@
+package com.pkg2;
+
+import com.pkg3.ValidatorClass;
+
+public class ProcessorClass {
+    main() {
+        OceanOutput("--- PROCESSOR CLASS ---");
+        String val = args[0]; // sıkıntı çıkarıyor
+        String origin = args[1];
+        OceanOutput("ProcessorClass received: " + val + " from: " + origin);
+
+        String[] newArgs = new String[2];
+        newArgs[0] = val + " -> Processed";
+        newArgs[1] = "Processor";
+
+        ValidatorClass.main(newArgs);
+    }
+}

@@ -1,0 +1,29 @@
+package com.resources;
+import java.lang.System;
+import java.math.BigInteger;
+
+class FibBench {
+    static main() {
+        OceanOutput("Ocean Fib(200,000) baslatiliyor...");
+        long start = System.currentTimeMillis();
+        
+        BigInteger a = BigInteger.ZERO;
+        BigInteger b = BigInteger.ONE;
+        
+        for (int i from 2 to 200000 with increasing 1) {
+            BigInteger temp = a.add(b);
+            a = b;
+            b = temp;
+        }
+        
+        long dur = System.currentTimeMillis() - start;
+        OceanOutput("Ocean Fib(200,000) Tamamlandi.");
+        OceanOutput("Sure: " + dur + " ms");
+        String bStr = b.toString();
+        if (bStr.length() == 41797 && bStr.substring(0, 10) == "9323465182" && bStr.substring(bStr.length() - 10) == "7967737501") {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

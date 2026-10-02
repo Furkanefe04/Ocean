@@ -1,0 +1,17 @@
+import java.lang.Runnable;
+
+class TestAnonymousClass {
+    main() {
+        Runnable r = new Runnable() {
+            void function run() {
+                OceanOutput("Anonymous Class Executed!");
+            }
+        };
+        r();
+        if (r != null) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

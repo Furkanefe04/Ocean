@@ -1,0 +1,15 @@
+package com.resources;
+
+class StaticMethodAccessTest {
+    void function nonStaticMethod() {
+        OceanOutput("non-static");
+    }
+
+    static void function staticMethod() {
+        nonStaticMethod(); // Invalid: non-static method from static context
+    }
+
+    main() {
+        staticMethod();
+    }
+}

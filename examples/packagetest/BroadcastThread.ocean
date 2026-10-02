@@ -1,0 +1,89 @@
+package com.trading.network;
+
+import java.lang.Thread;
+import java.lang.Exception;
+import com.trading.core.OrderListWrapper;
+
+public class MarketPriceUpdate {
+    public String symbol;
+    public double price;
+    public double volume;
+
+    public static MarketPriceUpdate function create(String sym, double pr, double vol) {
+        MarketPriceUpdate u = new MarketPriceUpdate();
+        u.symbol = sym;
+        u.price = pr;
+        u.volume = vol;
+        return u;
+    }
+}
+
+public class FeedSubscriber {
+    public String name;
+    public OrderListWrapper<String> receivedUpdates;
+
+    public static FeedSubscriber function create(String n) {
+        FeedSubscriber s = new FeedSubscriber();
+        s.name = n;
+        s.receivedUpdates = OrderListWrapper.create();
+        return s;
+    }
+
+    public void function onPriceUpdate(MarketPriceUpdate update) {
+        receivedUpdates.add("FEED(" + name + "): " + update.symbol + " price ticker updated to $" + update.price + " | Vol: " + update.volume);
+    }
+}
+
+public class MarketSpread {
+    public double bidPrice;
+    public double askPrice;
+
+    public static MarketSpread function create(double b, double a) {
+        MarketSpread s = new MarketSpread();
+        s.bidPrice = b;
+        s.askPrice = a;
+        return s;
+    }
+
+    public double function getSpread() {
+        return askPrice - bidPrice;
+    }
+}
+
+public class ArbitrageBot {
+    public String botId;
+
+    public static ArbitrageBot function create(String id) {
+        ArbitrageBot bot = new ArbitrageBot();
+        bot.botId = id;
+        return bot;
+    }
+
+    public bool function evaluateSpread(MarketSpread spread) {
+        double diff = spread.getSpread();
+        return diff > 50.0; // Trigger arb trade if bid/ask discrepancy exceeds $50
+    }
+}
+
+public class BroadcastThread extends Thread {
+    public MarketPriceUpdate update;
+    public FeedSubscriber subscriber;
+    public bool isFinished = false;
+
+    public static BroadcastThread function create(MarketPriceUpdate u, FeedSubscriber s) {
+        BroadcastThread t = new BroadcastThread();
+        t.update = u;
+        t.subscriber = s;
+        return t;
+    }
+
+    void function run() {
+        trying {
+            Thread.sleep(5L);
+            subscriber.onPriceUpdate(update);
+            isFinished = true;
+        } catch (Exception e) {
+            OceanOutput("Broadcast engine error: " + e.getMessage());
+        }
+    }
+}

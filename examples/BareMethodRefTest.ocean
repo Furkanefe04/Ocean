@@ -1,0 +1,58 @@
+package com.resources;
+
+import java.util.function.Supplier;
+import java.util.function.Function;
+import java.util.Locale;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+
+class Helper {
+    function Helper() {
+    }
+    static double function doubleIt(double x) {
+        return x * 2;
+    }
+
+    int function instanceAdd(int x) {
+        return x + 10;
+    }
+}
+
+
+class BareMethodRefTest {
+    main() {
+        variable h = new Helper();
+        variable s = new String("furkan");
+        variable ref1 = (Function) Helper::doubleIt;
+        variable ref2 = (Function) h::instanceAdd;
+        variable ref3 = (Supplier) Helper::new;
+        variable val1 = ref1(11.5);
+        variable val2 = ref2(14);
+        variable val3 = ref3();
+        variable deneme = (BiFunction) (int x,int y) -> Math.max(x,y);
+        variable xyz = (Consumer) (String x) -> OceanOutput(x);
+        variable def = (Consumer) (String y) -> {OceanOutput(y.length());};
+        variable comb = (Consumer) xyz.andThen(def);
+        variable instDeneme = (Function) (String x) -> x.toUpperCase();
+        variable instRes = instDeneme("deneme");
+        variable x = (BiFunction<int,int>) Math::max;
+        variable yz = (Function<String,String>) String::toUpperCase;
+        variable longProcess = (Function<int,int>) (a) -> {
+            int y = a*a;
+            int z = y*y;
+            return z*z;
+        };
+        OceanOutput(longProcess(10));
+        OceanOutput(x(10,20));
+        OceanOutput(yz("abc"));
+        OceanOutput(instRes);
+        comb("deneme");
+        variable sonuc = deneme(3,5);
+        OceanOutput(sonuc);
+        if (ref1 != null && ref2 != null && ref3 != null && val1==23.0 && val2==24 && val3 instanceof Helper) {
+            Output("STATUS: PASSED - All Bare Method References Resolved");
+        }else{
+            OceanOutput(val1 +"and"+ val2);
+        }
+    }
+}

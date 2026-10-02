@@ -1,0 +1,482 @@
+package compiler.tests;
+
+public class OceanExtremeTest {
+
+    static int passed = 0;
+    static int failed = 0;
+
+    static void function check(bool condition, String name) {
+        if (condition) {
+            passed++;
+            OceanOutput($"[PASS] {name}");
+        } else {
+            failed++;
+            OceanOutput($"[FAIL] {name}");
+        }
+    }
+
+    static void function checkInt(int actual, int expected, String name) {
+        check(actual == expected, name);
+    }
+
+    static void function checkString(String actual, String expected, String name) {
+        check(actual == expected, name);
+    }
+
+    static void function checkBool(bool actual, bool expected, String name) {
+        check(actual == expected, name);
+    }
+
+
+    main() {
+
+        // ============================================================
+        // 1. PRIMITIVE VARIABLES / ASSIGNMENTS
+        // ============================================================
+
+        int a = 10;
+        int b = 5;
+
+        a += 5;
+        a -= 2;
+        a *= 2;
+        a /= 4;
+        a %= 3;
+
+        checkInt(a, 0, "compound assignments");
+
+        ++a;
+        a++;
+        --a;
+        a--;
+
+        checkInt(a, 0, "prefix/postfix operators");
+
+
+        // ============================================================
+        // 2. VARIABLE / VALUE / FINAL
+        // ============================================================
+
+        variable dynamicValue = 25;
+        value constantValue = 50;
+        final int finalValue = 75;
+
+        checkInt(dynamicValue + constantValue, 75, "variable/value inference");
+        checkInt(finalValue, 75, "final variable");
+
+
+        // ============================================================
+        // 3. ARITHMETIC / BOOLEAN / BITWISE
+        // ============================================================
+
+        int arithmetic = (10 + 5) * 2 - (8 / 4) % 3;
+        checkInt(arithmetic, 28, "arithmetic precedence");
+
+        bool logical = (arithmetic > 20) && (arithmetic <= 30) || !(arithmetic == 100);
+        checkBool(logical, true, "logical operators");
+
+        int bitAnd = 12 & 10;
+        int bitOr = 12 | 10;
+        int bitXor = 12 ^ 10;
+        int bitNot = ~0;
+        int shiftLeft = 3 << 2;
+        int shiftRight = 32 >> 3;
+        int unsignedShift = 32 >>> 2;
+
+        checkInt(bitAnd, 8, "bitwise AND");
+        checkInt(bitOr, 14, "bitwise OR");
+        checkInt(bitXor, 6, "bitwise XOR");
+        checkInt(bitNot, -1, "bitwise NOT");
+        checkInt(shiftLeft, 12, "left shift");
+        checkInt(shiftRight, 4, "right shift");
+        checkInt(unsignedShift, 8, "unsigned right shift");
+
+
+        // ============================================================
+        // 4. TERNARY
+        // ============================================================
+
+        String ternaryResult = arithmetic > 20 ? "HIGH" : "LOW";
+        checkString(ternaryResult, "HIGH", "ternary expression");
+
+
+        // ============================================================
+        // 5. IF / ELSE IF / ELSE
+        // ============================================================
+
+        variable branchResult = "";
+
+        if (arithmetic < 0) {
+            branchResult = "NEGATIVE";
+        } else if (arithmetic == 28) {
+            branchResult = "EXPECTED";
+        } else {
+            branchResult = "WRONG";
+        }
+
+        checkString(branchResult, "EXPECTED", "if / else-if / else");
+
+
+        // ============================================================
+        // 6. FOR FROM / TO / INCREASING
+        // ============================================================
+
+        variable increasingSum = 0;
+
+        for (int i from 1 to 5 with increasing 1) {
+            increasingSum += i;
+        }
+
+        checkInt(increasingSum, 10, "for from/to increasing");
+
+
+        // ============================================================
+        // 7. FOR DECREASING
+        // ============================================================
+
+        variable decreasingSum = 0;
+
+        for (variable i from 10 to 0 with decreasing 2) {
+            decreasingSum += i;
+        }
+
+        checkInt(decreasingSum, 30, "for from/to decreasing");
+
+
+        // ============================================================
+        // 8. WHILE / DO-WHILE
+        // ============================================================
+
+        variable whileCounter = 0;
+
+        while (whileCounter < 5) {
+            whileCounter++;
+        }
+
+        checkInt(whileCounter, 5, "while loop");
+
+        do {
+            whileCounter--;
+        } while (whileCounter > 0);
+
+        checkInt(whileCounter, 0, "do-while loop");
+
+
+        // ============================================================
+        // 9. SKIP / STOP
+        // ============================================================
+
+        variable skipStopResult = 0;
+
+        for (int i from 1 to 10 with increasing 1) {
+
+            if (i == 3) skip;
+            if (i == 8) stop;
+            skipStopResult += i;
+        }
+
+        // 1+2+4+5+6+7 = 25
+        checkInt(skipStopResult, 25, "skip / stop");
+
+
+        // ============================================================
+        // 10. COLLECTION LITERALS
+        // ============================================================
+
+        variable numbers = [10, 20, 30, 40];
+
+        checkInt(numbers.size(), 4, "List literal");
+
+        checkInt(numbers.get(2), 30, "List indexing");
+
+
+        // ============================================================
+        // 11. ARRAY
+        // ============================================================
+
+        int[] array = { 5, 10, 15, 20 };
+
+        checkInt(array.length, 4, "array literal");
+
+        checkInt(array[1], 10, "array indexing");
+
+
+        // ============================================================
+        // 12. RANGE SLICING
+        // ============================================================
+
+        int[] slice = array[1..3];
+
+        checkInt(slice.length, 3, "array slicing");
+
+        checkInt(slice[0], 10, "array slice first element");
+
+        checkInt(slice[1], 15, "array slice second element");
+
+
+        // ============================================================
+        // 13. STRING INTERPOLATION
+        // ============================================================
+
+        variable name = "Ocean";
+        variable version = 3;
+
+        String interpolated = $"Language: {name}, Version: {version}";
+
+        checkString(interpolated, "Language: Ocean, Version: 3", "string interpolation");
+
+
+        // ============================================================
+        // 14. NULLABLE TYPE / COALESCING
+        // ============================================================
+
+        String? optionalName = null;
+
+        String resolvedName = optionalName ?? "Default";
+
+        checkString(resolvedName, "Default", "null coalescing");
+
+
+        // ============================================================
+        // 15. CLASS / CONSTRUCTOR / THIS
+        // ============================================================
+
+        TestObject object = new TestObject("Ocean", 42);
+
+        checkString(object.name, "Ocean", "constructor String field");
+
+        checkInt(object.val, 42, "constructor int field");
+
+
+        // ============================================================
+        // 16. METHOD CALL / RETURN
+        // ============================================================
+
+        int calculated = object.calculate(10);
+
+        checkInt(calculated, 52, "instance method return");
+
+
+        // ============================================================
+        // 17. STATIC FIELD / STATIC METHOD
+        // ============================================================
+
+        checkInt(TestObject.staticValue, 100, "static field");
+
+        checkInt(TestObject.staticCalculate(20), 120, "static method");
+
+
+        // ============================================================
+        // 18. DATA CLASS
+        // ============================================================
+
+        Product product = new Product(7, "Keyboard", 1500.0);
+
+        checkInt(product.id, 7, "data class id");
+
+        checkString(product.name, "Keyboard", "data class name");
+
+
+        // ============================================================
+        // 19. SWITCH STATEMENT
+        // ============================================================
+
+        variable switchResult = "";
+
+        int switchValue = 2;
+
+        switch (switchValue) {
+
+            case 1:
+                switchResult = "ONE";
+                stop;
+
+            case 2:
+            case 3:
+                switchResult = "TWO_OR_THREE";
+                stop;
+
+            default:
+                switchResult = "OTHER";
+        }
+
+        checkString(switchResult, "TWO_OR_THREE", "switch statement");
+
+
+        // ============================================================
+        // 20. SWITCH EXPRESSION
+        // ============================================================
+
+        variable switchExpressionResult =
+            switch (switchValue) {
+                case 1 -> "ONE"
+                case 2 -> "TWO"
+                case 3 -> "THREE"
+                default -> "OTHER"
+            };
+
+        checkString(switchExpressionResult, "TWO", "switch expression");
+
+
+        // ============================================================
+        // 21. SWITCH EXPRESSION + RESULT
+        // ============================================================
+
+        variable detailedResult =
+            switch (switchValue) {
+                case 2 -> {
+                    variable text = "VALUE";
+                    result $"Found: {text}";
+                }
+
+                default -> "UNKNOWN"
+            };
+
+        checkString(detailedResult, "Found: VALUE", "switch result expression");
+
+
+        // ============================================================
+        // 22. GENERICS
+        // ============================================================
+
+        Box<String> stringBox = new Box<String>("Ocean");
+        checkString(stringBox.get(), "Ocean", "generic class");
+
+
+        // ============================================================
+        // 23. GENERIC METHOD
+        // ============================================================
+
+        String[] words = {"A", "B", "C"};
+
+        GenericTools<String> tools = new GenericTools<String>();
+
+        checkInt(tools.count(words), 3, "generic method");
+
+
+        // ============================================================
+        // 24. EXTENSION METHOD
+        // ============================================================
+
+        String extensionSource = "Ocean";
+
+        String extensionResult = extensionSource.reverseOcean();
+
+        checkString(extensionResult, "naecO", "extension method");
+
+
+        // ============================================================
+        // 25. LAMBDA
+        // ============================================================
+
+        Calculator<int, int> doubleValue = (x) -> x * 2;
+        checkInt(doubleValue.calculate(21), 42, "lambda expression");
+
+        // ============================================================
+        // 26. METHOD REFERENCE
+        // ============================================================
+
+        StringTools toolsRef = String::toUpperCase;
+
+        checkString(toolsRef.apply("ocean"), "OCEAN", "method reference");
+
+        // ============================================================
+        // FINAL STATUS
+        // ============================================================
+
+        OceanOutput("");
+        OceanOutput($"PASSED CHECKS: {passed}");
+        OceanOutput($"FAILED CHECKS: {failed}");
+
+        if (failed == 0) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+
+
+    // ================================================================
+    // SUPPORT CLASSES
+    // ================================================================
+
+    public class TestObject {
+
+        public String name;
+        public int val;
+
+        public static int staticValue = 100;
+
+        public function TestObject(String name, int val) {
+            this.name = name;
+            this.val = val;
+        }
+
+        public int function calculate(int amount) {
+            return this.val + amount;
+        }
+
+        public static int function staticCalculate(int amount) {
+            return staticValue + amount;
+        }
+    }
+
+
+    public data class Product(int id, String name, double price);
+
+
+    public class Box<T> {
+
+        private T val;
+
+        public function Box(T val) {
+            this.val = val;
+        }
+
+        public T function get() {
+            return val;
+        }
+    }
+
+
+    public class GenericTools<T> {
+
+        public int function count(T[] values) {
+            int res = 0;
+
+            for (T val in values) {
+                res++;
+            }
+
+            return res;
+        }
+    }
+
+
+    public class Extensions {
+
+        public String String.function reverseOcean() {
+
+            String res = "";
+
+            int i = this.length() - 1;
+
+            while (i >= 0) {
+                res += this.charAt(i);
+                i--;
+            }
+
+            return res;
+        }
+    }
+
+
+    public interface Calculator<T, R> {
+        R function calculate(T val);
+    }
+
+
+    public interface StringTools {
+        String function apply(String val);
+    }
+}

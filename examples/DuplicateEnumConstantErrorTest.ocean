@@ -1,0 +1,13 @@
+package com.resources;
+
+enum DuplicateEnumConstantErrorTest {
+    FIRST,
+    SECOND,
+    FIRST
+}
+
+class DuplicateEnumTestMain {
+    static main() {
+        OceanOutput("Test");
+    }
+}

@@ -1,0 +1,142 @@
+package com.resources;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.Scanner;
+
+class LiveBarcodeSearch {
+    static void function main() {
+        OceanOutput("========================================");
+        OceanOutput(" OCEAN 100-BARCODE STRESS TEST & BENCHMARK");
+        OceanOutput("========================================");
+        
+        // Veri Seti (Örneklenmiş 100 Barkod)
+        String b1 = "8690504020509"; String b2 = "8690504020516"; String b3 = "737628064502";
+        String b4 = "5449000000996"; String b5 = "8690624103106"; String b6 = "8000500033100";
+        String b7 = "8690637113116"; String b8 = "7622210444547"; String b9 = "8690504533047";
+        String b10 = "4005900000000"; String b11 = "8690533515021"; String b12 = "8680131450001";
+        String b13 = "40845011"; String b14 = "8690514101014"; String b15 = "3068320055008";
+        String b16 = "5000112513470"; String b17 = "8690504022138"; String b18 = "8690504444008";
+        String b19 = "7613034626844"; String b20 = "8690565011027"; String b21 = "8690632034027";
+        String b22 = "8715700421375"; String b23 = "8002205030438"; String b24 = "8690504010104";
+        String b25 = "8690504050209"; String b26 = "5060060690013"; String b27 = "8690637013102";
+        String b28 = "8690637996115"; String b29 = "3017620421003"; String b30 = "7613035345676";
+        String b31 = "8690504511021"; String b32 = "8690782000019"; String b33 = "8690533010113";
+        String b34 = "8690637993022"; String b35 = "8690504012139"; String b36 = "8000508311149";
+        String b37 = "8690514131011"; String b38 = "009800895007"; String b39 = "8690504033042";
+        String b40 = "8691500000014"; String b41 = "8690504013109"; String b42 = "8690637111020";
+        String b43 = "8693301100010"; String b44 = "5449000052322"; String b45 = "5449000133335";
+        String b46 = "8690632000015"; String b47 = "8711000511100"; String b48 = "8690520000011";
+        String b49 = "8690504021230"; String b50 = "8690637113123"; String b51 = "8000300403102";
+        String b52 = "8690624203103"; String b53 = "7613032822118"; String b54 = "8690637222115";
+        String b55 = "8690504033059"; String b56 = "8410013511101"; String b57 = "8690533515038";
+        String b58 = "8690514101021"; String b59 = "8690504013116"; String b60 = "8000500133107";
+        String b61 = "5449000131805"; String b62 = "8690637333118"; String b63 = "8690504033103";
+        String b64 = "8690632034034"; String b65 = "8690504022145"; String b66 = "8691234500019";
+        String b67 = "8690637444111"; String b68 = "8001120711124"; String b69 = "8690541000014";
+        String b70 = "8690504050216"; String b71 = "7613034991232"; String b72 = "8690637555114";
+        String b73 = "8690514131028"; String b74 = "8690504010111"; String b75 = "8008336331102";
+        String b76 = "8690624003109"; String b77 = "8690637666110"; String b78 = "8690504013123";
+        String b79 = "8690533515045"; String b80 = "8690504033110"; String b81 = "7622210444554";
+        String b82 = "8690637777116"; String b83 = "8690514101038"; String b84 = "8691500000021";
+        String b85 = "8690504021247"; String b86 = "8690637111037"; String b87 = "5000159413115";
+        String b88 = "8690504033127"; String b89 = "8690533010120"; String b90 = "8691234511114";
+        String b91 = "7613034333117"; String b92 = "8690637888112"; String b93 = "4004980000001";
+        String b94 = "8690504022152"; String b95 = "8690632000022"; String b96 = "8680131450018";
+        String b97 = "8690504013130"; String b98 = "8690637999119"; String b99 = "8690504020509"; // Tekrar
+        String b100 = "8690637113116"; // Tekrar
+        
+        // Testi Çalıştır (Manüel Döngü - Derleyici Stabilitesi İçin)
+        // Not: Ocean'da String dizileri şu an sınırlı, bu yüzden manuel sırayla çağırıyoruz
+        // Ancak 100 tanesini tek tek yazmak yerine, bir yardımcı metodla yönetiyoruz.
+        
+        test(b1, 1); test(b2, 2); test(b3, 3); test(b4, 4); test(b5, 5);
+        test(b6, 6); test(b7, 7); test(b8, 8); test(b9, 9); test(b10, 10);
+        test(b11, 11); test(b12, 12); test(b13, 13); test(b14, 14); test(b15, 15);
+        test(b16, 16); test(b17, 17); test(b18, 18); test(b19, 19); test(b20, 20);
+        test(b21, 21); test(b22, 22); test(b23, 23); test(b24, 24); test(b25, 25);
+        test(b26, 26); test(b27, 27); test(b28, 28); test(b29, 29); test(b30, 30);
+        test(b31, 31); test(b32, 32); test(b33, 33); test(b34, 34); test(b35, 35);
+        test(b36, 36); test(b37, 37); test(b38, 38); test(b39, 39); test(b40, 40);
+        test(b41, 41); test(b42, 42); test(b43, 43); test(b44, 44); test(b45, 45);
+        test(b46, 46); test(b47, 47); test(b48, 48); test(b49, 49); test(b50, 50);
+        test(b51, 51); test(b52, 52); test(b53, 53); test(b54, 54); test(b55, 55);
+        test(b56, 56); test(b57, 57); test(b58, 58); test(b59, 59); test(b60, 60);
+        test(b61, 61); test(b62, 62); test(b63, 63); test(b64, 64); test(b65, 65);
+        test(b66, 66); test(b67, 67); test(b68, 68); test(b69, 69); test(b70, 70);
+        test(b71, 71); test(b72, 72); test(b73, 73); test(b74, 74); test(b75, 75);
+        test(b76, 76); test(b77, 77); test(b78, 78); test(b79, 79); test(b80, 80);
+        test(b81, 81); test(b82, 82); test(b83, 83); test(b84, 84); test(b85, 85);
+        test(b86, 86); test(b87, 87); test(b88, 88); test(b89, 89); test(b90, 90);
+        test(b91, 91); test(b92, 92); test(b93, 93); test(b94, 94); test(b95, 95);
+        test(b96, 96); test(b97, 97); test(b98, 98); test(b99, 99); test(b100, 100);
+
+        OceanOutput("");
+        OceanOutput("BENCHMARK TAMAMLANDI.");
+        OceanOutput("========================================");
+    }
+
+    static void function test(String barcode, int index) {
+        OceanOutput(index + "/100 -> " + barcode + " sorgulaniyor...");
+        fetchProductData(barcode);
+    }
+
+    static void function fetchProductData(String barcode) {
+        String json = fetchOFF(barcode);
+        if (json.indexOf("\"product\":") != -1) {
+            parseAndPrint(json, "Open Food Facts");
+            return;
+        }
+        
+        json = fetchUPC(barcode);
+        if (json.indexOf("\"total\":0") == -1 && json.length() > 50) {
+            parseAndPrint(json, "UPCitemdb");
+            return;
+        }
+        
+        OceanOutput("  [MISS] Bulunamadi.");
+    }
+
+    static String function fetchOFF(String barcode) {
+        String res = "";
+        trying {
+            URL url = new URL("https://world.openfoodfacts.org/api/v2/product/" + barcode + ".json");
+            URLConnection conn = url.openConnection();
+            conn.setRequestProperty("User-Agent", "OceanBenchmark/1.0");
+            Scanner s = new Scanner(conn.getInputStream());
+            while (s.hasNextLine()) {
+                res = res + s.nextLine();
+            }
+            s.close();
+        } catch(Exception e) {}
+        return res;
+    }
+
+    static String function fetchUPC(String barcode) {
+        String res = "";
+        trying {
+            URL url = new URL("https://api.upcitemdb.com/prod/trial/lookup?upc=" + barcode);
+            URLConnection conn = url.openConnection();
+            conn.setRequestProperty("User-Agent", "OceanBenchmark/1.0");
+            Scanner s = new Scanner(conn.getInputStream());
+            while (s.hasNextLine()) {
+                res = res + s.nextLine();
+            }
+            s.close();
+        } catch(Exception e) {}
+        return res;
+    }
+
+    static void function parseAndPrint(String json, String source) {
+        int start = json.indexOf("product_name\":\"");
+        if (start == -1) {
+            int startUPC = json.indexOf("title\":\"");
+            if (startUPC != -1) {
+                int endUPC = json.indexOf("\"", startUPC + 8);
+                OceanOutput("  [HIT] " + source + " -> " + json.substring(startUPC + 8, endUPC));
+            }
+        } else {
+            int end = json.indexOf("\"", start + 15);
+            OceanOutput("  [HIT] " + source + " -> " + json.substring(start + 15, end));
+        }
+    }
+}

@@ -1,0 +1,14 @@
+package com.resources;
+
+class Parent {
+}
+
+class Child implements Parent {
+}
+
+class ImplementsClassTest {
+    static main() {
+        Child c = new Child();
+        OceanOutput("ImplementsClassTest compiled!");
+    }
+}

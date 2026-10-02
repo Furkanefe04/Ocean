@@ -1,0 +1,20 @@
+package com.pkg1;
+
+import com.pkg2.ProcessorClass;
+
+public class StarterClass {
+    main() {
+        OceanOutput("--- STARTER CLASS ---");
+        String val = "Ocean";
+        if (args.length > 0) {
+            val = args[0];
+        }
+        OceanOutput("StarterClass started with payload: " + val);
+
+        String[] newArgs = new String[2];
+        newArgs[0] = val;
+        newArgs[1] = "Starter";
+
+        ProcessorClass.main(newArgs);
+    }
+}

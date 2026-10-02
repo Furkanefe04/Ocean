@@ -1,0 +1,52 @@
+package com.supertest;
+
+public class Parent {
+    public String val;
+
+    public function Parent() {
+        val = "PARENT_VAL";
+    }
+
+    public String function getVal() {
+        return val;
+    }
+}
+
+public class Child extends Parent {
+    public String val;
+
+    public function Child() {
+        super();
+        val = "CHILD_VAL";
+    }
+
+    @Override
+    public String function getVal() {
+        return val;
+    }
+
+    // Async method calling super.getVal()
+    public async String function getParentValAsync() {
+        // Comment to force recompile
+        return super.getVal();
+    }
+    public async String function getThisValAsync() {
+        return getVal();
+    }
+}
+
+public class AsyncSuperTest {
+    static main() {
+        Child c = new Child();
+        variable fut = c.getParentValAsync();
+        String res = (String) fut.join();
+        String res2 = c.getThisValAsync().join();
+        OceanOutput("Result of super call: " + res);
+        OceanOutput("Res of this call: "+res2);
+        if (res.equals("PARENT_VAL") && res2.equals("CHILD_VAL")) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

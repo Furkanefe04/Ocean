@@ -1,0 +1,12 @@
+package tests;
+
+class DefiniteAssignmentLoopTest {
+    main() {
+        variable x;
+        variable cond = true;
+        while (cond) {
+            x = 10;
+        }
+        OceanOutput(x); // x is not definitely assigned here!
+    }
+}

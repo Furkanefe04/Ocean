@@ -1,0 +1,23 @@
+package com.resources;
+
+class NativeSystemWrapper {
+    public static native int function nativeGetProcessId();
+    public native String function nativeReadBuffer(int size);
+    
+    public int function calculateLocal(int a, int b) {
+        return a + b;
+    }
+}
+
+class NativeMethodTest {
+    static main() {
+        NativeSystemWrapper wrapper = new NativeSystemWrapper();
+        int sum = wrapper.calculateLocal(10, 20);
+        if (sum == 30) {
+            OceanOutput("Native method wrapper verified!");
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("Assertion failed: sum != 30");
+        }
+    }
+}

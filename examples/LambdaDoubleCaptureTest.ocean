@@ -1,0 +1,21 @@
+package com.resources;
+import java.lang.Runnable;
+
+class LambdaDoubleCaptureTest {
+    main() {
+        double dVal = 42.42;
+        long lVal = 9999999999L;
+        
+        variable r = (Runnable) () -> {
+            OceanOutput("Double val: " + dVal);
+            OceanOutput("Long val: " + lVal);
+        };
+        
+        r();
+        if (dVal == 42.42 && lVal == 9999999999L) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

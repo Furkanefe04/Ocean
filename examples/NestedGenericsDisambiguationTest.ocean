@@ -1,0 +1,40 @@
+package com.resources;
+
+import java.util.*;
+
+public class NestedGenericsDisambiguationTest {
+    static main() {
+        // Test level 2 nested generics without space (>>)
+        Map<String, List<Integer>> mapLevel2 = new HashMap<String, List<Integer>>();
+        List<Integer> list1 = new ArrayList<Integer>();
+        list1.add(100);
+        list1.add(200);
+        mapLevel2.put("numbers", list1);
+
+        // Test level 3 nested generics without space (>>>)
+        List<Map<String, List<String>>> deepList = new ArrayList<Map<String, List<String>>>();
+        Map<String, List<String>> innerMap = new HashMap<String, List<String>>();
+        List<String> innerList = new ArrayList<String>();
+        innerList.add("OceanGen3");
+        innerMap.put("key", innerList);
+        deepList.add(innerMap);
+
+        // Verify nested generic retrievals
+        List<Integer> retrievedList = mapLevel2.get("numbers");
+        int num = (int)retrievedList.get(0);
+
+        List<String> retrievedStrList = (List<String>)((Map<String, List<String>>)deepList.get(0)).get("key");
+        String str = (String)retrievedStrList.get(0);
+
+        // Test bitwise shift operators (>> and >>>) in mathematical expressions
+        int bitval = 64;
+        int shiftResult1 = bitval >> 2;   // 16
+        int shiftResult2 = bitval >>> 1;  // 32
+
+        if (num == 100 && str.equals("OceanGen3") && shiftResult1 == 16 && shiftResult2 == 32) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

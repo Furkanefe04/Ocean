@@ -1,0 +1,11 @@
+class TernaryNullableAssignTest {
+
+    main(){
+        bool c = false;
+        int? n = c ? null : 5;
+
+        if (n == 5) OceanOutput("STATUS: PASSED");
+        else OceanOutput("STATUS: FAILED");
+    }
+}
+

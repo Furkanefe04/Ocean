@@ -1,0 +1,139 @@
+package com.extreme;
+
+import java.util.*;
+
+// 1. F-bounded generic interface
+interface SelfComparable<T> {
+    int function compareToSelf(T other);
+}
+
+// 2. Class implementing F-bounded polymorphism
+class ComparableValue<T <: ComparableValue<T>> implements SelfComparable<T> {
+    variable val;
+
+    function ComparableValue(double val) {
+        this.val = val;
+    }
+
+    double function getVal() {
+        return val;
+    }
+
+    @Override
+    int function compareToSelf(T other) {
+        double otherVal = other.getVal();
+        if (val < otherVal) {
+            return -1;
+        }
+        if (val > otherVal) {
+            return 1;
+        }
+        return 0;
+    }
+}
+
+// 3. Child class of F-bounded class
+class DoubleValue extends ComparableValue<DoubleValue> {
+    function DoubleValue(double val) {
+        super(val);
+    }
+}
+
+// 4. Class with method-level generics shadowing class-level generics
+class ShadowContainer<T> {
+    T classValue;
+
+    function ShadowContainer(T val) {
+        classValue = val;
+    }
+
+    T function getClassValue() {
+        return classValue;
+    }
+
+    // Shadows class-level T with method-level T!
+    public <T> T function shadowMethod(T methodValue) {
+        return methodValue;
+    }
+}
+
+// 5. Interface for covariant return type verification
+interface Generator<T> {
+    T function generate();
+}
+
+class NumberGenerator implements Generator<Number> {
+    @Override
+    Number function generate() {
+        return Double.valueOf(42.0);
+    }
+}
+
+class IntegerGenerator implements Generator<Integer> {
+    @Override
+    Integer function generate() {
+        return Integer.valueOf(100);
+    }
+}
+
+class ExtremeGenericsStressTest {
+    // 6. Generic arithmetic helper
+    public static <A <: Number, B <: Number> Number function multiplyGeneric(A a, B b) {
+        return a * b;
+    }
+
+    main() {
+        OceanOutput("=== EXTREME GENERICS STRESS TEST START ===");
+
+        // Test 1: F-bounded Polymorphism
+        DoubleValue v1 = new DoubleValue(12.5);
+        DoubleValue v2 = new DoubleValue(24.0);
+        DoubleValue v3 = new DoubleValue(12.5);
+
+        int comp1 = v1.compareToSelf(v2); // -1
+        int comp2 = v2.compareToSelf(v1); // 1
+        int comp3 = v1.compareToSelf(v3); // 0
+
+        OceanOutput("comp1: " + comp1);
+        OceanOutput("comp2: " + comp2);
+        OceanOutput("comp3: " + comp3);
+
+        // Test 2: Generic Shadowing
+        ShadowContainer<String> shadow = new ShadowContainer<String>("ClassString");
+        String classVal = shadow.getClassValue();
+        // Pass Integer to shadowed method-level T!
+        Integer shadowedVal = shadow.shadowMethod(Integer.valueOf(999));
+        
+        OceanOutput("classVal: " + classVal);
+        OceanOutput("shadowedVal: " + shadowedVal);
+
+        // Test 3: Covariant interface bridge methods
+        Generator<Number> gen1 = new NumberGenerator();
+        Generator<Integer> gen2 = new IntegerGenerator();
+
+        Number num1 = gen1.generate();
+        Integer num2 = gen2.generate();
+
+        OceanOutput("num1: " + num1);
+        OceanOutput("num2: " + num2);
+
+        // Test 4: Dynamic Generics Arithmetic
+        Number mulResult1 = multiplyGeneric(Double.valueOf(12.5), Integer.valueOf(8)); // 12.5 * 8 = 100.0
+        Number mulResult2 = multiplyGeneric(Integer.valueOf(12), Long.valueOf(12));   // 12 * 12 = 144
+        
+        OceanOutput("mulResult1: " + mulResult1);
+        OceanOutput("mulResult2: " + mulResult2);
+
+        // Final verification check
+        if (comp1 == -1 && comp2 == 1 && comp3 == 0 &&
+            classVal.equals("ClassString") && shadowedVal.intValue() == 999 &&
+            num1.doubleValue() == 42.0 && num2.intValue() == 100 &&
+            mulResult1.doubleValue() == 100.0 && mulResult2.intValue() == 144) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+
+        OceanOutput("=== EXTREME GENERICS STRESS TEST COMPLETED ===");
+    }
+}

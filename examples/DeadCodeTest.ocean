@@ -1,0 +1,20 @@
+class DeadCodeTest {
+    main() {
+        // Test 3: Constant folding
+        variable x = 5 + 10;
+        OceanOutput(x);
+        
+        variable y = 3 * 4 + 2;
+        OceanOutput(y);
+        
+        // Test 4: Final değişken
+        value pi = 3;
+        OceanOutput(pi);
+
+        if (x == 15 && y == 14 && pi == 3) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

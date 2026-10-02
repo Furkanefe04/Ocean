@@ -1,0 +1,95 @@
+package com.test.recordpattern;
+
+data class Point(int x, int y);
+data class Circle(Point center, double radius);
+data class Rectangle(Point topLeft, Point bottomRight);
+data class Window(Rectangle bounds, String title);
+
+public class RecordPatternMatchingTest {
+
+    public static String function describePoint(Object? obj) {
+        return switch (obj) {
+            case null -> "NULL"
+            case Point(int x, 0) -> "X_AXIS:" + x
+            case Point(0, int y) -> "Y_AXIS:" + y
+            case Point(int x, int y) when x == y -> "DIAGONAL:" + x
+            case Point(int x, int y) p -> "POINT(" + p.getX() + "," + p.getY() + ")"
+            default -> "OTHER"
+        };
+    }
+
+    public static String function describeShape(Object? obj) {
+        return switch (obj) {
+            case Circle(Point(int x, int y), double r) when x == 0 && y == 0 -> "ORIGIN_CIRCLE_R:" + r
+            case Circle(Point(int x, int y), double r) -> "CIRCLE_AT(" + x + "," + y + ")_R:" + r
+            case Window(Rectangle(Point(int x1, int y1), Point(int x2, int y2)), String title) ->
+                "WINDOW:" + title + " area=" + ((x2 - x1) * (y2 - y1))
+            default -> "UNKNOWN"
+        };
+    }
+
+    public static String function testStatement(Object? obj) {
+        variable res = "";
+        switch (obj) {
+            case null:
+                res = "NULL";
+                stop;
+            case Point(int x, int y) when x > 100:
+                res = "HUGE_X:" + x;
+                stop;
+            case Point(int x, int y):
+                res = "SUM:" + (x + y);
+                stop;
+            default:
+                res = "FALLBACK";
+                stop;
+        }
+        return res;
+    }
+
+    public static bool function testInstanceof(Object? obj) {
+        if (obj instanceof Point(int x, int y)) {
+            return (x + y) == 42;
+        }
+        return false;
+    }
+
+    main() {
+        OceanOutput("=== Record & Deconstruction Pattern Matching Test ===");
+
+        // 1. Switch Expr Data Class Deconstruction
+        OceanOutput(describePoint(null));
+        OceanOutput(describePoint(new Point(7, 0)));
+        OceanOutput(describePoint(new Point(0, 9)));
+        OceanOutput(describePoint(new Point(5, 5)));
+        OceanOutput(describePoint(new Point(3, 4)));
+        OceanOutput(describePoint("Not a point"));
+
+        // 2. Nested Deconstruction
+        OceanOutput(describeShape(new Circle(new Point(0, 0), 10.0)));
+        OceanOutput(describeShape(new Circle(new Point(5, 5), 2.5)));
+        OceanOutput(describeShape(new Window(new Rectangle(new Point(0, 0), new Point(80, 60)), "MainWin")));
+
+        // 3. Switch Stmt Record Deconstruction
+        OceanOutput(testStatement(null));
+        OceanOutput(testStatement(new Point(500, 2)));
+        OceanOutput(testStatement(new Point(10, 20)));
+        OceanOutput(testStatement("Test"));
+
+        // 4. Instanceof Record Deconstruction
+        bool inst1 = testInstanceof(new Point(40, 2));
+        bool inst2 = testInstanceof(new Point(10, 10));
+        bool inst3 = testInstanceof(null);
+        OceanOutput("Instanceof 1: " + inst1);
+        OceanOutput("Instanceof 2: " + inst2);
+        OceanOutput("Instanceof 3: " + inst3);
+
+        if (describePoint(new Point(5, 5)).equals("DIAGONAL:5") &&
+            describePoint(new Point(7, 0)).equals("X_AXIS:7") &&
+            inst1 && !inst2 && !inst3) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

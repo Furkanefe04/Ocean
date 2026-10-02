@@ -1,0 +1,39 @@
+package c.resources;
+
+class ClassA {
+    int x = 1;
+}
+
+class ClassB extends ClassA {
+    int x = 2;
+}
+
+class ClassC extends ClassB {
+    int x;
+    function ClassC(){
+        x = 3;
+    }
+
+
+    void function print() {
+        OceanOutput(x);         // 3
+        OceanOutput(this.x);    // 3
+        OceanOutput(super.x);   // 2
+    }
+
+    bool function check() {
+        return x == 3 && this.x == 3 && super.x == 2;
+    }
+
+}
+class T2 {
+    main(){
+        ClassC c = new ClassC();
+        c.print();
+        if (c.check()) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

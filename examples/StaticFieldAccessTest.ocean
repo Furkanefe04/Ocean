@@ -1,0 +1,14 @@
+package com.resources;
+
+class StaticFieldAccessTest {
+    int nonStaticField;
+
+    static void function staticMethod() {
+        nonStaticField = 10; // Invalid: non-static field from static context
+    }
+
+    main() {
+        staticMethod();
+        OceanOutput("StaticFieldAccessTest ran!");
+    }
+}

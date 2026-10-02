@@ -1,0 +1,9 @@
+package com.resources;
+
+class UntypedVarWithoutInitializerErrorTest {
+    variable uninitializedField;
+
+    static main() {
+        OceanOutput("Test");
+    }
+}

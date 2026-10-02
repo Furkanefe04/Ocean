@@ -1,0 +1,49 @@
+class GenericTest {
+    main() {
+        OceanOutput("--- Generic Test ---");
+        
+        int y = maxOf(10, 20);
+        OceanOutput(y);
+        
+        OceanOutput("Generic test passed!");
+    }
+    
+    static int function maxOf(int a, int b) {
+        if (a > b) return a;
+        return b;
+    }
+}
+
+// Scala-style bounded generics: T <: Number
+class Box<T> {
+    variable item = null;
+    
+    function Box(Object val) {
+        item = val;
+    }
+    
+    Object? function getItem() {
+        return item;
+    }
+}
+
+// Upper bound: +T <: Number (covariant, bounded)
+class NumberBox<+T <: Number> {
+    variable value = 0;
+}
+
+// Covariant output
+class Producer<+T> {
+    variable item = null;
+}
+
+// Contravariant input
+class Consumer<-T> {
+    variable item = null;
+}
+
+// Multiple type params
+class Pair<+A, -B> {
+    variable first = null;
+    variable second = null;
+}

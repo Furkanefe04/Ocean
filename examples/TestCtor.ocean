@@ -1,0 +1,15 @@
+package com.resources;
+    class TestCtor {
+    int counter;
+    function TestCtor() {
+        counter = 0;
+    }
+    main() {
+        TestCtor testObj = new TestCtor();
+        if (testObj.counter == 0) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

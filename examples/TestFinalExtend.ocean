@@ -1,0 +1,7 @@
+package com.resources;
+
+class TestFinalExtend extends String {
+    main() {
+        OceanOutput("FinalExtend");
+    }
+}

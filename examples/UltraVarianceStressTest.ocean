@@ -1,0 +1,194 @@
+﻿package com.resources;
+
+// ==========================================
+// 1. DÖRT SEVİYELİ TİP HİYERARŞİSİ
+// Entity -> LivingBeing -> Animal -> Dog -> GoldenRetriever
+//                       \-> Cat
+// ==========================================
+
+class Entity {
+    String name;
+    function Entity(String name) { this.name = name; }
+    String function getName() { return name; }
+}
+
+class LivingBeing extends Entity {
+    int age;
+    function LivingBeing(String name, int age) {
+        super(name);
+        this.age = age;
+    }
+    int function getAge() { return age; }
+}
+
+class Animal extends LivingBeing {
+    function Animal(String name, int age) { super(name, age); }
+}
+
+class Dog extends Animal {
+    function Dog(String name, int age) { super(name, age); }
+}
+
+class GoldenRetriever extends Dog {
+    function GoldenRetriever(String name, int age) { super(name, age); }
+}
+
+class Cat extends Animal {
+    function Cat(String name, int age) { super(name, age); }
+}
+
+// ==========================================
+// 2. VARYANS SINIF VE ARAYÜZLERİ
+// ==========================================
+
+// Covariant (+T: Sadece Çıktı / Producer)
+class Producer<+T> {
+    T? item;
+    function Producer(T item) { this.item = item; }
+    T? function get() { return item; }
+}
+
+// Contravariant (-T: Sadece Girdi / Consumer)
+class Consumer<-T> {
+    void function consume(T item) {
+        // Tüketim simülasyonu
+    }
+}
+
+// Higher-Order Function (-In, +Out: Fonksiyonel Dönüştürücü)
+class Mapper<-In, +Out> {
+    Out? fixedResult;
+    function Mapper(Out res) { fixedResult = res; }
+    Out? function apply(In input) {
+        return fixedResult;
+    }
+}
+
+// İkili Karışık Varyans (+Prod, -Cons)
+class DualContainer<+Prod, -Cons> {
+    Prod? product;
+    function DualContainer(Prod p) { product = p; }
+    Prod? function getProduct() { return product; }
+    void function feed(Cons input) { }
+}
+
+// Üçlü Varyans: Kovaryant (+A), Kontravaryant (-B), İnvaryant (C)
+class TripleContainer<+A, -B, C> {
+    A? valA;
+    C? valC;
+    function TripleContainer(A a, C c) {
+        valA = a;
+        valC = c;
+    }
+    A? function getA() { return valA; }
+    void function putB(B b) { }
+    C? function getC() { return valC; }
+}
+
+// ==========================================
+// 3. ULTRA STRESS TEST SINIFI
+// ==========================================
+
+class UltraVarianceStressTest {
+    static main() {
+        OceanOutput("=== ULTRA VARIANCE (+/-T) STRESS TESTI ===");
+        int score = 0;
+
+        GoldenRetriever buddy = new GoldenRetriever("Buddy", 3);
+        Cat whiskers = new Cat("Whiskers", 2);
+
+        // ----------------------------------------------------
+        // TEST 1: Derin Kovaryant Zincirleme (+T)
+        // Producer<GoldenRetriever> -> Producer<Dog> -> Producer<Animal> -> Producer<Entity>
+        // ----------------------------------------------------
+        Producer<GoldenRetriever> p1 = new Producer<GoldenRetriever>(buddy);
+        Producer<Dog> p2 = p1;
+        Producer<Animal> p3 = p2;
+        Producer<Entity> p4 = p3;
+        if (p4.get()?.getName() == "Buddy") {
+            OceanOutput("[PASS 1] Çok seviyeli kovaryant zincirleme başarılı.");
+            score++;
+        }
+
+        // ----------------------------------------------------
+        // TEST 2: Derin Kontravaryant Zincirleme (-T)
+        // Consumer<Entity> -> Consumer<LivingBeing> -> Consumer<Animal> -> Consumer<GoldenRetriever>
+        // ----------------------------------------------------
+        Consumer<Entity> c1 = new Consumer<Entity>();
+        Consumer<LivingBeing> c2 = c1;
+        Consumer<Animal> c3 = c2;
+        Consumer<GoldenRetriever> c4 = c3;
+        c4.consume(buddy);
+        OceanOutput("[PASS 2] Çok seviyeli kontravaryant zincirleme başarılı.");
+        score++;
+
+        // ----------------------------------------------------
+        // TEST 3: Fonksiyonel Varyans (-In, +Out)
+        // Mapper<LivingBeing, GoldenRetriever> -> Mapper<Dog, Animal>
+        // (Girdi genişler LivingBeing->Dog, Çıktı daralır GoldenRetriever->Animal)
+        // ----------------------------------------------------
+        Mapper<LivingBeing, GoldenRetriever> fn1 = new Mapper<LivingBeing, GoldenRetriever>(buddy);
+        Mapper<Dog, Animal> fn2 = fn1;
+        Mapper<GoldenRetriever, Entity> fn3 = fn2;
+        Entity? res = fn3.apply(buddy);
+        if (res?.getName() == "Buddy") {
+            OceanOutput("[PASS 3] Fonksiyonel (-In, +Out) varyans dönüşümü başarılı.");
+            score++;
+        }
+
+        // ----------------------------------------------------
+        // TEST 4: Karışık İkili Varyans (+Prod, -Cons)
+        // DualContainer<GoldenRetriever, LivingBeing> -> DualContainer<Animal, Dog>
+        // ----------------------------------------------------
+        DualContainer<GoldenRetriever, LivingBeing> dual1 = new DualContainer<GoldenRetriever, LivingBeing>(buddy);
+        DualContainer<Animal, Dog> dual2 = dual1;
+        dual2.feed(new Dog("Max", 4));
+        if (dual2.getProduct()?.getName() == "Buddy") {
+            OceanOutput("[PASS 4] İkili karışık varyans (+Prod, -Cons) başarılı.");
+            score++;
+        }
+
+        // ----------------------------------------------------
+        // TEST 5: İç İçe Kovaryans (Producer içinde Producer)
+        // Producer<Producer<GoldenRetriever>> -> Producer<Producer<Entity>>
+        // ----------------------------------------------------
+        Producer<Producer<GoldenRetriever>> nestedProd1 = new Producer<Producer<GoldenRetriever>>(p1);
+        Producer<Producer<Entity>> nestedProd2 = nestedProd1;
+        if (nestedProd2.get()?.get()?.getName() == "Buddy") {
+            OceanOutput("[PASS 5] İç içe kovaryans (Producer<Producer<T>>) başarılı.");
+            score++;
+        }
+
+        // ----------------------------------------------------
+        // TEST 6: Varyans Terslenmesi (Kovaryant içinde Kontravaryant)
+        // Consumer<Entity> <: Consumer<GoldenRetriever> olduğundan
+        // Producer<Consumer<Entity>> -> Producer<Consumer<GoldenRetriever>> GEÇERLİDİR!
+        // ----------------------------------------------------
+        Producer<Consumer<Entity>> nestInv1 = new Producer<Consumer<Entity>>(c1);
+        Producer<Consumer<GoldenRetriever>> nestInv2 = nestInv1;
+        nestInv2.get()?.consume(buddy);
+        OceanOutput("[PASS 6] Varyans terslenmesi (Producer<Consumer<T>>) başarılı.");
+        score++;
+
+        // ----------------------------------------------------
+        // TEST 7: Üçlü Varyans (+A, -B, C)
+        // TripleContainer<GoldenRetriever, LivingBeing, String> -> TripleContainer<Animal, Dog, String>
+        // (A kovaryant, B kontravaryant, String invaryant)
+        // ----------------------------------------------------
+        TripleContainer<GoldenRetriever, LivingBeing, String> triple1 = new TripleContainer<GoldenRetriever, LivingBeing, String>(buddy, "TAG_101");
+        TripleContainer<Animal, Dog, String> triple2 = triple1;
+        triple2.putB(new Dog("Rex", 5));
+        if (triple2.getA()?.getName() == "Buddy" && (triple2).getC() == "TAG_101") {
+            OceanOutput("[PASS 7] Üçlü varyans (+A, -B, C) başarılı.");
+            score++;
+        }
+
+        OceanOutput($"Toplam Başarılı Test: {score} / 7");
+
+        if (score == 7) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

@@ -1,0 +1,32 @@
+package com.resources;
+import java.math.BigDecimal;
+class StrictLoopTest {
+    main() {
+        OceanOutput("--- Strict Parenthesized Increasing ---");
+        for (int i from 0 to 5 with increasing 1) {
+            OceanOutput(i);
+        }
+
+        OceanOutput("--- Strict Parenthesized Decreasing ---");
+        for (long j from 10 to 5 with decreasing 1) {
+            OceanOutput(j);
+        }
+
+        OceanOutput("--- Strict Parenthesized BigDecimal ---");
+        for (variable b from 10000000000000000000000000000 to 10000000000000000000000000010 with increasing 0.1) {
+            OceanOutput(b);
+        }
+
+        OceanOutput("--- Strict In Loop ---");
+        for (String s in ["A", "B", "C"]) {
+            OceanOutput(s);
+        }
+        variable x = 999999999999999999999999999999999999999999999999999999999;
+        while(x > 0)
+        {
+            if(x > 1000)x=x/2;
+            else x=x-10;
+            OceanOutput(x);
+        }
+    }
+}

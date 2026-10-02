@@ -1,0 +1,143 @@
+package com.enterprise.main;
+
+import com.enterprise.auth.UserSession;
+import com.enterprise.auth.AuthManager;
+import com.enterprise.core.CoreEntity;
+import com.enterprise.core.GenericListWrapper;
+import com.enterprise.core.Result;
+import com.enterprise.inventory.Aircraft;
+import com.enterprise.inventory.Seat;
+import com.enterprise.inventory.Flight;
+import com.enterprise.inventory.FlightSearchQuery;
+import com.enterprise.inventory.FlightSearchEngine;
+import com.enterprise.booking.Passenger;
+import com.enterprise.booking.Ticket;
+import com.enterprise.booking.BookingOrder;
+import com.enterprise.booking.PaymentGateway;
+import com.enterprise.booking.LedgerManager;
+import com.enterprise.booking.BookingProcessor;
+import com.enterprise.notification.EmailTemplateEngine;
+import com.enterprise.notification.Notification;
+import com.enterprise.notification.DispatcherThread;
+import com.enterprise.analytics.RevenueReport;
+import com.enterprise.analytics.MetricTracker;
+
+public class EnterpriseSystemTest {
+    main() {
+        OceanOutput("==============================================");
+        OceanOutput("  ENTERPRISE FLIGHT BOOKING SYSTEM (25 CLASSES)");
+        OceanOutput("==============================================");
+
+        // 1. Setup Inventory
+        Aircraft aircraft = Aircraft.create("N888AA", "Boeing 777-300ER", 300);
+        
+        Seat[] seats = new Seat[4];
+        seats[0] = Seat.create("1A", "BUSINESS");
+        seats[1] = Seat.create("1B", "BUSINESS");
+        seats[2] = Seat.create("12F", "ECONOMY");
+        seats[3] = Seat.create("12G", "ECONOMY");
+
+        Flight flight1 = Flight.create("FLIGHT-1", "OC-304", "IST", "LHR", aircraft, seats);
+
+        FlightSearchEngine searchEngine = FlightSearchEngine.create();
+        searchEngine.registerFlight(flight1);
+
+        // 2. Setup Ledger and Booking System
+        LedgerManager ledger = LedgerManager.create();
+        BookingProcessor processor = BookingProcessor.create(ledger);
+        MetricTracker metrics = new MetricTracker();
+        EmailTemplateEngine emailEngine = new EmailTemplateEngine();
+
+        // 3. Define Users
+        UserSession aliceSession = UserSession.create("alice", "CUSTOMER");
+        UserSession bobSession = UserSession.create("bob", "AGENT");
+        UserSession hackerSession = UserSession.create("hacker", "HACKER");
+
+        // 4. Run Transactional Bookings
+        Passenger pass1 = Passenger.create("Alice", "Smith", "TR12345");
+        Passenger pass2 = Passenger.create("Bob", "Jones", "TR67890");
+
+        // Transaction A: Alice searches flight and books Seat 1A (Business)
+        OceanOutput("\n--- Booking Transaction 1: Alice ---");
+        FlightSearchQuery query = FlightSearchQuery.create("IST", "LHR");
+        Flight? foundFlight = searchEngine.findFlight(query);
+
+        if (foundFlight != null) {
+            OceanOutput("Flight found: " + foundFlight?.flightNumber);
+            Result<BookingOrder> res = processor.processBooking(aliceSession, foundFlight, pass1, "1A", "4532-XXXX-XXXX-1111", 750.0);
+            if (res.success) {
+                BookingOrder order = res.data;
+                OceanOutput("SUCCESS: Booking code " + order.id + ", ticket status paid: " + order.isPaid);
+                metrics.trackSuccess();
+
+                // Dispatch Email Notification via asynchronous DispatcherThread (extending java.lang.Thread)
+                Notification n = Notification.create(order, "alice@smith.com");
+                DispatcherThread dispatcher = DispatcherThread.create(n, emailEngine);
+                dispatcher.start();
+                dispatcher.join(); // block to verify output cleanly in console
+            } else {
+                OceanOutput("FAILED: " + res.message);
+                metrics.trackFailure();
+            }
+        }
+
+        // Transaction B: Bob tries to book already reserved Seat 1A (should fail)
+        OceanOutput("\n--- Booking Transaction 2: Bob (Double Reservation Attempt) ---");
+        Result<BookingOrder> resDouble = processor.processBooking(bobSession, flight1, pass2, "1A", "5432-XXXX-XXXX-2222", 750.0);
+        if (resDouble.success) {
+            OceanOutput("ERROR: Allowed double booking!");
+            metrics.trackSuccess();
+        } else {
+            OceanOutput("EXPECTED FAIL: " + resDouble.message);
+            metrics.trackFailure();
+        }
+
+        // Transaction C: Bob books Seat 12F instead (Economy)
+        OceanOutput("\n--- Booking Transaction 3: Bob (Economy Seat) ---");
+        Result<BookingOrder> resOk = processor.processBooking(bobSession, flight1, pass2, "12F", "5432-XXXX-XXXX-2222", 250.0);
+        if (resOk.success) {
+            BookingOrder order = resOk.data;
+            OceanOutput("SUCCESS: Booking code " + order.id);
+            metrics.trackSuccess();
+
+            Notification n = Notification.create(order, "bob@jones.com");
+            DispatcherThread dispatcher = DispatcherThread.create(n, emailEngine);
+            dispatcher.start();
+            dispatcher.join();
+        } else {
+            OceanOutput("FAILED: " + resOk.message);
+            metrics.trackFailure();
+        }
+
+        // Transaction D: Hacker tries to book (should fail Auth Check)
+        OceanOutput("\n--- Booking Transaction 4: Hacker (Unauthorized Session) ---");
+        Result<BookingOrder> resHacker = processor.processBooking(hackerSession, flight1, pass2, "12G", "1111-XXXX-XXXX-1111", 250.0);
+        if (resHacker.success) {
+            OceanOutput("ERROR: Hacker allowed to book!");
+            metrics.trackSuccess();
+        } else {
+            OceanOutput("EXPECTED FAIL: " + resHacker.message);
+            metrics.trackFailure();
+        }
+
+        // 5. Generate Revenue & Performance Analytics
+        OceanOutput("\n--- Generating Enterprise Revenue & Analytics Reports ---");
+        double totalRev = RevenueReport.calculateTotalRevenue(ledger);
+        double avgTkt = RevenueReport.calculateAverageTicketValue(ledger);
+        OceanOutput("Total Ledger Records: " + ledger.getCount());
+        OceanOutput("Total Revenue: $" + totalRev);
+        OceanOutput("Average Ticket Cost: $" + avgTkt);
+        OceanOutput(metrics.getSummary());
+
+        // 6. Verification Assertions
+        if (ledger.getCount() == 2 && totalRev == 1000.0) {
+            OceanOutput("\n==============================================");
+            OceanOutput("  ENTERPRISE SYSTEM TEST SUCCESSFUL (25 CLASSES passed!)");
+            OceanOutput("==============================================");
+        } else {
+            OceanOutput("\n==============================================");
+            OceanOutput("  ENTERPRISE SYSTEM TEST FAILED!");
+            OceanOutput("==============================================");
+        }
+    }
+}

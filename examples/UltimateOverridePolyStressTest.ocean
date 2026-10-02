@@ -1,0 +1,92 @@
+package com.resources;
+
+import java.util.Locale;
+
+// ---- 1. POLYMORPHIC ANIMAL HIERARCHY ----
+public class Animal {
+    public String function speak() {
+        return "Generic Animal Sound";
+    }
+}
+
+public class Dog extends Animal {
+    @Override
+    public String function speak() {
+        return "Bark! Woof!";
+    }
+}
+
+public class Cat extends Animal {
+    @Override
+    public String function speak() {
+        return "Meow!";
+    }
+}
+
+// ---- 2. OVERLOADED GENERIC INTERFACE ----
+public interface TaskProcessor<T> {
+    public String function processTask(T task);
+    public String function processTask(T task, int retryCount);
+}
+
+public class StringTaskProcessor implements TaskProcessor<String> {
+    @Override
+    public String function processTask(String task) {
+        return "TASK:" + task;
+    }
+
+    @Override
+    public String function processTask(String task, int retryCount) {
+        return "TASK:" + task + "#RETRY:" + retryCount;
+    }
+}
+
+// ---- 3. OVERRIDE WITH EXTENSION METHOD INTEROP ----
+public class BaseFormatter {
+    public String function format(String raw) {
+        return raw;
+    }
+}
+
+public class FancyFormatter extends BaseFormatter {
+    @Override
+    public String function format(String raw) {
+        return "FANCY[" + raw.toUpperCase(Locale.ENGLISH) + "]";
+    }
+}
+
+// ---- MAIN TEST CLASS ----
+public class UltimateOverridePolyStressTest {
+    static main() {
+        // Test 1: Polymorphic Dispatch via Supertype References
+        Animal a1 = new Dog();
+        Animal a2 = new Cat();
+        String sound1 = a1.speak();
+        String sound2 = a2.speak();
+
+        // Test 2: Overloaded Generic Method Overrides
+        TaskProcessor<String> tp = new StringTaskProcessor();
+        String singleRes = tp.processTask("DeployJob");
+        String retryRes = tp.processTask("DeployJob", 3);
+
+        // Test 3: Override with Extension Method Interop
+        FancyFormatter formatter = new FancyFormatter();
+        String fancyRes = formatter.format("ocean compiler");
+
+        OceanOutput("sound1=" + sound1);
+        OceanOutput("sound2=" + sound2);
+        OceanOutput("singleRes=" + singleRes);
+        OceanOutput("retryRes=" + retryRes);
+        OceanOutput("fancyRes=" + fancyRes);
+
+        bool polyOk = sound1.equals("Bark! Woof!") && sound2.equals("Meow!");
+        bool overloadOk = singleRes.equals("TASK:DeployJob") && retryRes.equals("TASK:DeployJob#RETRY:3");
+        bool fancyOk = fancyRes.equals("FANCY[OCEAN COMPILER]");
+
+        if (polyOk && overloadOk && fancyOk) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

@@ -1,0 +1,21 @@
+package com.resources;
+    class EscapeTest {
+    main() {
+        String s1 = "Satir 1\nSatir 2";
+        String s2 = "Tab\tBosluk";
+        String s3 = "Tirnak: \"";
+        String s4 = "Ters Slas: \\";
+
+        OceanOutput("--- Kacis Karakterleri Testi ---");
+        OceanOutput(s1);
+        OceanOutput(s2);
+        OceanOutput(s3);
+        OceanOutput(s4);
+
+        if (s1.equals("Satir 1\nSatir 2") && s2.equals("Tab\tBosluk") && s3.equals("Tirnak: \"") && s4.equals("Ters Slas: \\")) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

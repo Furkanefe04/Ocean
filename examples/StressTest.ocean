@@ -1,0 +1,213 @@
+package com.resources;
+    class StressTest {
+
+    // TEST 1: Ic ice 3 katli for dongusu (200x200x200 = 8M iterasyon)
+    static int function tripleFor() {
+        variable total = 0;
+        for (int i from 0 to 200 with increasing 1) {
+            for (int j from 0 to 200 with increasing 1) {
+                for (int k from 0 to 200 with increasing 1) {
+                    total = total + 1;
+                }
+            }
+        }
+        return total;
+    }
+
+    // TEST 2: Ic ice while dongusu (GCD tablosu 5000x100)
+    static int function testGcd() {
+        variable total = 0;
+        variable i = 0;
+        while (i < 5000) {
+            variable j = 1;
+            while (j < 100) {
+                variable a = i;
+                variable b = j;
+                while (b != 0) {
+                    variable temp = b;
+                    b = a % b;
+                    a = temp;
+                }
+                total = total + a;
+                j = j + 1;
+            }
+            i = i + 1;
+        }
+        return total;
+    }
+
+    // TEST 3: For icinde while (Insertion sort 5000 eleman)
+    static int function testSort() {
+        variable size = 5000;
+        variable arr = new int[size];
+        for (int i from 0 to size with increasing 1) {
+            arr[i] = size - i;
+        }
+
+        for (int i from 1 to size with increasing 1) {
+            variable key = arr[i];
+            variable j = i - 1;
+            while (j >= 0) {
+                if (arr[j] > key) {
+                    arr[j + 1] = arr[j];
+                    j = j - 1;
+                } else {
+                    j = -1;
+                }
+            }
+            arr[j + 1] = key;
+        }
+
+        variable chk = 0;
+        for (int i from 0 to 10 with increasing 1) {
+            chk = chk + arr[i];
+        }
+        return chk;
+    }
+
+    // TEST 4: While icinde for (Asal carpan toplami 50000)
+    static int function testPrime() {
+        variable total = 0;
+        variable n = 2;
+        while (n <= 50000) {
+            variable num = n;
+            for (int p from 2 to num + 1 with increasing 1) {
+                while (num % p == 0) {
+                    total = total + p;
+                    num = num / p;
+                }
+            }
+            n = n + 1;
+        }
+        return total;
+    }
+
+    // TEST 5: Skip testi - ic ice for (1000x1000, skip %3 ve %7)
+    static int function testCont() {
+        variable total = 0;
+        for (int i from 1 to 1001 with increasing 1) {
+            for (int j from 1 to 1001 with increasing 1) {
+                if (j % 3 == 0) {
+                    skip;
+                }
+                if (j % 7 == 0) {
+                    skip;
+                }
+                total = total + 1;
+            }
+        }
+        return total;
+    }
+
+    // TEST 6: Stop testi - while icinde while (10000 triangle)
+    static int function testHalt() {
+        variable total = 0;
+        variable i = 0;
+        while (i < 10000) {
+            variable j = 1;
+            while (j < 10000) {
+                if (j > i) {
+                    stop;
+                }
+                total = total + 1;
+                j = j + 1;
+            }
+            i = i + 1;
+        }
+        return total;
+    }
+
+    // TEST 7: 4 katli karisik ic ice dongu (30x30x30x30 = 810K)
+    static int function quadMix() {
+        variable total = 0;
+        for (int a from 0 to 30 with increasing 1) {
+            variable b = 0;
+            while (b < 30) {
+                for (int c from 0 to 30 with increasing 1) {
+                    variable d = 0;
+                    while (d < 30) {
+                        total = total + 1;
+                        d = d + 1;
+                    }
+                }
+                b = b + 1;
+            }
+        }
+        return total;
+    }
+
+    // TEST 8: 500M basit for dongusu (unrolling tam devrede)
+    static int function massiveLoop() {
+        variable total = 0;
+        for (int i from 0 to 500000000 with increasing 1) {
+            total = total + 1;
+        }
+        return total;
+    }
+
+    static main() {
+        OceanOutput("==============================================");
+        OceanOutput("  OCEAN STRESS TEST v1.0");
+        OceanOutput("  Ic Ice Dongu + Unrolling Sinir Testi");
+        OceanOutput("==============================================");
+
+        OceanOutput("");
+        OceanOutput("[TEST 1] 3 Katli Ic Ice For (200x200x200)...");
+        variable r1 = tripleFor();
+        OceanOutput("  Sonuc = " + r1);
+        if (r1 == 8000000) { OceanOutput("  DOGRULAMA: BASARILI"); }
+        else { OceanOutput("  DOGRULAMA: HATALI! Beklenen: 8000000"); }
+
+        OceanOutput("");
+        OceanOutput("[TEST 2] Ic Ice While GCD (5000x100)...");
+        variable r2 = testGcd();
+        OceanOutput("  GCD Toplam = " + r2);
+
+        OceanOutput("");
+        OceanOutput("[TEST 3] For+While Mix - Insertion Sort (5000)...");
+        variable r3 = testSort();
+        OceanOutput("  Ilk10 Toplam = " + r3);
+        if (r3 == 55) { OceanOutput("  DOGRULAMA: BASARILI"); }
+        else { OceanOutput("  DOGRULAMA: HATALI! Beklenen: 55"); }
+
+        OceanOutput("");
+        OceanOutput("[TEST 4] While+For Mix - Asal Carpan (50000)...");
+        variable r4 = testPrime();
+        OceanOutput("  Asal Carpan Toplami = " + r4);
+
+        OceanOutput("");
+        OceanOutput("[TEST 5] Skip Stress (1000x1000)...");
+        variable r5 = testCont();
+        OceanOutput("  Kalan eleman = " + r5);
+
+        OceanOutput("");
+        OceanOutput("[TEST 6] Stop Stress (10000 while+stop)...");
+        variable r6 = testHalt();
+        OceanOutput("  Toplam = " + r6);
+
+        OceanOutput("");
+        OceanOutput("[TEST 7] 4 Katli Karisik (30x30x30x30)...");
+        variable r7 = quadMix();
+        OceanOutput("  Sonuc = " + r7);
+        if (r7 == 810000) { OceanOutput("  DOGRULAMA: BASARILI"); }
+        else { OceanOutput("  DOGRULAMA: HATALI! Beklenen: 810000"); }
+
+        OceanOutput("");
+        OceanOutput("[TEST 8] Massive Simple Loop (500M)...");
+        variable r8 = massiveLoop();
+        OceanOutput("  Sonuc = " + r8);
+        if (r8 == 500000000) { OceanOutput("  DOGRULAMA: BASARILI"); }
+        else { OceanOutput("  DOGRULAMA: HATALI! Beklenen: 500000000"); }
+
+        OceanOutput("");
+        OceanOutput("==============================================");
+        OceanOutput("  TUM STRESS TESTLER TAMAMLANDI");
+        OceanOutput("==============================================");
+        
+        if (r1 == 8000000 && r2 == 1613630 && r3 == 55 && r4 == 213116660 && r5 == 572000 && r6 == 49995000 && r7 == 810000 && r8 == 500000000) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

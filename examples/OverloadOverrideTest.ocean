@@ -1,0 +1,52 @@
+package com.resources;
+public class BaseClass {
+    public void function display() {
+        OceanOutput("BaseClass display()");
+    }
+
+    public int function calculate(int a) {
+        return a * 2;
+    }
+}
+
+public class ChildClass extends BaseClass {
+    @Override
+    public void function display() {
+        OceanOutput("ChildClass display() overridden!");
+    }
+
+    // Method Overloading
+    public int function calculate(int a, int b) {
+        return a + b;
+    }
+
+    // Overloading different types
+    public String function calculate(String s) {
+        return s;
+    }
+}
+
+public class OverloadOverrideTest {
+    main() {
+        variable child = new ChildClass();
+        child.display(); // Should print "ChildClass display() overridden!"
+
+        variable res1 = child.calculate(10);
+        OceanOutput("calculate(10): ");
+        OceanOutput(res1);
+
+        variable res2 = child.calculate(5, 7);
+        OceanOutput("calculate(5, 7): ");
+        OceanOutput(res2);
+
+        variable res3 = child.calculate("Hello Overload");
+        OceanOutput("calculate('Hello Overload'): ");
+        OceanOutput(res3);
+
+        if (res1 == 20 && res2 == 12 && res3 == "Hello Overload") {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

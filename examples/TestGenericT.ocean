@@ -1,0 +1,26 @@
+package com.generic;
+
+interface ABQ {
+    Object function get();
+}
+
+class CBQ implements ABQ{
+
+    @Override
+    String function get() {
+        return "hello";
+    }
+}
+
+class TestGenericT {
+    main(){
+        CBQ cClass = new CBQ();
+        String resultx = cClass.get();
+        if (resultx.equals("hello")) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+
+}

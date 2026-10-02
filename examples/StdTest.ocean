@@ -1,0 +1,17 @@
+package com.resources;
+import java.util.ArrayList;
+
+class StdTest {
+    static void function main() {
+        ArrayList list = new ArrayList();
+        list.add(100);
+        list.add(200);
+        variable val = list.get(1);
+        OceanOutput(val);
+        if (val == 200) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

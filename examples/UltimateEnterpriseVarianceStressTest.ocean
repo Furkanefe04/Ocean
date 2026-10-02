@@ -1,0 +1,251 @@
+﻿package com.resources;
+
+import java.util.concurrent.CompletableFuture;
+
+// =========================================================================
+// 1. DATA CLASS, ENUM VE ARAYÜZ HİYERARŞİSİ
+// =========================================================================
+
+interface IMessage {
+    String function getId();
+    int function getTimestamp();
+}
+
+interface ISecureMessage extends IMessage {
+    String function getToken();
+}
+
+enum PriorityLevel {
+    LOW(1, "Standart"),
+    MEDIUM(5, "Orta"),
+    HIGH(10, "Kritik");
+
+    int weight;
+    String label;
+
+    function PriorityLevel(int pWeight, String pLabel) {
+        weight = pWeight;
+        label = pLabel;
+    }
+
+    int function getWeight() { return weight; }
+    String function getLabel() { return label; }
+}
+
+// Data Sınıfları (IMessage ve ISecureMessage Arayüzlerini Uygular)
+data class BaseMessage(String id, int timestamp) implements IMessage;
+
+data class SecureMessage(String id, int timestamp, String token) implements ISecureMessage;
+
+data class AdminAuditMessage(String id, int timestamp, String token, String adminId) implements ISecureMessage;
+
+// =========================================================================
+// 2. EXTENSION METHODLAR
+// =========================================================================
+
+class MessageExtensions {
+    public String SecureMessage.function toSummary() {
+        return $"[SECURE id={this.getId()}, token={this.getToken()}]";
+    }
+
+    public int PriorityLevel.function calculatePriorityScore(int multiplier) {
+        return this.getWeight() * multiplier;
+    }
+}
+
+// =========================================================================
+// 3. VARYANS VE FONKSİYONEL ARAYÜZLER (SAM Interfaces & Variant Classes)
+// =========================================================================
+
+// SAM Arayüzü (Lambda dönüşümü için)
+interface MessageTransformer<InMsg, OutMsg> {
+    OutMsg function apply(InMsg input);
+}
+
+// Kovaryant Mesaj Üreticisi (+Msg)
+class MessageProducer<+Msg> {
+    Msg content;
+
+    function MessageProducer(Msg pContent) {
+        content = pContent;
+    }
+
+    Msg function produce() {
+        return content;
+    }
+}
+
+// Kontravaryant Mesaj Tüketicisi (-Msg)
+class MessageConsumer<-Msg> {
+    int processedCount = 0;
+
+    function MessageConsumer() { }
+
+    void function consume(Msg pItem) {
+        processedCount++;
+    }
+
+    int function getProcessedCount() { return processedCount; }
+}
+
+// İki Parametreli Varyans Boru Hattı (-In, +Out)
+class AsyncPipelineStep<-In, +Out> {
+    Out fixedSample;
+
+    function AsyncPipelineStep(Out pSample) {
+        fixedSample = pSample;
+    }
+
+    Out function executeStep(In pInput) {
+        return fixedSample;
+    }
+}
+
+// =========================================================================
+// 4. ASENKRON MOTOR VE ANA TEST SINIFI
+// =========================================================================
+
+class UltimateEnterpriseVarianceStressTest {
+
+    // Asenkron Metot (CompletableFuture döner)
+    public static async String function processMessageAsync(SecureMessage pMsg, PriorityLevel pLevel) {
+        // Switch Expression ile öncelik metni hesaplama
+        String priorityTag = switch (pLevel) {
+            case PriorityLevel.HIGH -> "CRITICAL_EXEC"
+            case PriorityLevel.MEDIUM -> "NORMAL_EXEC"
+            case PriorityLevel.LOW -> "BACKGROUND_EXEC"
+            default -> "UNKNOWN_EXEC"
+        };
+
+        // Extension method kullanımı
+        String summary = pMsg.toSummary();
+        return $"{priorityTag} => {summary}";
+    }
+
+    public static async void function runAsyncSuite() {
+        int totalPassed = 0;
+
+        AdminAuditMessage adminMsg = new AdminAuditMessage("MSG_9001", 1700000000, "AUTH_TOKEN_XYZ", "ROOT_ADMIN");
+        SecureMessage secureMsg = new SecureMessage("MSG_8001", 1700000100, "AUTH_TOKEN_ABC");
+        BaseMessage baseMsg = new BaseMessage("MSG_1001", 1700000200);
+
+        PriorityLevel currentLevel = PriorityLevel.HIGH;
+
+        // -----------------------------------------------------------------
+        // [SENARYO 1] Data Class Eşitlik ve Değer Doğrulama
+        // -----------------------------------------------------------------
+        AdminAuditMessage duplicateAdmin = new AdminAuditMessage("MSG_9001", 1700000000, "AUTH_TOKEN_XYZ", "ROOT_ADMIN");
+        if (adminMsg.getId() == "MSG_9001" && adminMsg.equals(duplicateAdmin)) {
+            OceanOutput("[PASS 1] Data Class Alanları ve Equals Doğrulaması Başarılı.");
+            totalPassed++;
+        }
+
+        // -----------------------------------------------------------------
+        // [SENARYO 2] Enum, Extension Method ve Switch Expression Entegrasyonu
+        // -----------------------------------------------------------------
+        int calculatedScore = currentLevel.calculatePriorityScore(5);
+        String categoryDesc = switch (currentLevel) {
+            case PriorityLevel.HIGH -> "ACIL"
+            case PriorityLevel.MEDIUM -> "STANDART"
+            default -> "DUSUK"
+        };
+
+        if (calculatedScore == 50 && categoryDesc == "ACIL" && currentLevel.getLabel() == "Kritik") {
+            OceanOutput("[PASS 2] Enum + Extension Method + Switch Expression Başarılı.");
+            totalPassed++;
+        }
+
+        // -----------------------------------------------------------------
+        // [SENARYO 3] Data Class Üzerinde Extension Method Çağrısı
+        // -----------------------------------------------------------------
+        String secSummary = secureMsg.toSummary();
+        if (secSummary.contains("MSG_8001") && secSummary.contains("AUTH_TOKEN_ABC")) {
+            OceanOutput("[PASS 3] Data Class Üzerinde Extension Method Çağrısı Başarılı.");
+            totalPassed++;
+        }
+
+        // -----------------------------------------------------------------
+        // [SENARYO 4] Lambda Fonksiyonu ile Varyanslı Dönüştürücü (SAM Conversion)
+        // -----------------------------------------------------------------
+        MessageTransformer<SecureMessage, String> transformer = (SecureMessage m) -> {
+            return m.toSummary();
+        };
+        String transformed = transformer.apply(secureMsg);
+        if (transformed.contains("MSG_8001")) {
+            OceanOutput("[PASS 4] Lambda ve SAM Arayüz Entegrasyonu Başarılı.");
+            totalPassed++;
+        }
+
+        // -----------------------------------------------------------------
+        // [SENARYO 5] Çok Seviyeli Kovaryant Arayüz/Data Class Zinciri (+Msg)
+        // MessageProducer<AdminAuditMessage> -> MessageProducer<ISecureMessage> -> MessageProducer<IMessage>
+        // -----------------------------------------------------------------
+        MessageProducer<AdminAuditMessage> pAdmin = new MessageProducer<AdminAuditMessage>(adminMsg);
+        MessageProducer<ISecureMessage> pSecure = pAdmin;
+        MessageProducer<IMessage> pBase = pSecure;
+
+        if (pBase.produce().getId() == "MSG_9001") {
+            OceanOutput("[PASS 5] Data Class Kovaryans Genişlemesi (+Msg) Başarılı.");
+            totalPassed++;
+        }
+
+        // -----------------------------------------------------------------
+        // [SENARYO 6] Çok Seviyeli Kontravaryant Tüketici Zinciri (-Msg)
+        // MessageConsumer<IMessage> -> MessageConsumer<ISecureMessage> -> MessageConsumer<AdminAuditMessage>
+        // -----------------------------------------------------------------
+        MessageConsumer<IMessage> cBase = new MessageConsumer<IMessage>();
+        MessageConsumer<ISecureMessage> cSecure = cBase;
+        MessageConsumer<AdminAuditMessage> cAdmin = cSecure;
+
+        cAdmin.consume(adminMsg);
+        if (cBase.getProcessedCount() == 1) {
+            OceanOutput("[PASS 6] Kontravaryant Tüketici Zincirlemesi (-Msg) Başarılı.");
+            totalPassed++;
+        }
+
+        // -----------------------------------------------------------------
+        // [SENARYO 7] Asenkron Metot (async) ve Bekleme (await)
+        // -----------------------------------------------------------------
+        variable asyncFuture = processMessageAsync(secureMsg, PriorityLevel.HIGH);
+        String asyncResult = await asyncFuture;
+
+        if (asyncResult.contains("CRITICAL_EXEC") && asyncResult.contains("MSG_8001")) {
+            OceanOutput("[PASS 7] Asenkron (async/await) + Switch Expression Entegrasyonu Başarılı.");
+            totalPassed++;
+        }
+
+        // -----------------------------------------------------------------
+        // [SENARYO 8] Asenkron Pipeline ile Varyans Dönüşümü (-In, +Out)
+        // AsyncPipelineStep<IMessage, AdminAuditMessage>
+        //   -> AsyncPipelineStep<ISecureMessage, ISecureMessage>
+        //   -> AsyncPipelineStep<AdminAuditMessage, IMessage>
+        // -----------------------------------------------------------------
+        AsyncPipelineStep<IMessage, AdminAuditMessage> step1 =
+            new AsyncPipelineStep<IMessage, AdminAuditMessage>(adminMsg);
+
+        AsyncPipelineStep<ISecureMessage, ISecureMessage> step2 = step1;
+        AsyncPipelineStep<AdminAuditMessage, IMessage> step3 = step2;
+
+        IMessage executedMsg = step3.executeStep(adminMsg);
+        if (executedMsg.getId() == "MSG_9001") {
+            OceanOutput("[PASS 8] Asenkron Fonksiyonel Varyans Boru Hattı (-In, +Out) Başarılı.");
+            totalPassed++;
+        }
+
+        OceanOutput("-------------------------------------------------");
+        OceanOutput($"Toplam Başarılı Test Aşaması: {totalPassed} / 8");
+
+        if (totalPassed == 8) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+
+    static main() {
+        OceanOutput("=================================================");
+        OceanOutput(" ULTIMATE ENTERPRISE VARIANCE & FEATURES STRESS  ");
+        OceanOutput("=================================================");
+        runAsyncSuite().join();
+    }
+}

@@ -1,0 +1,104 @@
+package compiler.tests;
+
+import ocean.util.OceanList;
+import java.util.Map;
+import java.util.HashMap;
+
+class Box<T> {
+    private T value;
+
+    public function Box(T val) {
+        this.value = val;
+    }
+
+    public void function set(T val) {
+        this.value = val;
+    }
+
+    public T function get() {
+        return this.value;
+    }
+}
+
+class SubBox<T> extends Box<T> {
+    public function SubBox(T val) {
+        super(val);
+    }
+}
+
+class Pair<K, V> {
+    public K key;
+    public V value;
+
+    public function Pair(K k, V v) {
+        this.key = k;
+        this.value = v;
+    }
+}
+
+interface Calculator<T, R> {
+    R function calculate(T input);
+}
+
+class GenericCastEliminationTest {
+
+    public static void function checkString(String s, String expected) {
+        if (!s.equals(expected)) {
+            OceanOutput("FAILED: String mismatch");
+            System.exit(1);
+        }
+    }
+
+    public static void function checkInt(int actual, int expected) {
+        if (actual != expected) {
+            OceanOutput("FAILED: Int mismatch");
+            System.exit(1);
+        }
+    }
+
+    public static void function main(String[] args) {
+        OceanOutput("=== Running Generic Cast Elimination Test ===");
+
+        // 1. Passing generic get() directly to method expecting concrete type
+        Box<String> strBox = new Box<String>("OceanGeneric");
+        checkString(strBox.get(), "OceanGeneric");
+        OceanOutput("[PASS] Direct method argument propagation for String");
+
+        // 2. Chained method calls on generic return
+        String upper = strBox.get().substring(0, 5).toUpperCase();
+        checkString(upper, "OCEAN");
+        OceanOutput("[PASS] Chained method calls on generic result");
+
+        // 3. Generic int box in arithmetic and method call without cast
+        Box<int> intBox = new Box<int>(100);
+        int sum = intBox.get() + 50;
+        checkInt(sum, 150);
+        checkInt(intBox.get(), 100);
+        OceanOutput("[PASS] Primitive generic box in arithmetic and arguments");
+
+        // 4. Inner class subclass inheriting generic method
+        SubBox<String> subStr = new SubBox<String>("SubOcean");
+        checkString(subStr.get(), "SubOcean");
+        OceanOutput("[PASS] Inner class generic inheritance get() without cast");
+
+        // 5. Generic Functional Interface / Lambda without cast
+        Calculator<int, int> doubler = (x) -> x * 2;
+        int doubleRes = doubler.calculate(21);
+        checkInt(doubleRes, 42);
+        checkInt(doubler.calculate(21), 42);
+        OceanOutput("[PASS] Generic lambda invocation without cast");
+
+        // 6. Generic field access
+        Pair<String, int> pair = new Pair<String, int>("Score", 99);
+        checkString(pair.key, "Score");
+        checkInt(pair.value, 99);
+        OceanOutput("[PASS] Generic field access without cast");
+
+        // 7. Nested generic boxes
+        Box<Box<String>> nested = new Box<Box<String>>(strBox);
+        checkString(nested.get().get(), "OceanGeneric");
+        OceanOutput("[PASS] Nested generic boxes get().get() without cast");
+
+        OceanOutput("STATUS: PASSED");
+    }
+}

@@ -1,0 +1,57 @@
+class OuterHost {
+    data class InnerData(int x);
+    InnerData function make(int x) { return new InnerData(x); }
+}
+
+data class UserItem(String name) {
+    int localBodyCounter = 100;
+}
+
+class OC20DataClassIdentityTest {
+    main(String[] args) {
+        // 1. Data class with body field: copy and equals consistency
+        UserItem u1 = new UserItem("Alice");
+        u1.setLocalBodyCounter(999);
+        UserItem u2 = u1.copy();
+        
+        // Copy only copies primary components, and equals only compares primary components
+        if (!u1.equals(u2)) {
+            OceanOutput("FAILED: u1.equals(u2) should be true despite body field differences");
+            System.exit(1);
+        }
+        
+        // toString should only format primary components
+        String str = u1.toString();
+        if (str.contains("localBodyCounter")) {
+            OceanOutput("FAILED: toString should not contain body field 'localBodyCounter': " + str);
+            System.exit(1);
+        }
+        if (!str.contains("Alice")) {
+            OceanOutput("FAILED: toString should contain primary parameter 'Alice': " + str);
+            System.exit(1);
+        }
+
+        // 2. Inner data class: different outer instances should still be equal
+        OuterHost o1 = new OuterHost();
+        OuterHost o2 = new OuterHost();
+        OuterHost.InnerData in1 = o1.make(42);
+        OuterHost.InnerData in2 = o2.make(42);
+        
+        if (!in1.equals(in2)) {
+            OceanOutput("FAILED: in1.equals(in2) should be true regardless of this$0");
+            System.exit(1);
+        }
+        if (in1.hashCode() != in2.hashCode()) {
+            OceanOutput("FAILED: in1.hashCode() should equal in2.hashCode()");
+            System.exit(1);
+        }
+        String inStr = in1.toString();
+        if (inStr.contains("this$0")) {
+            OceanOutput("FAILED: toString should not contain synthetic field 'this$0': " + inStr);
+            System.exit(1);
+        }
+
+        OceanOutput("OC-20 Data Class Identity Test: PASSED");
+        OceanOutput("STATUS: PASSED");
+    }
+}

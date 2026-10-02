@@ -1,0 +1,215 @@
+package com.resources;
+
+
+class CLiteralTest {
+    static main() {
+        int passedCount = 0;
+
+        // Test 1: List of Maps with nested Lists (List -> Map -> List -> Int)
+        variable records = [
+            {"id": 101, "scores": [10, 20, 30]},
+            {"id": 202, "scores": [40, 50, 60]},
+            {"id": 303, "scores": [70, 80, 90]}
+        ];
+        variable t1 =((OceanIntList) records.get(1).get("scores")).get(2);
+        if (t1 == 60) {
+            passedCount = passedCount + 1;
+            OceanOutput("TEST 1 PASSED: records.get(1).get(\"scores\").get(2) == 60");
+        } else {
+            OceanOutput("TEST 1 FAILED");
+        }
+
+        // Test 2: Deeply nested Map of Maps (Map -> Map -> Map -> Map -> Int)
+        variable deepMap = {
+            "user": {
+                "profile": {
+                    "details": {
+                        "age": 25
+                    }
+                }
+            }
+        };
+        variable t2 = deepMap.get("user").get("profile").get("details").get("age");
+        if (t2 == 25) {
+            passedCount = passedCount + 1;
+            OceanOutput("TEST 2 PASSED: deepMap.get(\"user\").get(\"profile\").get(\"details\").get(\"age\") == 25");
+        } else {
+            OceanOutput("TEST 2 FAILED");
+        }
+
+        // Test 3: List of Lists of Maps (List -> List -> Map -> Int)
+        variable listInList = [
+            [{"x": 1}, {"x": 2}],
+            [{"x": 3, "val": 99}, {"x": 4}]
+        ];
+        variable t3 = listInList.get(1).get(0).get("val");
+        if (t3 == 99) {
+            passedCount = passedCount + 1;
+            OceanOutput("TEST 3 PASSED: listInList.get(1).get(0).get(\"val\") == 99");
+        } else {
+            OceanOutput("TEST 3 FAILED");
+        }
+
+        // Test 4: Map containing List of Maps with nested String Lists (Map -> List -> Map -> List -> String)
+        variable catalog = {
+            "categories": [
+                {"name": "tech", "tags": ["hardware", "software"]},
+                {"name": "books", "tags": ["fiction", "non-fiction", "sci-fi"]}
+            ]
+        };
+        variable t4 = ((OceanList<String>) catalog.get("categories").get(1).get("tags")).get(2);
+        if (t4 == "sci-fi") {
+            passedCount = passedCount + 1;
+            OceanOutput("TEST 4 PASSED: catalog.get(\"categories\").get(1).get(\"tags\").get(2) == \"sci-fi\"");
+        } else {
+            OceanOutput("TEST 4 FAILED");
+        }
+
+        // Test 5: Organization structure (Map -> List -> Map -> List -> Map -> String)
+        variable company = {
+            "departments": [
+                {
+                    "name": "Engineering",
+                    "employees": [
+                        {"name": "Alice", "role": "Dev"},
+                        {"name": "Bob", "role": "Lead"}
+                    ]
+                }
+            ]
+        };
+        variable t5 =((OceanList<OceanMap<String,String>>)company
+        .get("departments")
+        .getFirst()
+        .get("employees"))
+        .get(1)
+        .get("name");
+        if (t5 == "Bob") {
+            passedCount = passedCount + 1;
+            OceanOutput("TEST 5 PASSED: company.get(\"departments\").get(0).get(\"employees\").get(1).get(\"name\") == \"Bob\"");
+        } else {
+            OceanOutput("TEST 5 FAILED");
+        }
+
+        // Test 6: 4-level Grid Structure (List -> Map -> List -> Map -> Int)
+        variable grid = [
+            {"row": [{"col": 0, "val": 100}, {"col": 1, "val": 200}]},
+            {"row": [{"col": 0, "val": 300}, {"col": 1, "val": 400}]}
+        ];
+        variable t6 = grid.get(1).get("row").get(1).get("val");
+        if (t6 == 400) {
+            passedCount = passedCount + 1;
+            OceanOutput("TEST 6 PASSED: grid.get(1).get(\"row\").get(1).get(\"val\") == 400");
+        } else {
+            OceanOutput("TEST 6 FAILED");
+        }
+
+        // Test 7: Heterogeneous Map inside List inside Map (Map -> List -> Map -> String)
+        variable response = {
+            "status": 200,
+            "payload": [
+                {"active": true, "code": "OK"},
+                {"active": false, "code": "ERR"}
+            ]
+        };
+        variable t7 =(String) ((OceanMap)((OceanList)response.get("payload")).getFirst()).get("code");
+        if (t7 == "OK") {
+            passedCount = passedCount + 1;
+            OceanOutput("TEST 7 PASSED: response.get(\"payload\").get(0).get(\"code\") == \"OK\"");
+        } else {
+            OceanOutput("TEST 7 FAILED");
+        }
+
+        // Test 8: Tensor / Matrix structure (Map -> List -> List -> Int)
+        variable tensor = {
+            "matrix": [
+                [1, 2, 3],
+                [4, 5, 6]
+            ]
+        };
+        variable t8 = tensor.get("matrix").get(1).get(2);
+        if (t8 == 6) {
+            passedCount = passedCount + 1;
+            OceanOutput("TEST 8 PASSED: tensor.get(\"matrix\").get(1).get(2) == 6");
+        } else {
+            OceanOutput("TEST 8 FAILED");
+        }
+
+        // Test 9: Expression addition of two separate chained calls
+        variable t9 = ((OceanList)records.get(2).get("scores")).getFirst() + ((OceanList)records.getFirst().get("scores")).get(2);
+        if (t9 == 100) {
+            passedCount = passedCount + 1;
+            OceanOutput("TEST 9 PASSED: records.get(2).get(\"scores\").get(0) + records.get(0).get(\"scores\").get(2) == 100");
+        } else {
+            OceanOutput("TEST 9 FAILED");
+        }
+
+        // Test 10: Object vs Primitive Boolean equality check (Object == true)
+        variable config = {
+            "settings": [
+                {"feature": "auth", "enabled": true},
+                {"feature": "beta", "enabled": false}
+            ]
+        };
+        variable t10 = config.get("settings").get(0).get("enabled");
+        if (t10 == true) {
+            passedCount = passedCount + 1;
+            OceanOutput("TEST 10 PASSED: config.get(\"settings\").get(0).get(\"enabled\") == true");
+        } else {
+            OceanOutput("TEST 10 FAILED");
+        }
+
+        // Test 11: Direct Reference Comparison (!=) for distinct List instances
+        variable list1 = records.get(0).get("scores");
+        variable list2 = [10, 20, 30];
+        if (list1 != list2) {
+            passedCount = passedCount + 1;
+            OceanOutput("TEST 11 PASSED: Reference Inequality for distinct Lists (list1 != [10, 20, 30])");
+        } else {
+            OceanOutput("TEST 11 FAILED");
+        }
+
+        // Test 12: Direct Reference Comparison (!=) for distinct Map instances
+        variable map1 = records.get(0);
+        variable map2 = {"id": 101, "scores": [10, 20, 30]};
+        if (map1 != map2) {
+            passedCount = passedCount + 1;
+            OceanOutput("TEST 12 PASSED: Reference Inequality for distinct Maps (map1 != {\"id\": 101, ...})");
+        } else {
+            OceanOutput("TEST 12 FAILED");
+        }
+
+        // Test 13: Null-safe comparisons (Object == null)
+        variable missingVal = config.get("settings").get(0).get("nonExistentKey");
+        if (missingVal == null) {
+            passedCount = passedCount + 1;
+            OceanOutput("TEST 13 PASSED: Null-safe Equality (missingVal == null)");
+        } else {
+            OceanOutput("TEST 13 FAILED");
+        }
+
+        // Test 14: Object vs Primitive Double equality check
+        variable doubleVal = {"meta": {"rate": 99.5}}.get("meta").get("rate");
+        if (doubleVal == 99.5) {
+            passedCount = passedCount + 1;
+            OceanOutput("TEST 14 PASSED: Object vs Primitive Double (doubleVal == 99.5)");
+        } else {
+            OceanOutput("TEST 14 FAILED");
+        }
+
+        // Test 15: Compound boolean expression combining multiple object equality checks
+        if (records.get(0).get("id") == 101 && config.get("settings").get(0).get("enabled") == true && listInList.get(1).get(0).get("val") == 99) {
+            passedCount = passedCount + 1;
+            OceanOutput("TEST 15 PASSED: Compound Object Equality (id == 101 && enabled == true && val == 99)");
+        } else {
+            OceanOutput("TEST 15 FAILED");
+        }
+
+        OceanOutput("----------------------------------------");
+        if (passedCount == 15) {
+            OceanOutput("ALL 15 EXTREME OBJECT COMPARISON TESTS PASSED!");
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

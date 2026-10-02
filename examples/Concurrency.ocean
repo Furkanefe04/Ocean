@@ -1,0 +1,28 @@
+package examples;
+
+class Concurrency {
+    public static async String function fetchRemoteData(String serviceId, int delayMillis) {
+        Task.sleep(delayMillis);
+        return $"[Service {serviceId}] Data received after {delayMillis}ms";
+    }
+
+    public static async void function runDemo() {
+        OceanOutput("=== Ocean Virtual Threads & Async / Await ===");
+
+        // Asynchronous tasks running on lightweight virtual threads
+        value task1 = fetchRemoteData("AuthService", 50);
+        value task2 = fetchRemoteData("BillingService", 80);
+
+        // Await results concurrently
+        value res1 = await task1;
+        value res2 = await task2;
+
+        OceanOutput(res1);
+        OceanOutput(res2);
+        OceanOutput("All services responded successfully.");
+    }
+
+    static main() {
+        runDemo().join();
+    }
+}

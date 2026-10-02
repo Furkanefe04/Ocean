@@ -1,0 +1,56 @@
+package com.resources;
+
+class QueueStackVerificationTest {
+    static main() {
+        OceanOutput("=== QUEUE & STACK VERIFICATION ===");
+
+        // 1. Verify OceanQueue
+        variable queue = new OceanQueue<String>();
+        OceanOutput("Queue is empty at start: " + queue.isEmpty());
+        
+        queue.enqueue("First");
+        queue.enqueue("Second");
+        queue.enqueue("Third");
+        
+        OceanOutput("Queue size (should be 3): " + queue.size());
+        OceanOutput("Queue peek (should be First): " + queue.peek());
+        
+        variable item1 = queue.dequeue();
+        OceanOutput("Dequeued (should be First): " + item1);
+        OceanOutput("Queue peek after dequeue (should be Second): " + queue.peek());
+        OceanOutput("Queue size (should be 2): " + queue.size());
+
+        // 2. Verify OceanStack
+        variable stack = new OceanStack<Integer>();
+        OceanOutput("Stack is empty at start: " + stack.isEmpty());
+        
+        stack.push(10);
+        stack.push(20);
+        stack.push(30);
+        
+        OceanOutput("Stack size (should be 3): " + stack.size());
+        OceanOutput("Stack peek (should be 30): " + stack.peek());
+        
+        variable val1 = stack.pop();
+        OceanOutput("Popped (should be 30): " + val1);
+        OceanOutput("Stack peek after pop (should be 20): " + stack.peek());
+        OceanOutput("Stack size (should be 2): " + stack.size());
+
+        // 3. Verify Auto-Import of OceanList and OceanSet
+        variable list = [1, 2, 3];
+        OceanOutput("OceanList size: " + list.size());
+        
+        variable set = #{100, 200};
+        OceanOutput("OceanSet size: " + set.size());
+
+        OceanOutput("Queue & Stack verification test completed successfully!");
+        bool queueOk = (item1 == "First") && (queue.peek() == "Second") && (queue.size() == 2);
+        bool stackOk = (val1 == 30) && (stack.peek() == 20) && (stack.size() == 2);
+        bool collectionOk = (list.size() == 3) && (set.size() == 2);
+        if (queueOk && stackOk && collectionOk) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

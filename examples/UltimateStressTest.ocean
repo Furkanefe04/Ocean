@@ -1,0 +1,136 @@
+package com.resources;
+
+import java.lang.Thread;
+import java.lang.Exception;
+
+class CustomWorker extends Thread {
+    int count = 0;
+
+    void function run() {
+        trying {
+            for (int i from 0 to 5 with increasing 1) {
+                count = count + 1;
+                Thread.sleep(1L);
+            }
+        } catch (Exception e) {
+            OceanOutput("CustomWorker exception caught: " + e.getMessage());
+        }
+    }
+}
+
+class StressContainer<T> {
+    T dat;
+
+    void function setData(T val) {
+        dat = val;
+    }
+
+    T function getData() {
+        return dat;
+    }
+}
+
+class MathOperator {
+    <A, B> String function processPair(A first, B second) {
+        return first.toString() + " + " + second.toString();
+    }
+}
+
+class StressProduct {
+    String name;
+
+    static StressProduct function create(String n) {
+        StressProduct p = new StressProduct();
+        p.name = n;
+        return p;
+    }
+}
+
+class UltimateStressTest {
+    main() {
+        OceanOutput("==============================================");
+        OceanOutput("  OCEAN ULTIMATE STRESS TEST v1.0");
+        OceanOutput("==============================================");
+
+        // 1. JDK Subclassing & Reflection Traversal Test
+        OceanOutput("\n[TEST 1] JDK Subclassing & Inherited Methods...");
+        CustomWorker worker = new CustomWorker();
+        worker.start();
+        worker.join();
+        OceanOutput("Worker completed. Count: " + worker.count);
+        if (worker.count == 5) {
+            OceanOutput("  STATUS: SUCCESS");
+        } else {
+            OceanOutput("  STATUS: FAILED!");
+        }
+
+        // 2. Generics, Erasure & Primitive Autoboxing Test
+        OceanOutput("\n[TEST 2] Generics & Autoboxing boundary...");
+        StressContainer<String> sc = new StressContainer<String>();
+        sc.setData("Ocean Compiler");
+        OceanOutput("Container Data: " + sc.getData());
+
+        MathOperator op = new MathOperator();
+        // 100 (int) and 3.14 (double) are primitive types passed to erased types
+        String resultx = op.processPair(100, 3.14);
+        OceanOutput("Generic Erased Pair: " + resultx);
+        if (resultx.equals("100 + 3.14")) {
+            OceanOutput("  STATUS: SUCCESS");
+        } else {
+            OceanOutput("  STATUS: FAILED!");
+        }
+
+        // 3. Labeled Loops, continue (skip) & break (stop) Jumps
+        OceanOutput("\n[TEST 3] Complex Loop Jumps (skip/stop)...");
+        variable total = 0;
+        for (int i from 0 to 10 with increasing 1) {
+            variable j = 0;
+            while (j < 10) {
+                if (j == 3) {
+                    j = j + 1;
+                    skip; // skip index 3
+                }
+                if (j == 7) {
+                    stop; // break at index 7
+                }
+                total = total + 1;
+                j = j + 1;
+            }
+        }
+        OceanOutput("Total Jump Counts: " + total);
+        if (total == 60) { // 10 iterations * 6 elements (0, 1, 2, 4, 5, 6)
+            OceanOutput("  STATUS: SUCCESS");
+        } else {
+            OceanOutput("  STATUS: FAILED! Expected: 60, Got: " + total);
+        }
+
+        // 4. Try-Catch & Exception Boundary
+        OceanOutput("\n[TEST 4] Exception Try-Catch Boundary...");
+        bool test4_success = false;
+        trying {
+            throw new Exception("Compiler is Rock-Solid!");
+        } catch (Exception e) {
+            OceanOutput("Caught expected exception: " + e.getMessage());
+            OceanOutput("  STATUS: SUCCESS");
+            test4_success = true;
+        }
+
+        // 5. Local Package Priority Name Resolution Test
+        OceanOutput("\n[TEST 5] Local Package Prioritized Name Resolution...");
+        StressProduct prod = StressProduct.create("Ocean 1.0 Release Candidate");
+        OceanOutput("Product Name: " + prod.name);
+        if (prod.name.equals("Ocean 1.0 Release Candidate")) {
+            OceanOutput("  STATUS: SUCCESS");
+        } else {
+            OceanOutput("  STATUS: FAILED!");
+        }
+
+        OceanOutput("\n==============================================");
+        if (worker.count == 5 && sc.getData().equals("Ocean Compiler") && resultx.equals("100 + 3.14") && total == 60 && test4_success && prod.name.equals("Ocean 1.0 Release Candidate")) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+        OceanOutput("==============================================");
+    }
+}

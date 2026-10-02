@@ -1,0 +1,24 @@
+package com.resources;
+
+public class Array2DTest {
+    main() {
+        variable matrix = [[1, 2], [3, 4], [5, 6]];
+        OceanOutput("Matrix length: " + matrix.size());
+        OceanOutput("First row length: " + matrix[0].size());
+        OceanOutput("matrix[1][1] (should be 4): " + matrix[1][1]);
+
+        variable sum = 0;
+        for(variable row in matrix) {
+            for(int val in row) {
+                sum = sum + val;
+            }
+        }
+        OceanOutput("Sum of matrix: " + sum);
+
+        if(matrix.size() == 3 && matrix[0].size() == 2 && matrix[1][1] == 4 && sum == 21) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

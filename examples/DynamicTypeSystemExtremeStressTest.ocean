@@ -1,0 +1,117 @@
+package java_custom_pkg;
+
+import java.util.Comparator;
+
+@FunctionalInterface
+public interface CustomTransformer<T, R> {
+    public R function transform(T input);
+}
+
+@FunctionalInterface
+public interface CustomPredicate<T> {
+    public bool function test(T item);
+}
+
+@FunctionalInterface
+public interface CustomCalculator<T> {
+    public T function calculate(T a, T b);
+}
+
+public interface BaseContainer<T> {
+    public int function size();
+    public T function get(int index);
+}
+
+public class DynamicTypeSystemExtremeStressTest implements BaseContainer<String> {
+
+    private variable items = ["Alpha", "Beta", "Gamma", "Delta"];
+
+    @Override
+    public int function size() {
+        return items.size();
+    }
+
+    @Override
+    public String function get(int index) {
+        return (String) items.get(index);
+    }
+
+    public static String function processItem(String item, CustomTransformer<String, String> transformer) {
+        return transformer.transform(item);
+    }
+
+    public static bool function filterItem(String item, CustomPredicate<String> predicate) {
+        return predicate.test(item);
+    }
+
+    public static int function computeSum(int a, int b, CustomCalculator<Integer> calc) {
+        return (int) calc.calculate(a, b);
+    }
+
+    main() {
+        OceanOutput("=== DYNAMIC TYPE SYSTEM EXTREME STRESS TEST START ===");
+
+        // 1. Custom @FunctionalInterface Lambda Test
+        CustomTransformer<String, String> upperTransformer = new CustomTransformer<String, String>() {
+            @Override
+            public String function transform(String input) {
+                return input.toUpperCase();
+            }
+        };
+
+        String res1 = processItem("ocean_lang", upperTransformer);
+        OceanOutput("Transformed: " + res1);
+
+        // 2. Custom Predicate Anonymous Class
+        CustomPredicate<String> lengthFilter = new CustomPredicate<String>() {
+            @Override
+            public bool function test(String item) {
+                return item.length() > 4;
+            }
+        };
+
+        bool filterRes = filterItem("ocean_lang", lengthFilter);
+        OceanOutput("Length > 4 check: " + filterRes);
+
+        // 3. Custom Calculator SAM Test
+        CustomCalculator<Integer> adder = new CustomCalculator<Integer>() {
+            @Override
+            public Integer function calculate(Integer a, Integer b) {
+                return a + b;
+            }
+        };
+
+        int sumRes = computeSum(15, 27, adder);
+        OceanOutput("Custom calc sum: " + sumRes);
+
+        // 4. Primitive List Specialization Verification
+        variable intList = [100, 200, 300, 400, 500];
+        intList.shuffle();
+        intList.sort(new Comparator<Integer>() {
+            @Override
+            public int function compare(Integer o1, Integer o2) {
+                return o1.compareTo(o2);
+            }
+        });
+        int firstElem = (int) intList.get(0);
+        int lastElem = (int) intList.get(4);
+        OceanOutput("Sorted int list first: " + firstElem + ", last: " + lastElem);
+
+        // 5. Container Implementation Check
+        DynamicTypeSystemExtremeStressTest container = new DynamicTypeSystemExtremeStressTest();
+        OceanOutput("Container size: " + container.size() + ", item[0]: " + container.get(0));
+
+        // Final Verification Assertions
+        bool p1 = res1.equals("OCEAN_LANG");
+        bool p2 = filterRes == true;
+        bool p3 = sumRes == 42;
+        bool p4 = firstElem == 100 && lastElem == 500;
+        bool p5 = container.size() == 4 && container.get(0).equals("Alpha");
+
+        if (p1 && p2 && p3 && p4 && p5) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

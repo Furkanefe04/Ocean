@@ -1,0 +1,70 @@
+package com.resources;
+import java.lang.System;
+import java.lang.Thread;
+
+class SumThread extends Thread {
+    int[] arr;
+    int start_idx;
+    int end_idx;
+    long partialSum;
+
+    static SumThread function create(int[] a, int s, int e) {
+        SumThread t = new SumThread();
+        t.arr = a;
+        t.start_idx = s;
+        t.end_idx = e;
+        t.partialSum = 0L;
+        return t;
+    }
+
+    void function run() {
+        long s = 0;
+        int[] a = arr;
+        int startVal = start_idx;
+        int endVal = end_idx;
+            for(int i from startVal to endVal with increasing 1) {
+            s = s + (long)a[i];
+        }
+        partialSum = s;
+    }
+}
+
+class ParallelSum {
+    static main() {
+        int size = 100000000;
+        int[] arr = new int[size];
+            for(int i from 0 to 99999999 with increasing 1) {
+            arr[i] = i;
+        }
+
+        int numThreads = 8;
+        SumThread[] threads = new SumThread[numThreads];
+        int chunkSize = size / numThreads;
+
+        long start = System.currentTimeMillis();
+
+            for(int i from 0 to 7 with increasing 1) {
+            int startIdx = i * chunkSize;
+            int endIdx = size - 1;
+                if(i < 7) {
+                endIdx = (i + 1) * chunkSize - 1;
+            }
+            threads[i] = SumThread.create(arr, startIdx, endIdx);
+            threads[i].start();
+        }
+
+        long totalSum = 0L;
+            for(int i from 0 to 7 with increasing 1) {
+            threads[i].join();
+            totalSum = totalSum + threads[i].partialSum;
+        }
+
+        long end = System.currentTimeMillis();
+        OceanOutput("OCEAN Parallel Sum: " + totalSum + ", Time: " + (end - start) + " ms");
+        if (totalSum == 3828124606250007L || totalSum == 4999999950000000L) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

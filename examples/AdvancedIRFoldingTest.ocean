@@ -1,0 +1,49 @@
+package com.resources;
+
+class AdvancedIRFoldingTest {
+    static main() {
+        // 1. String Constant Method Folding
+        int sLen = "hello world".length();
+        String sUpper = "ocean".toUpperCase();
+        String sLower = "OCEAN".toLowerCase();
+        String sTrim = "  clean  ".trim();
+        String sSub = "programming".substring(0, 4);
+        bool sEq = "test".equalsIgnoreCase("TEST");
+
+        // 2. Math Constant Folding
+        int absVal = Math.abs(-42);
+        int minVal = Math.min(15, 30);
+        int maxVal = Math.max(15, 30);
+        double sqrtVal = Math.sqrt(25.0);
+
+        // 3. Bitwise Identity Folding
+        int bitAnd = 100 & 0;
+        int bitOr = 50 | 0;
+        int bitXor = 75 ^ 0;
+
+        // 4. Array Constant Length Folding
+        int[] arr1 = new int[5];
+        int arrLen = arr1.length;
+
+        OceanOutput("sLen=" + sLen);
+        OceanOutput("sUpper=" + sUpper);
+        OceanOutput("sLower=" + sLower);
+        OceanOutput("sTrim=" + sTrim);
+        OceanOutput("sSub=" + sSub);
+        OceanOutput("sEq=" + sEq);
+        OceanOutput("absVal=" + absVal + ", minVal=" + minVal + ", maxVal=" + maxVal + ", sqrtVal=" + sqrtVal);
+        OceanOutput("bitAnd=" + bitAnd + ", bitOr=" + bitOr + ", bitXor=" + bitXor);
+        OceanOutput("arrLen=" + arrLen);
+
+        bool strOk = (sLen == 11) && sUpper.equals("OCEAN") && sLower.equals("ocean") && sTrim.equals("clean") && sSub.equals("prog") && sEq;
+        bool mathOk = (absVal == 42) && (minVal == 15) && (maxVal == 30) && (sqrtVal == 5.0);
+        bool bitOk = (bitAnd == 0) && (bitOr == 50) && (bitXor == 75);
+        bool arrOk = (arrLen == 5);
+
+        if (strOk && mathOk && bitOk && arrOk) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

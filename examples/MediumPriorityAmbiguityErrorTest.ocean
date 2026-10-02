@@ -1,0 +1,16 @@
+package com.resources;
+
+import com.packagea.ConflictClassA;
+import com.packageb.ConflictClassB;
+
+// Missing import to trigger resolveClassName ambiguity error!
+
+class MediumPriorityAmbiguityErrorTest {
+    main() {
+        ConflictClassA? dummyA = null;
+        ConflictClassB? dummyB = null;
+
+        ConflictClass obj = new ConflictClass();
+        obj.doA();
+    }
+}

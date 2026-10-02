@@ -1,0 +1,23 @@
+package tests;
+
+class DefiniteAssignmentTest {
+
+    static void function testSimpleUninit() {
+        variable x;
+        OceanOutput("x is: " + x); // Should fail here
+    }
+
+    static void function testConditionalUninit(bool cond) {
+        variable y;
+        if (cond) {
+            y = 10;
+        }
+        // y is not initialized in the else branch
+        OceanOutput("y is: " + y); // Should fail here
+    }
+
+    static main() {
+        testSimpleUninit();
+        testConditionalUninit(true);
+    }
+}

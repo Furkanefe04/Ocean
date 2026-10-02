@@ -1,0 +1,74 @@
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.ArrayList;
+import java.util.List;
+
+class VirtualThreadsComprehensiveTest {
+
+    public static async bool function checkIsVirtual() {
+        return Task.isVirtual();
+    }
+
+    public static async String function fetchRemoteData(String serviceName, int delayMs) {
+        Task.sleep(delayMs);
+        bool v = Task.isVirtual();
+        return serviceName + "-DATA[v=" + v + "]";
+    }
+
+    public static async int function computeSquare(int n) {
+        return n * n;
+    }
+
+    public static async void function workerTask(AtomicInteger counter) {
+        counter.incrementAndGet();
+    }
+
+    public static async void function runComprehensiveTests() {
+        OceanOutput("=== VIRTUAL THREADS COMPREHENSIVE TEST ===");
+
+        // 1. Check Virtual Thread Execution
+        bool isVirt = await checkIsVirtual();
+        OceanOutput("Async method running on Virtual Thread: " + isVirt);
+
+        // 2. Concurrent Async Execution & Non-blocking Sleep
+        variable fut1 = fetchRemoteData("UsersService", 20);
+        variable fut2 = fetchRemoteData("OrdersService", 10);
+        variable fut3 = fetchRemoteData("InventoryService", 15);
+
+        await Task.all(fut1, fut2, fut3);
+
+        OceanOutput(await fut1);
+        OceanOutput(await fut2);
+        OceanOutput(await fut3);
+
+        // 3. Primitive async/await with boxing
+        int sq = await computeSquare(12);
+        OceanOutput("Square of 12: " + sq);
+
+        // 4. Massive Concurrency Stress Test on Virtual Threads
+        AtomicInteger counter = new AtomicInteger(0);
+        int totalWorkers = 2000;
+        List futures = new ArrayList();
+
+        for (int i from 0 to totalWorkers with increasing 1) {
+            futures.add(workerTask(counter));
+        }
+
+        for (int j from 0 to totalWorkers with increasing 1) {
+            CompletableFuture f = (CompletableFuture) futures.get(j);
+            await f;
+        }
+
+        OceanOutput("Massive concurrency counter: " + counter.get());
+
+        if (isVirt && counter.get() == totalWorkers && sq == 144) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+
+    static main() {
+        runComprehensiveTests().join();
+    }
+}

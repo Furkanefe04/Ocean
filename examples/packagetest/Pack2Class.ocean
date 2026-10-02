@@ -1,0 +1,11 @@
+package com.pack2;
+
+import com.pack1.Pack1Class;
+
+public class Pack2Class {
+    public static String function processUser(String username) {
+        String prefix = Pack1Class.getPrefix(username);
+        int nameLen = Pack1Class.calculateLen(username);
+        return prefix + " (length: " + nameLen + ")";
+    }
+}

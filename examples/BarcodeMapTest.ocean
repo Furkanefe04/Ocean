@@ -1,0 +1,31 @@
+package com.resources;
+    class MapProduct {
+    variable name = "";
+    variable price = 0;
+}
+    class BarcodeMapTest {
+    main(){
+        variable start = System.nanoTime();
+        variable limit = 100;
+        for(variable i from 0 to limit with increasing 1)
+        {
+            OceanMap db = new OceanMap();
+            MapProduct p = new MapProduct();
+            p.name = "Test";
+            p.price = 100;
+            db.put("123", p);
+
+            MapProduct p2 = (MapProduct)db.get("123");
+            p2.price = 150;
+
+            OceanOutput(((MapProduct)db.get("123")).price);
+            OceanOutput(((MapProduct)db.get("123")).name);
+            variable kalan = limit - i;
+            OceanOutput("Kalan : "+ kalan);
+        }
+        variable end = System.nanoTime();
+        // Milisaniye dönüşümü
+        variable diffMs = (end - start) / 1000000.0;
+        OceanOutput($"fark : {diffMs} ms");
+    }
+}

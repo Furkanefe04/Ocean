@@ -1,0 +1,10 @@
+class HomojenTest {
+    static main() {
+        OceanList<OceanMap<String, int>> dat = [{"a": 1}, {"b": 2}];
+        if (dat.size() == 2 && dat.get(0).get("a") == 1 && dat.get(1).get("b") == 2) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

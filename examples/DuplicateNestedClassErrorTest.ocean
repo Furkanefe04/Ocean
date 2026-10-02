@@ -1,0 +1,11 @@
+class DuplicateNestedClassErrorTest {
+    class NestedItem {
+        public int x = 1;
+    }
+    class NestedItem {
+        public int x = 2;
+    }
+    public static void function main(String[] args) {
+        println("Should not compile");
+    }
+}

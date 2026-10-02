@@ -1,0 +1,33 @@
+package pkg_test;
+
+class CovariantParent {
+    Object function getVal() {
+        return "Parent Value";
+    }
+}
+
+class CovariantChild extends CovariantParent {
+    @Override
+    String function getVal() {
+        return "Child Value";
+    }
+}
+
+class CovariantTest {
+    main() {
+        OceanOutput("--- CovariantTest ---");
+        CovariantParent p = new CovariantChild();
+        Object val = p.getVal();
+        OceanOutput(val);
+        
+        CovariantChild c = new CovariantChild();
+        String strVal = c.getVal();
+        OceanOutput(strVal);
+        
+        if (val.equals("Child Value") && strVal.equals("Child Value")) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

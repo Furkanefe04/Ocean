@@ -1,0 +1,29 @@
+data class DataClassTestPoint(int x, String name) {}
+
+class DataClassTest {
+    static main() {
+        DataClassTestPoint p1 = new DataClassTestPoint(10, "hello");
+        DataClassTestPoint p2 = new DataClassTestPoint(10, "hello");
+        
+        OceanOutput("x: " + p1.getX());
+        OceanOutput("name: " + p1.getName());
+        
+        p1.setX(15);
+        OceanOutput("new_x: " + p1.getX());
+        
+        bool eq1 = p1.equals(p2);
+        bool eq2 = p2.equals(new DataClassTestPoint(10, "hello"));
+        
+        OceanOutput("eq1: " + eq1);
+        OceanOutput("eq2: " + eq2);
+        
+        OceanOutput("toString: " + p2.toString());
+        OceanOutput("hashCode: " + p2.hashCode());
+
+        if (p1.getX() == 15 && !eq1 && eq2) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

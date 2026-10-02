@@ -1,0 +1,91 @@
+package com.resources;
+public class Wallet {
+    variable address = "";
+    variable ownerName = "";
+    variable balanceTRY = 0;
+    variable balanceBTC = 0;
+    variable balanceETH = 0;
+    variable totalTrades = 0;
+    variable isVerified = false;
+
+    function Wallet(String name, int initialTRY) {
+        ownerName = name;
+        balanceTRY = initialTRY;
+        isVerified = true;
+        address = "OX";
+    }
+
+    void function depositTRY(int amount) {
+        if(!isVerified) return;
+
+        balanceTRY = balanceTRY + amount;
+    }
+
+    int function withdrawTRY(int amount) {
+        if(!isVerified) return 0;
+
+        if(balanceTRY >= amount) {
+            balanceTRY = balanceTRY - amount;
+            return 1;
+        }
+        return 0;
+    }
+
+    void function addBTC(int satoshi) {
+        balanceBTC = balanceBTC + satoshi;
+        totalTrades = totalTrades + 1;
+    }
+
+    void function addETH(int gwei) {
+        balanceETH = balanceETH + gwei;
+        totalTrades = totalTrades + 1;
+    }
+
+    int function removeBTC(int satoshi) {
+        if(balanceBTC >= satoshi) {
+            balanceBTC = balanceBTC - satoshi;
+            totalTrades = totalTrades + 1;
+            return 1;
+        }
+        return 0;
+    }
+
+    int function removeETH(int gwei) {
+        if(balanceETH >= gwei) {
+            balanceETH = balanceETH - gwei;
+            totalTrades = totalTrades + 1;
+            return 1;
+        }
+        return 0;
+    }
+
+    void function freeze() {
+        isVerified = false;
+    }
+
+    void function unfreeze() {
+        isVerified = true;
+    }
+
+    int function getBalanceTRY() {
+        return balanceTRY;
+    }
+    int function getBalanceBTC() {
+        return balanceBTC;
+    }
+    int function getBalanceETH() {
+        return balanceETH;
+    }
+    int function getTotalTrades() {
+        return totalTrades;
+    }
+    String function getOwnerName() {
+        return ownerName;
+    }
+    String function getAddress() {
+        return address;
+    }
+    bool function isVerified() {
+        return isVerified;
+    }
+}

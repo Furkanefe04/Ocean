@@ -1,0 +1,82 @@
+package com.trading.wallet;
+
+import java.lang.Exception;
+import com.trading.core.OrderListWrapper;
+
+public class AccountProfile {
+    public String username;
+    public String tier; // "STANDARD" or "VIP"
+
+    public static AccountProfile function create(String u, String t) {
+        AccountProfile ap = new AccountProfile();
+        ap.username = u;
+        ap.tier = t;
+        return ap;
+    }
+}
+
+public class AssetBalance {
+    public String symbol;
+    public double balance;
+
+    public static AssetBalance function create(String sym, double amt) {
+        AssetBalance b = new AssetBalance();
+        b.symbol = sym;
+        b.balance = amt;
+        return b;
+    }
+}
+
+public class Wallet {
+    public String accountId;
+    public AssetBalance[] balances;
+
+    public static Wallet function create(String acc, AssetBalance[] balList) {
+        Wallet w = new Wallet();
+        w.accountId = acc;
+        w.balances = balList;
+        return w;
+    }
+
+    public double function getBalance(String sym) {
+        for (int i from 0 to balances.length with increasing 1) {
+            if (balances[i].symbol.equals(sym)) {
+                return balances[i].balance;
+            }
+        }
+        return 0.0;
+    }
+
+    public void function deposit(String sym, double amount) {
+        for (int i from 0 to balances.length with increasing 1) {
+            if (balances[i].symbol.equals(sym)) {
+                balances[i].balance = balances[i].balance + amount;
+            }
+        }
+    }
+
+    public void function withdraw(String sym, double amount) throws Exception {
+        for (int i from 0 to balances.length with increasing 1) {
+            if (balances[i].symbol.equals(sym)) {
+                if (balances[i].balance < amount) {
+                    throw new Exception("Insufficient funds for asset: " + sym);
+                }
+                balances[i].balance = balances[i].balance - amount;
+            }
+        }
+    }
+}
+
+public class Ledger {
+    public OrderListWrapper<String> auditLogs;
+
+    public static Ledger function create() {
+        Ledger l = new Ledger();
+        l.auditLogs = OrderListWrapper.create();
+        return l;
+    }
+
+    public void function logTransfer(String fromAcc, String toAcc, String sym, double amt) {
+        auditLogs.add("TRANSFER: $" + amt + " " + sym + " from " + fromAcc + " to " + toAcc);
+    }
+}

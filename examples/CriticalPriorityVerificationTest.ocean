@@ -1,0 +1,107 @@
+package com.resources;
+
+class CriticalPriorityVerificationTest {
+    static main() {
+        OceanOutput("=== CRITICAL PRIORITY VERIFICATION TEST ===");
+
+        // 1. OceanString Verification
+        String text = "  Ocean Language  ";
+        OceanOutput("length: " + OceanString.length(text));
+        OceanOutput("trim: '" + OceanString.trim(text) + "'");
+        OceanOutput("trim length: " + OceanString.length(OceanString.trim(text)));
+        
+        String trimmed = OceanString.trim(text);
+        OceanOutput("contains Lang: " + OceanString.contains(trimmed, "Lang"));
+        OceanOutput("startsWith Ocean: " + OceanString.startsWith(trimmed, "Ocean"));
+        OceanOutput("endsWith uage: " + OceanString.endsWith(trimmed, "uage"));
+        OceanOutput("toUpperCase: " + OceanString.toUpperCase(trimmed));
+        OceanOutput("toLowerCase: " + OceanString.toLowerCase(trimmed));
+        OceanOutput("replace Language with Code: " + OceanString.replace(trimmed, "Language", "Code"));
+        OceanOutput("indexOf Lan: " + OceanString.indexOf(trimmed, "Lan"));
+        OceanOutput("substring(0, 5): " + OceanString.substring(trimmed, 0, 5));
+        
+        OceanOutput("toInt '123': " + OceanString.toInt("123"));
+        OceanOutput("toDouble '123.45': " + OceanString.toDouble("123.45"));
+        
+        OceanOutput("isEmpty empty: " + OceanString.isEmpty(""));
+        OceanOutput("isBlank blank: " + OceanString.isBlank("   "));
+        
+        String formatted = OceanString.format("Hello %s version %d", "Ocean", 1);
+        OceanOutput("format: " + formatted);
+
+        // 2. OceanMath Verification
+        OceanOutput("Math PI: " + OceanMath.PI);
+        OceanOutput("Math E: " + OceanMath.E);
+        OceanOutput("max(10, 20): " + OceanMath.max(10, 20));
+        OceanOutput("max(10.5, 20.5): " + OceanMath.max(10.5, 20.5));
+        OceanOutput("min(10, 20): " + OceanMath.min(10, 20));
+        OceanOutput("min(10.5, 20.5): " + OceanMath.min(10.5, 20.5));
+        OceanOutput("abs(-10): " + OceanMath.abs(-10));
+        OceanOutput("abs(-10.5): " + OceanMath.abs(-10.5));
+        OceanOutput("pow(2, 3): " + OceanMath.pow(2.0, 3.0));
+        OceanOutput("floor(3.7): " + OceanMath.floor(3.7));
+        OceanOutput("ceil(3.2): " + OceanMath.ceil(3.2));
+        OceanOutput("round(3.5): " + OceanMath.round(3.5));
+        OceanOutput("log(E): " + OceanMath.log(OceanMath.E));
+        OceanOutput("log10(100): " + OceanMath.log10(100.0));
+        OceanOutput("sin(PI/2): " + OceanMath.sin(OceanMath.PI / 2.0));
+        OceanOutput("cos(0): " + OceanMath.cos(0.0));
+        OceanOutput("tan(0): " + OceanMath.tan(0.0));
+        OceanOutput("random between 0 and 1: " + OceanMath.random());
+        OceanOutput("clamp(15, 0, 10): " + OceanMath.clamp(15, 0, 10));
+        OceanOutput("clamp(5.5, 0.0, 10.0): " + OceanMath.clamp(5.5, 0.0, 10.0));
+
+        // 3. Generic OceanList Verification
+        OceanList<String> list = new OceanList();
+        list.add("FirstItem");
+        list.add("SecondItem");
+        
+        OceanOutput("List size: " + list.size());
+        OceanOutput("List get(0): " + list.get(0));
+        OceanOutput("List get(1): " + list.get(1));
+
+        bool passed = true;
+        if (OceanString.length(text) != 18) { passed = false; }
+        if (OceanString.trim(text) != "Ocean Language") { passed = false; }
+        if (OceanString.length(OceanString.trim(text)) != 14) { passed = false; }
+        if (OceanString.contains(trimmed, "Lang") != true) { passed = false; }
+        if (OceanString.startsWith(trimmed, "Ocean") != true) { passed = false; }
+        if (OceanString.endsWith(trimmed, "uage") != true) { passed = false; }
+        if (OceanString.toUpperCase(trimmed) != "OCEAN LANGUAGE") { passed = false; }
+        if (OceanString.toLowerCase(trimmed) != "ocean language") { passed = false; }
+        if (OceanString.replace(trimmed, "Language", "Code") != "Ocean Code") { passed = false; }
+        if (OceanString.indexOf(trimmed, "Lan") != 6) { passed = false; }
+        if (OceanString.substring(trimmed, 0, 5) != "Ocean") { passed = false; }
+        if (OceanString.toInt("123") != 123) { passed = false; }
+        if (OceanString.toDouble("123.45") != 123.45) { passed = false; }
+        if (OceanString.isEmpty("") != true) { passed = false; }
+        if (OceanString.isBlank("   ") != true) { passed = false; }
+        if (formatted != "Hello Ocean version 1") { passed = false; }
+        if (OceanMath.max(10, 20) != 20) { passed = false; }
+        if (OceanMath.max(10.5, 20.5) != 20.5) { passed = false; }
+        if (OceanMath.min(10, 20) != 10) { passed = false; }
+        if (OceanMath.min(10.5, 20.5) != 10.5) { passed = false; }
+        if (OceanMath.abs(-10) != 10) { passed = false; }
+        if (OceanMath.abs(-10.5) != 10.5) { passed = false; }
+        if (OceanMath.pow(2.0, 3.0) != 8.0) { passed = false; }
+        if (OceanMath.floor(3.7) != 3.0) { passed = false; }
+        if (OceanMath.ceil(3.2) != 4.0) { passed = false; }
+        if (OceanMath.round(3.5) != 4.0) { passed = false; }
+        if (OceanMath.log(OceanMath.E) != 1.0) { passed = false; }
+        if (OceanMath.log10(100.0) != 2.0) { passed = false; }
+        if (OceanMath.sin(OceanMath.PI / 2.0) != 1.0) { passed = false; }
+        if (OceanMath.cos(0.0) != 1.0) { passed = false; }
+        if (OceanMath.tan(0.0) != 0.0) { passed = false; }
+        if (OceanMath.clamp(15, 0, 10) != 10) { passed = false; }
+        if (OceanMath.clamp(5.5, 0.0, 10.0) != 5.5) { passed = false; }
+        if (list.size() != 2) { passed = false; }
+        if (list.get(0) != "FirstItem") { passed = false; }
+        if (list.get(1) != "SecondItem") { passed = false; }
+
+        if (passed) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

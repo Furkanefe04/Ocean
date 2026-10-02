@@ -1,0 +1,29 @@
+
+class OceanPrimitiveListTest {
+
+    static OceanIntList x = [10,20,30,40,50];
+
+    main(){
+        bool p1 = (x[1] == 20);
+        if (x[3] == 40) {
+            x[4] = 55;
+        }
+        x.add(100);
+        bool p2 = (x.getInt(4) == 55);
+        bool p3 = (x[5] == 100);
+
+        int sum = 0;
+        for(int val in x) {
+            sum = sum + val;
+        }
+        // 10 + 20 + 30 + 40 + 55 + 100 = 255
+        bool p4 = (sum == 255);
+
+        if (p1 && p2 && p3 && p4) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+
+}

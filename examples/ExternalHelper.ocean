@@ -1,0 +1,16 @@
+package com.external;
+
+public class ExternalHelper {
+    public static int function multiply(int a, int b) {
+        return a * b;
+    }
+
+    public static void function main() {
+        int resultx = multiply(6, 7);
+        if (resultx == 42) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

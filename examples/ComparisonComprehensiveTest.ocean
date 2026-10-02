@@ -1,0 +1,89 @@
+package com.resources;
+
+import java.math.BigDecimal;
+
+class ComparisonComprehensiveTest {
+    main() {
+        OceanOutput("=== COMPREHENSIVE COMPARISON OPERATOR TEST ===");
+
+        bool allPassed = true;
+
+        // 1. Primitive int vs int
+        int i1 = 10;
+        int i2 = 20;
+        if (!(i1 < i2 && i2 > i1 && i1 <= 10 && i2 >= 20 && i1 != i2 && !(i1 == i2))) {
+            OceanOutput("FAIL: Primitive int comparison");
+            allPassed = false;
+        }
+
+        // 2. Primitive double vs double
+        double d1 = 3.14;
+        double d2 = 9.81;
+        if (!(d1 < d2 && d2 > d1 && d1 <= 3.14 && d2 >= 9.81 && d1 != d2 && !(d1 == d2))) {
+            OceanOutput("FAIL: Primitive double comparison");
+            allPassed = false;
+        }
+
+        // 3. Mixed Numeric (int vs double, long vs int)
+        long l1 = 1000L;
+        int i3 = 500;
+        if (!(i3 < l1 && l1 > d1 && i3 <= l1)) {
+            OceanOutput("FAIL: Mixed numeric comparison");
+            allPassed = false;
+        }
+
+        // 4. Variable (Dynamic Object) vs Primitive Int
+        variable vCond = 100;
+        if (!(vCond > 50 && vCond >= 100 && vCond < 200 && vCond <= 100 && vCond == 100 && vCond != 50)) {
+            OceanOutput("FAIL: Variable vs Primitive comparison");
+            allPassed = false;
+        }
+
+        // 5. Variable vs Variable
+        variable v1 = 42;
+        variable v2 = 99;
+        if (!(v1 < v2 && v2 > v1 && v1 <= v2 && v1 != v2)) {
+            OceanOutput("FAIL: Variable vs Variable comparison");
+            allPassed = false;
+        }
+
+        // 6. String Equality (== and !=)
+        String s1 = "Ocean";
+        String s2 = "Ocean";
+        String s3 = "Java";
+        if (!(s1 == s2 && s1 != s3 && !(s1 == s3))) {
+            OceanOutput("FAIL: String equality comparison");
+            allPassed = false;
+        }
+
+        // 7. BigDecimal Comparisons
+        BigDecimal b1 = new BigDecimal("10.5");
+        BigDecimal b2 = new BigDecimal("20.5");
+        if (!(b1 < b2 && b2 > b1 && b1 <= b2 && b1 != b2)) {
+            OceanOutput("FAIL: BigDecimal comparison");
+            allPassed = false;
+        }
+
+        // 8. Null Object reference comparison
+        Object? objNull = null;
+        Object objNonNull = "Test";
+        if (!(objNull == null && objNonNull != null && !(objNonNull == null))) {
+            OceanOutput("FAIL: Null reference comparison");
+            allPassed = false;
+        }
+
+        // 9. Boolean Equality
+        bool bTrue = true;
+        bool bFalse = false;
+        if (!(bTrue == true && bFalse == false && bTrue != bFalse)) {
+            OceanOutput("FAIL: Boolean equality comparison");
+            allPassed = false;
+        }
+
+        if (allPassed) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

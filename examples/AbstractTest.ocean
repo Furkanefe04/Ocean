@@ -1,0 +1,57 @@
+package com.resources;
+
+// Abstract Class Support Test
+abstract class Shape {
+    int x;
+    int y;
+
+    function Shape(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    abstract int function area();
+    
+    void function printPos() {
+        OceanOutput("Position: ");
+        OceanOutput(x);
+        OceanOutput(y);
+
+    }
+}
+
+class Circle extends Shape {
+    int radius;
+
+    function Circle(int x, int y, int radius) {
+        super(x, y);
+        this.radius = radius;
+    }
+
+    int function area() {
+        // Simple area calculation (3 * r * r)
+        return 3 * radius * radius;
+    }
+}
+
+class AbstractTest {
+    main() {
+        OceanOutput("--- Abstract Class Test ---");
+        
+        Circle c = new Circle(10, 20, 5);
+        c.printPos();
+        OceanOutput("Circle Area: ");
+        OceanOutput(c.area());
+
+        // Test Polymorphism
+        Shape s = c;
+        OceanOutput("Area via Shape reference: ");
+        OceanOutput(s.area());
+        
+        if (c.x == 10 && c.y == 20 && c.radius == 5 && c.area() == 75 && s.area() == 75) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

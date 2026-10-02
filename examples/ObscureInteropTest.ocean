@@ -1,0 +1,55 @@
+package com.resources;
+import java.util.UUID;
+import java.net.URL;
+import java.util.concurrent.ThreadLocalRandom;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.BitSet;
+import java.lang.Exception;
+
+class ObscureInteropTest {
+    static main() {
+        trying {
+            // Test UUID (java.util)
+            variable id = UUID.randomUUID();
+            Output("Generated UUID: " + id.toString());
+            
+            // Test URL (java.net)
+            variable url = new URL("https://www.google.com");
+            Output("URL Host: " + url.getHost());
+            
+            // Test ThreadLocalRandom (java.util.concurrent)
+            variable rand = ThreadLocalRandom.current();
+            int randVal = rand.nextInt(1, 100);
+            Output("Random Int: " + randVal);
+            
+            // Test SimpleDateFormat (java.text)
+            variable sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            variable now = new Date();
+            Output("Formatted Date: " + sdf.format(now));
+            
+            // Test BitSet (java.util)
+            variable bits = new BitSet();
+            bits.set(10);
+            bits.set(20);
+            Output("BitSet: " + bits.toString());
+            Output("Bit at 10: " + bits.get(10));
+            Output("Bit at 15: " + bits.get(15));
+
+            bool success = (id != null && id.toString().length() == 36) &&
+                              "www.google.com".equals(url.getHost()) &&
+                              (randVal >= 1 && randVal <= 100) &&
+                              (sdf.format(now) != null) &&
+                              bits.get(10) &&
+                              !bits.get(15) &&
+                              "{10, 20}".equals(bits.toString());
+            if (success) {
+                Output("STATUS: PASSED");
+            } else {
+                Output("STATUS: FAILED");
+            }
+        } catch (Exception e) {
+            Output("STATUS: FAILED");
+        }
+    }
+}

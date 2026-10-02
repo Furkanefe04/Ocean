@@ -1,0 +1,7 @@
+package Test;
+
+class DataTypeException extends Exception {
+    function DataTypeException(String message){
+        super(message);
+    }
+}

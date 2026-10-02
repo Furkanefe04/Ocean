@@ -1,0 +1,24 @@
+package com.resources;
+
+class NullSafetyAssignmentTest {
+    static main() {
+        OceanOutput("=== NULL SAFETY ASSIGNMENT STRESS TEST ===");
+
+        String s1 = "Valid";
+        OceanOutput("s1: " + s1);
+
+        String? nullableStr = null;
+        String s2 = nullableStr ?? "Fallback";
+        OceanOutput("s2: " + s2);
+
+        String? nullableStr2 = "Present";
+        String s3 = nullableStr2 != null ? nullableStr2 : "Fallback2";
+        OceanOutput("s3: " + s3);
+
+        if (s1.equals("Valid") && s2.equals("Fallback") && s3.equals("Present")) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

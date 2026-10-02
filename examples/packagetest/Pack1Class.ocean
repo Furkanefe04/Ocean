@@ -1,0 +1,11 @@
+package com.pack1;
+
+public class Pack1Class {
+    public static String function getPrefix(String name) {
+        return "Dear " + name;
+    }
+
+    public static int function calculateLen(String name) {
+        return name.length();
+    }
+}

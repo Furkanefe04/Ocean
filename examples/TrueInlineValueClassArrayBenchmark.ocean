@@ -1,0 +1,73 @@
+package com.resources;
+
+import java.util.Objects;
+
+@Inline
+class UserId {
+    public int id;
+    function UserId(int id) {
+        this.id = id;
+    }
+}
+
+class StandardUserId {
+    public int id;
+    function StandardUserId(int id) {
+        this.id = id;
+    }
+}
+
+class TrueInlineValueClassArrayBenchmark {
+
+    static main() {
+        OceanOutput("=== TRUE UNBOXED VALUE ARRAY BENCHMARK START ===");
+        long start1 = System.nanoTime();
+
+        int size = 5000000; // 5 Milyon Eleman
+
+        // 1. Unboxed Primitive Array (@Inline Class Primitive Storage)
+        int[] unboxedArray = new int[size];
+        int i = 0;
+        while (i < size) {
+            UserId u = new UserId(i); // @Inline unwraps to raw int
+            unboxedArray[i] = u.id;
+            i = i + 1;
+        }
+
+        long sum1 = 0;
+        int j = 0;
+        while (j < size) {
+            sum1 = sum1 + unboxedArray[j];
+            j = j + 1;
+        }
+        long durationInlineMs = (System.nanoTime() - start1) / 1000000;
+
+        // 2. Standard Object Heap Array (Standard Heap Allocation)
+        long start2 = System.nanoTime();
+        StandardUserId[] heapArray = new StandardUserId[size];
+        int k = 0;
+        while (k < size) {
+            heapArray[k] = new StandardUserId(k); // Real Heap Object Allocation
+            k = k + 1;
+        }
+
+        long sum2 = 0;
+        int m = 0;
+        while (m < size) {
+            sum2 = sum2 + heapArray[m].id;
+            m = m + 1;
+        }
+        long durationStandardMs = (System.nanoTime() - start2) / 1000000;
+
+        OceanOutput("Duration (@Inline Unboxed Primitive Storage): " + durationInlineMs + " ms");
+        OceanOutput("Duration (Standard Heap Class Allocation): " + durationStandardMs + " ms");
+        OceanOutput("Sum 1: " + sum1 + " | Sum 2: " + sum2);
+
+        if (durationInlineMs <= durationStandardMs + 10) {
+            OceanOutput("WINNER: @Inline Unboxed Array is FASTER!");
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("WINNER: Standard Heap Array");
+        }
+    }
+}

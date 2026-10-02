@@ -1,0 +1,59 @@
+package com.resources;
+
+data class DenemeDataClass(Number x,Number y) {
+
+    function DenemeDataClass(int x,int y){
+        this.x = x;
+        this.y = y;
+    }
+
+    function DenemeDataClass(double x , double y){
+        this.x = x+1;
+        this.y = y+1;
+    }
+
+    double function sum(){
+        return x + y;
+    }
+
+    double function minus(){
+        return x-y;
+    }
+
+    double function mul(){
+        return (double) x*y;
+    }
+
+    double function div(){
+        return (double) x/y;
+    }
+}
+
+
+class DataClassDenemesi {
+    main(){
+        DenemeDataClass deneme = new DenemeDataClass(3,0);
+        DenemeDataClass deneme1 = new DenemeDataClass(35.4,20.4);
+        OceanOutput(deneme.getX());
+        OceanOutput(deneme1.getX());
+        OceanOutput("Toplama : "+deneme.sum()+"\nÇıkarma : " +deneme.minus() +"\nÇarpma : "+deneme.mul()+"\nBölme : "+deneme.div());
+        OceanOutput("Toplama : "+deneme1.sum()+"\nÇıkarma : "+deneme1.minus() +"\nÇarpma : " +deneme1.mul()+"\nBölme : "+deneme1.div());
+
+        bool passed = true;
+        if (deneme.getX() != 3) { passed = false; }
+        if (deneme1.getX() != 36.4) { passed = false; }
+        if (deneme.sum() != 3.0) { passed = false; }
+        if (deneme.minus() != 3.0) { passed = false; }
+        if (deneme.mul() != 0.0) { passed = false; }
+        if (deneme1.sum() != 57.8) { passed = false; }
+        if (deneme1.minus() != 15.0) { passed = false; }
+        if (deneme1.mul() < 778.95 || deneme1.mul() > 778.97) { passed = false; }
+        if (deneme1.div() < 1.70 || deneme1.div() > 1.71) { passed = false; }
+
+        if (passed) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

@@ -1,0 +1,20 @@
+package com.resources;
+
+class SpecializedPrimitiveGenericsTest {
+    static main() {
+        OceanOutput("=== SPECIALIZED PRIMITIVE GENERICS TEST START ===");
+
+        // Primitive int specialized list literal [10, 20, 30, 40, 50]
+        variable intList = [10, 20, 30, 40, 50];
+
+        OceanOutput("IntList Size: " + intList.size());
+        OceanOutput("Element 0: " + intList.get(0));
+        OceanOutput("Element 4: " + intList.get(4));
+
+        if (intList.size() == 5 && intList.get(0) == 10 && intList.get(4) == 50) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

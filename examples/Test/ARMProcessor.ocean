@@ -1,0 +1,33 @@
+package Test;
+
+class ARMProcessor extends Processor<Data,String> {
+    sync int threadInSleep;
+    function ARMProcessor(String name,int threads){
+        super(name,threads);
+        threadInSleep=threads;
+    }
+
+    @Override
+    String function process(Data pData) throws ProcessorException {
+        if(threadInSleep==0) throw new ProcessorException("Insufficient core",this);
+        threadInSleep--;
+        OceanOutput(super.name +" sleep cores : "+threadInSleep);
+        if(control(pData)){
+            trying{
+                Thread.sleep(100);
+                threadInSleep++;
+            }
+            catch(Exception e){
+                OceanOutput(e.getMessage());
+            }
+            return pData.command +" X ";
+        }
+        threadInSleep++;
+        throw new ProcessorException("Cannot process CISC data by ARM processor",this);
+    }
+
+    @Override
+    bool function control(Data pData){
+        return pData.commandLenght == 2;
+    }
+}

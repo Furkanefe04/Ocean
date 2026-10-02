@@ -1,0 +1,24 @@
+package com.resources;
+    class CallsBench {
+    static int function add(int a, int b) {
+        return a + b;
+    }
+
+    main() {
+        long limit = 1000000000;
+        long start = System.currentTimeMillis();
+        
+        long sum = 0;
+        for (int i from 0 to 999999999 with increasing 1) {
+            sum = sum + add(i, 1);
+        }
+        
+        long end = System.currentTimeMillis();
+        OceanOutput("OCEAN Calls Sum: " + sum + ", Time: " + (end - start) + " ms");
+        if (sum == 499999999500000000L) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

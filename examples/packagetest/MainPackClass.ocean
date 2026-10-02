@@ -1,0 +1,21 @@
+package com.mainpack;
+
+import com.pack2.Pack2Class;
+import java.util.ArrayList;
+
+class MainPackClass {
+    main() {
+        String user = "OceanDeveloper";
+        variable arrx = [];
+        for(int i from 0 to args.length with increasing 1) {
+            arrx.add(args[i]);
+        }
+        while (arrx.size()>0){
+            user = arrx.getFirst();
+            System.out.println("Processing user argument: " + user);
+            String resultx = Pack2Class.processUser(user);
+            System.out.println("Result: " + resultx);
+            arrx.remove(arrx.getFirst());
+        }
+    }
+}

@@ -1,0 +1,13 @@
+package com.resources;
+    class MinimalFail {
+    main() {
+        int a = 10;
+        int b = 20;
+        variable status = $"Status: { (a + b > 25 ? "High" : "Low") }";
+        if ("Status: High".equals(status)) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

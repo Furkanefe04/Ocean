@@ -1,0 +1,25 @@
+package com.resources;
+
+class TryFinallyReturnTest {
+    static int function testMethod(int x) {
+        trying {
+            if (x > 0) {
+                return x + 10;
+            }
+            return 5;
+        } finally {
+            OceanOutput("Finally block executed");
+        }
+    }
+
+    main() {
+        OceanOutput("=== TRY FINALLY RETURN TEST START ===");
+        int res = testMethod(5);
+        OceanOutput("Result: " + res);
+        if (res == 15) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

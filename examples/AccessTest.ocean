@@ -1,0 +1,22 @@
+package com.resources;
+    class AccessTest {
+    main() {
+        variable secret = new SecretClass();
+        secret.publicCode = 123; // Allowed
+        secret.setSecret(456);  // Allowed
+        
+        OceanOutput("Public code: " + secret.publicCode);
+        
+        // These should cause compiler errors
+        // OceanOutput("Secret code: " + secret.secretCode); 
+        // OceanOutput("Secret code via func: " + secret.getSecret());
+        
+        OceanOutput("Secret code via public func: " + secret.getSecretPublicly());
+        
+        if (secret.publicCode == 123 && secret.getSecretPublicly() == 456) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

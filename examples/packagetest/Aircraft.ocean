@@ -1,0 +1,87 @@
+package com.enterprise.inventory;
+
+import com.enterprise.core.CoreEntity;
+import com.enterprise.core.GenericListWrapper;
+
+public class Aircraft {
+    public String tailNumber;
+    public String model;
+    public int capacity;
+
+    public static Aircraft function create(String tail, String mod, int cap) {
+        Aircraft a = new Aircraft();
+        a.tailNumber = tail;
+        a.model = mod;
+        a.capacity = cap;
+        return a;
+    }
+}
+
+public class Seat {
+    public String seatNo;
+    public String classType;
+    public bool isReserved;
+
+    public static Seat function create(String no, String t) {
+        Seat s = new Seat();
+        s.seatNo = no;
+        s.classType = t;
+        s.isReserved = false;
+        return s;
+    }
+}
+
+public class Flight extends CoreEntity {
+    public String flightNumber;
+    public String origin;
+    public String destination;
+    public Aircraft aircraft;
+    public Seat[] seats;
+
+    public static Flight function create(String id, String num, String orig, String dest, Aircraft ac, Seat[] sList) {
+        Flight f = new Flight();
+        f.id = id;
+        f.flightNumber = num;
+        f.origin = orig;
+        f.destination = dest;
+        f.aircraft = ac;
+        f.seats = sList;
+        return f;
+    }
+}
+
+public class FlightSearchQuery {
+    public String origin;
+    public String destination;
+
+    public static FlightSearchQuery function create(String o, String d) {
+        FlightSearchQuery q = new FlightSearchQuery();
+        q.origin = o;
+        q.destination = d;
+        return q;
+    }
+}
+
+public class FlightSearchEngine {
+    public GenericListWrapper < Flight > flights;
+
+    public static FlightSearchEngine function create() {
+        FlightSearchEngine eng = new FlightSearchEngine();
+        eng.flights = GenericListWrapper.create();
+        return eng;
+    }
+
+    public void function registerFlight(Flight f) {
+        flights.add(f);
+    }
+
+    public Flight? function findFlight(FlightSearchQuery query) {
+        for(int i from 0 to flights.size() with increasing 1) {
+            Flight f = flights.get(i);
+            if(f.origin.equals(query.origin) && f.destination.equals(query.destination)) {
+                return f;
+            }
+        }
+        return null;
+    }
+}

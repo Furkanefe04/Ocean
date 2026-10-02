@@ -1,0 +1,96 @@
+package com.resources;
+import java.lang.System;
+import java.util.Arrays;
+
+class OceanEntity {
+    int val;
+    void function speak() {
+        val = val + 1;
+    }
+}
+
+class AntigravitySuiteBench {
+    static int function fibPureIterative(int n) {
+        if (n <= 1) { return n; }
+        int a = 0;
+        int b = 1;
+        int c = 0;
+        for (int i from 2 to n with increasing 1) {
+            c = a + b;
+            a = b;
+            b = c;
+        }
+        return b;
+    }
+
+    main() {
+        // 1. FIBONACCI
+        long t0 = System.nanoTime();
+        long fsum = 0;
+        for (int i from 0 to 50000 with increasing 1) {
+            fsum = fsum + fibPureIterative(100);
+        }
+        double fibMs = (System.nanoTime() - t0) / 1000000.0;
+
+        // 2. CONTIGUOUS 1D MATRIX MULTIPLICATION (500x500 flat double[])
+        int N = 500;
+        double[] A = new double[N * N];
+        double[] B = new double[N * N];
+        double[] C = new double[N * N];
+        Arrays.fill(A, 1.0);
+        Arrays.fill(B, 2.0);
+
+        t0 = System.nanoTime();
+        for (int i from 0 to 499 with increasing 1) {
+            for (int k from 0 to 499 with increasing 1) {
+                double a_ik = A[i * N + k];
+                for (int j from 0 to 499 with increasing 1) {
+                    C[i * N + j] = C[i * N + j] + (a_ik * B[k * N + j]);
+                }
+            }
+        }
+        double matrixMs = (System.nanoTime() - t0) / 1000000.0;
+
+        // 3. PRIME SIEVE (10M elements)
+        int limit = 10000000;
+        bool[] isPrime = new bool[limit + 1];
+        Arrays.fill(isPrime, true);
+
+        t0 = System.nanoTime();
+        int p = 2;
+        while (p * p <= limit) {
+            if (isPrime[p]) {
+                int idx = p * p;
+                while (idx <= limit) {
+                    isPrime[idx] = false;
+                    idx = idx + p;
+                }
+            }
+            p = p + 1;
+        }
+        double sieveMs = (System.nanoTime() - t0) / 1000000.0;
+
+        // 4. PURE VIRTUAL DISPATCH LATENCY
+        OceanEntity entity = new OceanEntity();
+        entity.val = 0;
+        t0 = System.nanoTime();
+        for (int i from 0 to 99999999 with increasing 1) {
+            entity.speak();
+        }
+        double oopMs = (System.nanoTime() - t0) / 1000000.0;
+        double dispatchNs = (oopMs * 1000000.0) / 100000000.0;
+
+        OceanOutput("DYNAMIC_BENCH_RESULTS");
+        OceanOutput("FIB_MS:" + fibMs);
+        OceanOutput("MATRIX_MS:" + matrixMs);
+        OceanOutput("SIEVE_MS:" + sieveMs);
+        OceanOutput("OOP_DISPATCH_NS:" + dispatchNs);
+        OceanOutput("OOP_OVERHEAD_MS:" + oopMs);
+        
+        if (fsum == -44474457500000 && C[0] == 998.0 && C[249999] == 0.0 && entity.val == 99999999 && isPrime[2] == true && isPrime[4] == false) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

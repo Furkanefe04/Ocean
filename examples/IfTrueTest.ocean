@@ -1,0 +1,18 @@
+package com.resources;
+
+class IfTrueTest {
+    int function test() {
+        if (true) {
+            return 1;
+        }
+    }
+    
+    static main() {
+        IfTrueTest t = new IfTrueTest();
+        if (t.test() == 1) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

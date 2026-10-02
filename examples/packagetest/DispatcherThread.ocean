@@ -1,0 +1,52 @@
+package com.enterprise.notification;
+
+import java.lang.Thread;
+import java.lang.Exception;
+import com.enterprise.booking.BookingOrder;
+
+public interface TemplateEngine {
+    String function format(BookingOrder order);
+}
+
+public class EmailTemplateEngine implements TemplateEngine {
+    public String function format(BookingOrder order) {
+        if (order == null) return "";
+        return "EMAIL TICKET: Dear " + order.ticket.passenger.firstName + ", your seat " + order.ticket.seatNo + " is confirmed on flight " + order.ticket.flightNumber + ". Price: " + order.totalAmount;
+    }
+}
+
+public class Notification {
+    public BookingOrder order;
+    public String recipientEmail;
+
+    public static Notification function create(BookingOrder o, String email) {
+        Notification n = new Notification();
+        n.order = o;
+        n.recipientEmail = email;
+        return n;
+    }
+}
+
+public class DispatcherThread extends Thread {
+    public Notification notification;
+    public EmailTemplateEngine engine;
+    public bool isDone = false;
+
+    public static DispatcherThread function create(Notification n, EmailTemplateEngine eng) {
+        DispatcherThread t = new DispatcherThread();
+        t.notification = n;
+        t.engine = eng;
+        return t;
+    }
+
+    void function run() {
+        trying {
+            Thread.sleep(5L);
+            String formatted = engine.format(notification.order);
+            OceanOutput(formatted + " sent to " + notification.recipientEmail);
+            isDone = true;
+        } catch (Exception e) {
+            OceanOutput("Dispatcher error: " + e.getMessage());
+        }
+    }
+}

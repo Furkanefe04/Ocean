@@ -1,0 +1,92 @@
+package com.annotationtest;
+
+import java.lang.Class;
+import java.lang.reflect.Method;
+import java.lang.reflect.Field;
+import java.lang.annotation.Annotation;
+
+// Custom Annotation with Array Members & Default Values
+public annotation Secured {
+    String[] roles() default {"USER"};
+    int[] level() default {1};
+}
+
+@Secured(roles = {"ADMIN", "SUPERVISOR"}, level = {5, 10})
+public class AdvancedAnnotationArrayTest {
+
+    @Secured(roles = {"GUEST"})
+    public void function publicAccess() {
+        OceanOutput("Public access function");
+    }
+
+    @Secured
+    public void function defaultAccess() {
+        OceanOutput("Default access function");
+    }
+
+    static main() {
+        OceanOutput("=== ADVANCED ANNOTATION ARRAY TEST START ===");
+
+        bool classOk = false;
+        bool method1Ok = false;
+        bool method2Ok = false;
+
+        trying {
+            AdvancedAnnotationArrayTest instance = new AdvancedAnnotationArrayTest();
+            variable clazz = instance.getClass();
+            variable annoType = clazz.getClassLoader().loadClass("com.annotationtest.Secured");
+
+            // 1. Validate Class-level Array Annotation
+            Secured classAnno = (Secured) clazz.getAnnotation(annoType);
+            if (classAnno != null) {
+                String[] roles = classAnno.roles();
+                int[] levels = classAnno.level();
+                OceanOutput("Class Roles: " + roles[0] + ", " + roles[1]);
+                OceanOutput("Class Levels: " + levels[0] + ", " + levels[1]);
+
+                if (roles.length == 2 && roles[0].equals("ADMIN") && roles[1].equals("SUPERVISOR") && levels[0] == 5 && levels[1] == 10) {
+                    classOk = true;
+                }
+            }
+
+            // 2. Validate Method-level Custom Array Annotation Overrides
+            Method m1 = clazz.getMethod("publicAccess");
+            Secured m1Anno = (Secured) m1.getAnnotation(annoType);
+            if (m1Anno != null) {
+                String[] roles = m1Anno.roles();
+                int[] levels = m1Anno.level();
+                OceanOutput("Method1 Roles: " + roles[0]);
+                OceanOutput("Method1 Default Level: " + levels[0]);
+
+                if (roles.length == 1 && roles[0].equals("GUEST") && levels[0] == 1) {
+                    method1Ok = true;
+                }
+            }
+
+            // 3. Validate Method-level Default Annotation Values
+            Method m2 = clazz.getMethod("defaultAccess");
+            Secured m2Anno = (Secured) m2.getAnnotation(annoType);
+            if (m2Anno != null) {
+                String[] roles = m2Anno.roles();
+                int[] levels = m2Anno.level();
+                OceanOutput("Method2 Default Roles: " + roles[0]);
+                OceanOutput("Method2 Default Level: " + levels[0]);
+
+                if (roles.length == 1 && roles[0].equals("USER") && levels[0] == 1) {
+                    method2Ok = true;
+                }
+            }
+
+        } catch (Exception e) {
+            OceanOutput("Array Test Exception: " + e.getMessage());
+        }
+
+        if (classOk && method1Ok && method2Ok) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+
+        OceanOutput("=== ADVANCED ANNOTATION ARRAY TEST COMPLETED ===");
+    }
+}

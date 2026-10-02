@@ -1,0 +1,11 @@
+package com.resources;
+    class TestMath {
+    main() {
+        variable res = Math.sqrt(16.0);
+        if (res == 4) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

@@ -1,0 +1,68 @@
+package com.resources;
+
+class LockTestHelper {
+    private variable lockObj = new Object();
+    private int counter = 0;
+
+    public sync void function syncMethod() {
+        counter = counter + 10;
+    }
+
+    public int function incrementAndReturn() {
+        lock (lockObj) {
+            counter = counter + 1;
+            if (counter > 0) {
+                return counter;
+            }
+        }
+        return -1;
+    }
+
+    public String function nestedLockReturn(String prefix) {
+        variable innerLock = new Object();
+        lock (lockObj) {
+            lock (innerLock) {
+                return prefix + ":" + counter;
+            }
+        }
+    }
+
+    public int function loopLockStop() {
+        int sum = 0;
+        int i = 0;
+        while (i < 5) {
+            lock (lockObj) {
+                if (i == 3) {
+                    stop;
+                }
+                sum = sum + i;
+            }
+            i = i + 1;
+        }
+        return sum;
+    }
+}
+
+public class LockSyncStressTest {
+    main() {
+        OceanOutput("=== LOCK SYNC STRESS TEST START ===");
+
+        LockTestHelper helper = new LockTestHelper();
+        helper.syncMethod();
+
+        int val1 = helper.incrementAndReturn();
+        OceanOutput("Returned val1: " + val1);
+
+        String val2 = helper.nestedLockReturn("RESULT");
+        OceanOutput("Returned val2: " + val2);
+
+        int loopVal = helper.loopLockStop();
+        OceanOutput("Loop lock stop val: " + loopVal);
+
+        if (val1 == 11 && "RESULT:11".equals(val2) && loopVal == 3) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

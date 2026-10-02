@@ -1,0 +1,25 @@
+package com.resources;
+
+import java.util.*;
+import java.math.*;
+
+class ClassResolutionStressTest {
+    main() {
+        OceanOutput("=== CLASS RESOLUTION STRESS TEST START ===");
+
+        // Test java.util via wildcard import
+        ArrayList list = new ArrayList();
+        list.add("Hello Wildcard Import");
+        OceanOutput("List size: " + list.size());
+
+        // Test java.math.BigDecimal via explicit/wildcard import
+        BigDecimal num = new BigDecimal("123.45");
+        OceanOutput("BigDecimal value: " + num.toString());
+
+        if (list.size() == 1 && list.get(0).toString().equals("Hello Wildcard Import") && num.toString().equals("123.45")) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

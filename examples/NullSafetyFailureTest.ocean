@@ -1,0 +1,11 @@
+package com.resources;
+
+class NullSafetyFailureTest {
+    static main() {
+        String n = null;
+        int len = n.length(); // Should fail: Nullable member access
+        
+        String[] arr = null;
+        String val = arr[0];  // Should fail: Nullable array access
+    }
+}

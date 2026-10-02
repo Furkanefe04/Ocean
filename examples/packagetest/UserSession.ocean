@@ -1,0 +1,37 @@
+package com.enterprise.auth;
+
+import java.lang.Exception;
+
+public class UserSession {
+    public String username;
+    public String role;
+    public bool isActive;
+
+    public static UserSession function create(String u, String r) {
+        UserSession s = new UserSession();
+        s.username = u;
+        s.role = r;
+        s.isActive = true;
+        return s;
+    }
+}
+
+public class AuthManager {
+    public static void function verifyBookingAccess(UserSession s) throws Exception {
+        if (s == null) {
+            throw new Exception("No active session!");
+        }
+        if (!s.isActive) {
+            throw new Exception("Session has expired!");
+        }
+        if (!s.role.equals("CUSTOMER") && !s.role.equals("AGENT")) {
+            throw new Exception("Role " + s.role + " is not permitted to book flights!");
+        }
+    }
+
+    public static void function verifyAdminAccess(UserSession s) throws Exception {
+        if (s == null || !s.role.equals("ADMIN")) {
+            throw new Exception("Admin privileges required!");
+        }
+    }
+}

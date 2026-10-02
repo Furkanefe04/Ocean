@@ -1,0 +1,70 @@
+package com.resources;
+    class ComprehensiveTest {
+    int counter;
+    static int staticCounter;
+
+    function ComprehensiveTest() {
+        counter = 0;
+    }
+
+    main() {
+        OceanOutput("=== Compound Assignment ===");
+        int x = 10;
+        x += 5;
+        OceanOutput(x);
+        x -= 3;
+        OceanOutput(x);
+        x *= 2;
+        OceanOutput(x);
+        x /= 4;
+        OceanOutput(x);
+        x %= 3;
+        OceanOutput(x);
+
+        OceanOutput("=== Increment/Decrement ===");
+        int a = 5;
+        a++;
+        OceanOutput(a);
+        a--;
+        OceanOutput(a);
+        ++a;
+        OceanOutput(a);
+        --a;
+        OceanOutput(a);
+
+
+        OceanOutput("=== throw/catch ===");
+        bool exceptionCaught = false;
+        trying {
+            throw new Exception("Ocean throw works!");
+        } catch(Exception e) {
+            OceanOutput(e.getMessage());
+            if (e.getMessage() == "Ocean throw works!") {
+                exceptionCaught = true;
+            }
+        }
+
+        OceanOutput("=== instanceof ===");
+        variable obj = "Hello Ocean";
+        bool isString = false;
+        if(obj instanceof String) {
+            OceanOutput("obj is a String");
+            isString = true;
+        }
+        int num = 42;
+        OceanOutput("instanceof check passed");
+
+        OceanOutput("=== do-while ===");
+        int i = 0;
+        do {
+            OceanOutput(i);
+            i++;
+        } while(i < 3);
+
+        if (x == 0 && a == 5 && exceptionCaught && isString && i == 3) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

@@ -1,0 +1,61 @@
+package com.resources;
+    class ExtremeCompilerTest {
+    main() {
+        OceanOutput("=== EXTREME COMPILER CHALLENGE START ===");
+        variable passed = true;
+
+        // 1. 3D Arrays
+        variable cube = new int[2][2][2];
+        cube[0][0][0] = 1;
+        cube[1][1][1] = 8;
+        OceanOutput("Cube[1][1][1]: " + cube[1][1][1]);
+        if (cube[1][1][1] != 8) { passed = false; }
+
+        // 2. String Chain
+        variable s1 = "Zincir: ";
+        variable s2 = s1 + "A" + "B" + 100;
+        OceanOutput(s2);
+        if (s2 != "Zincir: AB100") { passed = false; }
+
+        // 3. Slot Reuse
+        {
+            variable x = 10;
+            OceanOutput("Block 1: " + x);
+            if (x != 10) { passed = false; }
+        }
+        {
+            variable y = 20;
+            OceanOutput("Block 2: " + y);
+            if (y != 20) { passed = false; }
+        }
+
+        // 4. Exception & DCE
+        variable exceptionCaught = false;
+        trying {
+            int x = 10 / 0;
+        } catch (ArithmeticException e) {
+            OceanOutput("Hata yakalandi.");
+            exceptionCaught = true;
+        } finally {
+            OceanOutput("Finally calisti.");
+            if (passed && exceptionCaught) {
+                OceanOutput("STATUS: PASSED");
+            } else {
+                OceanOutput("STATUS: FAILED");
+            }
+            //OceanOutput("HATA: Burasi gorunmemeli!");
+        }
+    }
+}
+
+class Animal {
+    void function noise() { OceanOutput("Animal noise"); }
+}
+
+class Dog extends Animal {
+    void function noise() { OceanOutput("Dog bark"); }
+}
+
+interface Producer {
+    Object function produce();
+}

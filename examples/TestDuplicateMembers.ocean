@@ -1,0 +1,10 @@
+package com.resources;
+
+class TestDuplicateMembers {
+    int counter;
+    String counter;
+
+    main() {
+        OceanOutput("DuplicateMembers");
+    }
+}

@@ -1,0 +1,31 @@
+package com.resources;
+
+import java.util.Date;
+
+abstract class BaseInterop {
+    abstract Date function getDate();
+    
+    void function printDate() {
+        Date d = getDate();
+        Output("Date from abstract: " + d.toString());
+    }
+}
+
+class DerivedInterop extends BaseInterop {
+    Date function getDate() {
+        return new Date();
+    }
+}
+
+class AbstractInteropTest {
+    main() {
+        variable test = new DerivedInterop();
+        test.printDate();
+        Date d = test.getDate();
+        if (d != null) {
+            Output("STATUS: PASSED");
+        } else {
+            Output("STATUS: FAILED");
+        }
+    }
+}

@@ -1,0 +1,25 @@
+package examples;
+
+class Fibonacci {
+    public static long function fib(int n) {
+        if (n <= 1) {
+            return (long) n;
+        }
+        variable a = 0L;
+        variable b = 1L;
+        for (int i from 2 to n with increasing 1) {
+            value temp = a + b;
+            a = b;
+            b = temp;
+        }
+        return b;
+    }
+
+    main() {
+        OceanOutput("=== Ocean Fibonacci Sequence ===");
+        for (int i from 0 to 10 with increasing 1) {
+            value result = fib(i);
+            OceanOutput($"fib({i}) = {result}");
+        }
+    }
+}

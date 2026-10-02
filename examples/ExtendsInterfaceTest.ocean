@@ -1,0 +1,14 @@
+package com.resources;
+
+interface MyInterface {
+}
+
+class Child extends MyInterface {
+}
+
+class ExtendsInterfaceTest {
+    static main() {
+        Child c = new Child();
+        OceanOutput("ExtendsInterfaceTest compiled!");
+    }
+}

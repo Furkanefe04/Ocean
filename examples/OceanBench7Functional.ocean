@@ -1,0 +1,20 @@
+package com.resources;
+
+class OceanBench7Functional {
+    static main() {
+        int n = 3000000;
+        int[] arr = new int[n];
+        for (int i from 0 to n - 1 with increasing 1) {
+            arr[i] = i;
+        }
+        long start = System.nanoTime();
+        long sum = 0L;
+        for (int i from 0 to n - 1 with increasing 1) {
+            if (arr[i] % 2 == 0) {
+                sum = sum + arr[i] * 3L;
+            }
+        }
+        long end = System.nanoTime();
+        OceanOutput("pipeline_sum=" + sum + " | time_ms=" + ((end - start) / 1000000));
+    }
+}

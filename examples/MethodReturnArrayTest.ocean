@@ -1,0 +1,16 @@
+class MethodReturnArrayTest {
+    public int[] function test(){
+        variable arr = {10,20,30};
+        return arr;
+    }
+
+    main(){
+        MethodReturnArrayTest test = new MethodReturnArrayTest();
+        if (test.test()[1] == 20) {
+            OceanOutput("STATUS: PASSED");
+        }
+        else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

@@ -1,0 +1,26 @@
+package Test;
+
+class Main {
+
+    main(){
+        trying {
+            variable data1 = Data.build("EAX 4",2);
+            variable data2 = Data.build("MOV 3",6);
+            data2.set(2);
+            // Data errData = Data.build("MOV 5",4);
+            Processor processor = new ARMProcessor("Samsung exynos 2400",4);
+            Processor processor2 = new x64Processor("AMD Ryzen 7 8845hs",8);
+            variable output = processor.process(data1);
+            variable out = processor2.process(data2);
+            OceanOutput(output);
+            OceanOutput(out);
+            OceanOutput(processor.getClass().toString());
+        } catch (ProcessorException | DataTypeException e) {
+            OceanOutput("Exception: " + e.getMessage());
+        }
+    }
+
+    public static void Data.function set(int len){
+        this.setCommandLenght(len);
+    }
+}

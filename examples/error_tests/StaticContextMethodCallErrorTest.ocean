@@ -1,0 +1,11 @@
+package tests;
+
+class StaticContextMethodCallErrorTest {
+    main() {
+        nonStaticMethod();
+    }
+
+    void function nonStaticMethod() {
+        OceanOutput("Should fail because called directly from static context (main)");
+    }
+}

@@ -1,0 +1,87 @@
+package com.resources;
+
+import java.util.function.BiFunction;
+
+
+public class OptimizerStressTest {
+
+    main() {
+
+        variable start = System.nanoTime();
+
+        variable total = new int[1];
+
+        variable obj = new StressObject("CORE");
+
+        for (variable i from 0 to 2000000 with increasing 1) {
+
+            obj.tick();
+
+            total[0] = total[0] + obj.val;
+
+            if (i % 4 == 0) {
+                obj.flip();
+            }
+
+            if (i % 7 == 0) {
+                obj.inc(2);
+            }
+
+            if (i % 10 == 0) {
+                obj.reset();
+            }
+
+            if (i % 100 == 0) {
+                OceanOutput("checkpoint => " + i + " total=" + total[0]);
+            }
+        }
+
+        variable fn = (BiFunction) (a, b) -> a * b + total[0];
+
+        variable resultx = fn(6, 7);
+
+        variable end = System.nanoTime();
+
+        variable diff = (end - start) / 1000000000.0;
+
+        OceanOutput("RESULT => " + resultx);
+        OceanOutput("TIME => " + diff);
+        if (resultx == 13571460) {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}
+
+
+class StressObject {
+
+    public variable val = 1;
+    public variable state = false;
+    public variable name;
+
+    function StressObject(String name) {
+        this.name = name;
+    }
+
+    void function tick() {
+        val = val + 1;
+    }
+
+    void function inc(int x) {
+        val = val + x;
+    }
+
+    void function flip() {
+        if (state == false) {
+            state = true;
+        } else {
+            state = false;
+        }
+    }
+
+    void function reset() {
+        val = 0;
+    }
+}

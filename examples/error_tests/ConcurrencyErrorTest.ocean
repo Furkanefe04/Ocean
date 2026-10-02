@@ -1,0 +1,10 @@
+package tests;
+
+class ConcurrencyErrorTest {
+    static main() {
+        // Locking on a primitive (5 is int) should trigger semantic analysis error
+        lock(5) {
+            OceanOutput("Should not compile");
+        }
+    }
+}

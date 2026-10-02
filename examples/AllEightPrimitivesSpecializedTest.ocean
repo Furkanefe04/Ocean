@@ -1,0 +1,48 @@
+package com.resources;
+
+class AllEightPrimitivesSpecializedTest {
+     main() {
+        OceanOutput("=== ALL 8 PRIMITIVE SPECIALIZED LISTS TEST START ===");
+
+        variable intList = [10, 20];
+        variable longList = [100L, 200L];
+        variable doubleList = [1.5d, 2.5d];
+        variable floatList = [1.1f, 2.2f];
+        variable boolList = [true, false];
+        variable byteList = [(byte) 1, (byte) 2];
+        variable shortList = [(short) 10, (short) 20];
+        variable charList = ['A', 'B'];
+
+        OceanOutput("1. IntList size: " + intList.size() + ", get(0): " + intList.get(0));
+        OceanOutput("2. LongList size: " + longList.size() + ", get(1): " + longList.get(1));
+        OceanOutput("3. DoubleList size: " + doubleList.size() + ", get(0): " + doubleList.get(0));
+        OceanOutput("4. FloatList size: " + floatList.size() + ", get(1): " + floatList.get(1));
+        OceanOutput("5. BoolList size: " + boolList.size() + ", get(0): " + boolList.get(0));
+        OceanOutput("6. ByteList size: " + byteList.size() + ", get(1): " + byteList.get(1));
+        OceanOutput("7. ShortList size: " + shortList.size() + ", get(0): " + shortList.get(0));
+        OceanOutput("8. CharList size: " + charList.size() + ", get(1): " + charList.get(1));
+
+        if (intList.getInt(0) == 10 &&
+            longList.getLong(1) ==(long) 200 &&
+            doubleList.getDouble(0) ==(double) 1.5 &&
+            floatList.getFloat(1) ==(float) 2.2 &&
+            boolList.getBool(0) == true &&
+            byteList.getByte(1) == 2 &&
+            shortList.getShort(0) == 10 &&
+            charList.getChar(1) == 'B'
+        )
+        {
+            OceanOutput("STATUS: PASSED");
+        } else {
+            OceanOutput(intList.getInt(0) == 10);
+            OceanOutput(longList.getLong(1) == 200L);
+            OceanOutput(doubleList.getDouble(0) == 1.5d);
+            OceanOutput(floatList.getFloat(1));
+            OceanOutput(boolList.getBool(0) == true);
+            OceanOutput(byteList.getByte(1) == 2);
+            OceanOutput(shortList.getShort(0) == 10);
+            OceanOutput(charList.getChar(1) == 'B');
+            OceanOutput("STATUS: FAILED");
+        }
+    }
+}

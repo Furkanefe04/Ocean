@@ -1,0 +1,14 @@
+class TypeSystemAssignabilityCheckTest {
+    static void function main() {
+        int x = 42;
+        long y = x;
+        double d = y;
+        String s = "Ocean Compiler";
+        Object obj = s;
+
+        OceanList list = new OceanList();
+        Object listObj = list;
+
+        OceanOutput("Assignability test passed: " + obj + " " + d);
+    }
+}
